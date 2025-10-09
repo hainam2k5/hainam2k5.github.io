@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+        ProductDetails {display: none;}
+        Product img {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            box-shadow: 5px 5px 10px #aaa;
+        }
+        ProductName {font-weight: bold;}
+        ProductPrice {font-style: italic;}
+        ProductPrice:before {content: "-";}
+        Product {
+            text-align: center;
+            width: 150px;
+            margin: 0px 20px;
+            float: left;
+            cursor: pointer;
+        }
+        Product:hover .ProductDetails {display: block;}
+    </style>
+</head>
+<body>
+    <link rel="stylesheet" href="BT1.css">
+    <div>
+        <div class="Product">
+            <img src="apple.png" />
+            <div class="ProductDetails">
+                <span class="ProductName">Apple</span>
+                <span class="ProductPrice">50K</span>
+            </div>
+        </div>
+        <div class="Product">
+            <img src="banana.png" />
+            <div class="ProductDetails">
+                <span class="ProductName">Banana</span>
+                <span class="ProductPrice">30K</span>
+            </div>
+        </div>
+        <div class="Product">
+            <img src="kiwi.png" />
+            <div class="ProductDetails">
+                <span class="ProductName">Kiwi</span>
+                <span class="ProductPrice">70K</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
