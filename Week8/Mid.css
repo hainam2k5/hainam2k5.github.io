@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 40px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    font-size: 1.2em;
+    margin: 10px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+li::before {
+    content: "●";
+    position: absolute;
+    left: 0;
+}
+
+li:nth-child(1)::before {
+    color: #16a085; 
+}
+
+li:nth-child(2)::before {
+    color: #e74c3c;
+}
+
+li:nth-child(3)::before {
+    color: #f1c40f;
+}

@@ -1,0 +1,31 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.menu {
+  list-style: none;
+  width: 180px;
+  padding: 0;
+  margin: 20px;
+}
+
+.menu li {
+  padding: 10px;
+  margin-bottom: 5px;
+  color: white;
+  background: linear-gradient(to right, #0099ff, #66ccff);
+  border-radius: 5px;
+  position: relative;
+}
+
+.menu li::before {
+  content: "•";
+  margin-right: 8px;
+  color: yellow;
+}
+
+.menu li:hover {
+  background-color: yellow;
+  color: black;
+  cursor: pointer;
+}
