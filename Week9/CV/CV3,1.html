@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+</head>
+<body>
+    <link rel="stylesheet" href="CV.css">
+    <nav id="topmenu">
+        <ul>
+            <li><a href="#hocvanme">Học Vấn</a></li>
+            <li><a href="#kinhnghiem">Kinh Nghiệm</a></li>
+            <li><a href="#sothich">Sở Thích</a></li>
+            <li><a href="#video">Video</a></li>
+        </ul>
+    </nav>
+    <header style="text-align: center;">
+        <img src="bear.jpg" alt="Hình ảnh của mình" style="border-radius: 50%;">
+    </header>
+    
+    <hr>
+
+    <section>
+        <h1 style="color: darkcyan;">Nguyen Ngoc Hai Nam</h1>
+        <h3>Ngay sinh: 01/01/2005
+            <br>
+            Dia chi: Ha Noi
+            <br>
+            Email: namnnh89@gmail.com
+        </h3>
+
+        <a style="color: coral;"> For more infomations about me:</a>
+        <br>
+        <a href="https://en.wikipedia.org/wiki/Brown_bear" target="_blank">More Infomations</a>
+    </section>
+
+    <hr>    
+
+    <section> 
+    <h2>Hoc van</h2>
+    <details>
+            <summary><b>Trường Quốc Tế - Đại học Quốc Gia Hà Nội</b></summary>
+            <ul>
+                <li>Ngành: Hệ thống thông tin quản lí</li>
+                <li>Sinh viên năm 3</li>
+            </ul>
+        </details>
+    </section>
+
+        <hr>
+<section>
+    <h2>Kinh nghiem lam viec</h2>
+    <p>Chua co kinh nghiem di thuc tap</p>
+</section>
+ 
+<hr>
+
+<section>
+    <h2>So thich</h2>
+    <ol type="disc">
+       <details>
+           <summary><b>Nghe nhac</b></summary>
+           <ul>
+               <li>pop</li>
+               <li>rock</li>
+               <li>ballad</li>
+           </ul>
+       </details>
+       <details>
+           <summary><b>Choi game</b></summary>
+           <ul>
+               <li>horror</li>
+           </ul>
+       </details>
+       <details>
+           <summary><b>Doc truyen</b></summary>
+           <ul>
+               <li>comedy</li>
+               <li>manga</li>
+           </ul>
+       </details>
+
+        </ul>
+    </ol>  
+    </section>
+
+<hr>
+    <header style="text-align: center;">
+    <h2 style="color: crimson;">Some videos about decoration</h2>
+
+    <video
+        width="320"
+        height="240"
+        controls
+        >
+        <source src="Video for week 4.mp4" type="video/mp4">
+    </video>
+    </header>
+</hr>
+
+<hr>
+    <div class="container" style="text-align: center;">
+        <h1>Contact Form</h1>
+        <h3>Liên hệ với tôi</h3>
+
+        <form>
+            <label for="course1">
+                <input type="checkbox" name="courses_attended" id="course1" value="course1">
+                Course 1
+            <label for="course2">
+                <input type="checkbox" name="courses_attended" id="course2" value="course2">
+                Course 2
+            </label>
+            
+            <br>
+
+            <label for="prefered_contact">Your prefered contact</label>
+            <div class="radio-group">
+                <label for="contact_email">
+                    <input type="radio" name="prefered_contact" id="contact_email" value="email">
+                    Email
+                </label>
+                <label for="contact_phone">
+                    <input type="radio" name="prefered_contact" id="contact_phone" value="phone">
+                    Phone
+                </label>
+            </div>
+
+            <br>
+
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other" selected>Other</option>
+            </select>
+
+            <br>
+
+            <label for="file">Upload File</label>
+            <input type="file" name="file" id="file">
+
+            <br>
+
+            <label for="large_text">Message</label>
+            <textarea name="large_text" id="large_text" rows="5"></textarea>
+
+            <br>
+
+            <div class="button-group">
+                <input type="submit" value="Submit">
+                <input type="reset" value="Reset">
+            </div>
+        </form>
+
+        <hr>
+
+        <div class="info-section" style="text-align: center;">
+            <p><strong>Thông Tin Liên Hệ:</strong></p>
+            <p>Email: <a href="mailto:namnnh89@gmail.com">namnnh89@gmail.com</a></p>
+            <p>Địa chỉ: Hà Nội, Việt Nam</p>
+        </div>
+    </div>
+    </script>
+
+
+</body>
+</html>
