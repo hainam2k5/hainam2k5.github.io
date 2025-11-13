@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register New Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .header {
+            background: #004080;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        td {
+            padding: 8px;
+        }
+        
+        td:first-child {
+            text-align: right;
+            width: 150px;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 5px;
+        }
+        
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        
+        .buttons {
+            text-align: center;
+            padding-top: 15px;
+        }
+        
+        button {
+            padding: 8px 20px;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">REGISTER NEW ACCOUNT</div>
+    
+    <form id="registrationForm" onsubmit="return formValid()">
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" id="username" name="username"></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" id="password" name="password"></td>
+            </tr>
+            <tr>
+                <td>Confirm password:</td>
+                <td><input type="password" id="confirmPassword" name="confirmPassword"></td>
+            </tr>
+            <tr>
+                <td>Gender:</td>
+                <td>
+                    <input type="radio" name="gender" value="male" id="male">
+                    <label for="male">Male</label>
+                    <input type="radio" name="gender" value="female" id="female">
+                    <label for="female">Female</label>
+                </td>
+            </tr>
+            <tr>
+                <td>Phone:</td>
+                <td><input type="text" id="phone" name="phone"></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" id="email" name="email"></td>
+            </tr>
+            <tr>
+                <td>Favourite:</td>
+                <td>
+                    <input type="checkbox" name="favourite" value="music" id="music">
+                    <label for="music">Music</label>
+                    <input type="checkbox" name="favourite" value="reading" id="reading">
+                    <label for="reading">Reading</label>
+                </td>
+            </tr>
+            <tr>
+                <td>Picture:</td>
+                <td>
+                    <input type="file" id="picture" name="picture">
+                </td>
+            </tr>
+            <tr>
+                <td>Description:</td>
+                <td><textarea id="description" name="description"></textarea></td>
+            </tr>
+            <tr>
+                <td>Education level:</td>
+                <td>
+                    <select id="education" name="education">
+                        <option value="">Select</option>
+                        <option value="dutch">Dutch</option>
+                        <option value="english">English</option>
+                        <option value="french">French</option>
+                        <option value="spanish">Spanish</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Language:</td>
+                <td>
+                    <select id="language" name="language">
+                        <option value="">Select</option>
+                        <option value="dutch">Dutch</option>
+                        <option value="english">English</option>
+                        <option value="french">French</option>
+                        <option value="spanish">Spanish</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        
+        <div class="buttons">
+            <button type="submit">Register</button>
+            <button type="reset">Reset</button>
+        </div>
+    </form>
+    
+    <script>
+        function formValid() {
+            const f = document.getElementById('registrationForm');
+            
+            // Username validation
+            const username_pattern = /^[a-zA-Z][a-zA-Z0-9_]{5,17}$/;
+            if (f.username.value === "") {
+                alert("Username can't be empty!");
+                f.username.focus();
+                return false;
+            }
+            if (username_pattern.test(f.username.value) === false) {
+                alert("Invalid username!");
+                f.username.focus();
+                return false;
+            }
+            
+            // Password length validation
+            if (f.password.value.length < 6 || f.password.value.length > 20) {
+                alert("Password length must be from 6 to 20 characters!");
+                f.password.focus();
+                return false;
+            }
+            
+            // Password confirmation validation
+            if (f.password.value !== f.confirmPassword.value) {
+                alert("Passwords doesn't match!");
+                f.confirmPassword.focus();
+                return false;
+            }
+            
+            // Phone validation
+            const phone_pattern = /^\d{3}-\d{3}-\d{4}$/;
+            if (phone_pattern.test(f.phone.value) === false) {
+                alert("Invalid phone number!");
+                f.phone.focus();
+                return false;
+            }
+            
+            // Email validation
+            if (f.email.value.indexOf("@") === -1 || f.email.value.indexOf(".") === -1) {
+                alert("Invalid email address!");
+                f.email.focus();
+                return false;
+            }
+            
+            // Gender validation
+            const genderChecked = document.querySelector('input[name="gender"]:checked');
+            if (!genderChecked) {
+                alert("You must select gender!");
+                return false;
+            }
+            
+            // Favourite validation
+            const favouriteChecked = document.querySelectorAll('input[name="favourite"]:checked');
+            if (favouriteChecked.length === 0) {
+                alert("You must select at least one favourite!");
+                return false;
+            }
+            
+            // Picture validation
+            if (f.picture.value === "") {
+                alert("You must select your picture!");
+                f.picture.focus();
+                return false;
+            }
+            
+            // Description validation
+            if (f.description.value === "") {
+                alert("You must enter description!");
+                f.description.focus();
+                return false;
+            }
+            
+            // Education level validation
+            if (f.education.value === "") {
+                alert("You must select education level!");
+                f.education.focus();
+                return false;
+            }
+            
+            // Language validation
+            if (f.language.value === "") {
+                alert("You must select language!");
+                f.language.focus();
+                return false;
+            }
+            
+            alert("All register information are correct!");
+            return true;
+        }
+    </script>
+</body>
+</html>
