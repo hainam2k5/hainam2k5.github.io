@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ex2</title>
+    <style>
+        .menu-section {
+            margin: 15px 0;
+        }
+        
+        .menu-section h3 {
+            color: black;
+            margin-bottom: 10px;
+        }
+        
+        .menu-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-left: 3px solid #007bff;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Ex2</h2>
+    <h2>Menu</h2>
+        <div class="menu-section">
+            <h3>Appetizers®</h3>
+            <div class="menu-item vegetarian">Salad ≥ 20.000VNĐ</div>
+            <div class="menu-item">Salad ngỗng ≥ 35.000VNĐ</div>
+        </div>
+        <div class="menu-section">
+            <h3>Main Course §</h3>
+            <div class="menu-item">Mỳ bò ≥ 45.000VNĐ</div>
+            <div class="menu-item vegetarian">Mỳ chay ≥ 45.000VNĐ</div>
+        </div>
+        <div class="menu-section">
+            <h3>Desserts</h3>
+            <div class="menu-item">Kem ≥ 12.000VNĐ</div>
+            <div class="menu-item vegetarian">Hoa quả ≥ 30.000VNĐ</div>
+        </div>
+        <div class="menu-section">
+            <h3>Drinks</h3>
+            <div class="menu-item">Soda ≥ 15.000VNĐ</div>
+            <div class="menu-item">Cà phê ≥ 35.000VNĐ</div>
+            <div class="menu-item vegetarian">Nước cam vắt ≥ 40.000VNĐ</div>
+        </div>
+        <button onclick="filterMenu()">Filter Menu</button>
+        <script>
+            var showAll = true;
+        function filterMenu() {
+            var items = document.getElementsByClassName('menu-item');
+            if (showAll) {
+                for (var i = 0; i < items.length; i++) {
+                    if (!items[i].classList.contains('vegetarian')) {  
+                        items[i].classList.add('hidden');
+                    }
+                }
+                showAll = false;
+            } else {
+                for (var i = 0; i < items.length; i++) {
+                    items[i].classList.remove('hidden');
+                }
+                showAll = true;
+            }
+        }
+        </script>
+</body>
+</html>

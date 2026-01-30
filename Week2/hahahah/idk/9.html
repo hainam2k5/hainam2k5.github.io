@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 9: Product Showcase</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 9:
+    ==========================================
+    YÊU CẦU:
+    1. Grid 4 product cards: tên, giá, mô tả
+    2. HTML entities: ®, €, →
+    3. Box-shadow và hover effects
+    4. Button "Toggle Price" ẩn/hiện giá
+    5. Sử dụng getElementsByClassName()
+    
+    JAVASCRIPT: Cần để toggle price
+    -->
+    
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== BODY ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== HEADING ===== */
+        h1 {
+            color: #4facfe;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 36px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+        
+        /* ===== PRODUCT GRID với CSS GRID ===== */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+            /* Giải thích CSS GRID:
+            - display: grid → Kích hoạt CSS Grid
+            - repeat(auto-fit, ...) → Tự động điều chỉnh số cột
+            - minmax(250px, 1fr) → Tối thiểu 250px, tối đa 1fr (chia đều)
+            - gap: 30px → Khoảng cách giữa cards
+            */
+        }
+        
+        /* ===== PRODUCT CARD ===== */
+        .product-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            /* Giải thích:
+            - box-shadow: x y blur spread color → Đổ bóng
+            - transition: all 0.3s → Hiệu ứng mượt cho mọi thay đổi
+            */
+        }
+        
+        /* ===== HOVER EFFECT ===== */
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(79, 172, 254, 0.4);
+            border-color: #4facfe;
+            /* Giải thích:
+            - transform: translateY(-10px) → Dịch lên 10px
+            - scale(1.03) → Phóng to 103%
+            - Kết hợp tạo hiệu ứng "nổi lên"
+            */
+        }
+        
+        /* ===== PRODUCT NAME ===== */
+        .product-card h3 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+        
+        /* ===== PRICE ===== */
+        .product-price {
+            color: #4facfe;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        /* ===== DESCRIPTION ===== */
+        .product-card p {
+            color: #666;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        
+        /* ===== TOGGLE BUTTON ===== */
+        button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s;
+            display: block;
+            margin: 30px auto;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 172, 254, 0.6);
+        }
+        
+        /* ===== EXPLANATION ===== */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛍️ Bài 9: Product Showcase</h1>
+        <p class="subtitle">Premium Tech Products</p>
+        
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+                <h3>Smart Watch &reg;</h3>
+                <p class="product-price price">299 &euro;</p>
+                <p>Track your fitness goals and stay connected &rarr;</p>
+            </div>
+            
+            <!-- Product 2 -->
+            <div class="product-card">
+                <h3>Wireless Earbuds</h3>
+                <p class="product-price price">149 &euro;</p>
+                <p>Premium sound quality with noise cancellation &rarr;</p>
+            </div>
+            
+            <!-- Product 3 -->
+            <div class="product-card">
+                <h3>Laptop Stand &reg;</h3>
+                <p class="product-price price">79 &euro;</p>
+                <p>Ergonomic design for better posture &rarr;</p>
+            </div>
+            
+            <!-- Product 4 -->
+            <div class="product-card">
+                <h3>USB Hub</h3>
+                <p class="product-price price">39 &euro;</p>
+                <p>Expand your connectivity with 7 ports &rarr;</p>
+            </div>
+        </div>
+        
+        <button onclick="togglePrice()">💰 Toggle Price Display</button>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>class="price"</code> - Class để đánh dấu giá</li>
+                <li><code>onclick="togglePrice()"</code> - Gọi hàm khi click</li>
+            </ul>
+            
+            <h2>🔤 HTML Entities:</h2>
+            <ul>
+                <li><code>&amp;reg;</code> → &reg; (Registered)</li>
+                <li><code>&amp;euro;</code> → &euro; (Euro)</li>
+                <li><code>&amp;rarr;</code> → &rarr; (Right arrow)</li>
+            </ul>
+            
+            <h2>🎨 CSS Grid Chi Tiết:</h2>
+            <ul>
+                <li><code>display: grid</code> - Kích hoạt CSS Grid</li>
+                <li><code>grid-template-columns</code> - Định nghĩa số cột</li>
+                <li><code>repeat(auto-fit, ...)</code> - Tự động điều chỉnh số cột</li>
+                <li><code>minmax(250px, 1fr)</code> - Min 250px, max chia đều</li>
+                <li><code>gap: 30px</code> - Khoảng cách giữa cards</li>
+            </ul>
+            
+            <h2>🎨 Transform và Hover:</h2>
+            <ul>
+                <li><code>transform: translateY(-10px)</code> - Dịch lên 10px</li>
+                <li><code>transform: scale(1.03)</code> - Phóng to 103%</li>
+                <li><code>box-shadow</code> - Đổ bóng (x, y, blur, spread, color)</li>
+                <li><code>:hover</code> - Pseudo-class khi rê chuột</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+var pricesVisible = true;
+
+function togglePrice() {
+    var prices = document.getElementsByClassName('price');
+    
+    if (pricesVisible) {
+        // Ẩn giá
+        for (var i = 0; i < prices.length; i++) {
+            prices[i].style.display = 'none';
+        }
+        pricesVisible = false;
+    } else {
+        // Hiện giá
+        for (var i = 0; i < prices.length; i++) {
+            prices[i].style.display = 'block';
+        }
+        pricesVisible = true;
+    }
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>var pricesVisible = true</code> - Biến theo dõi trạng thái</li>
+                <li><code>getElementsByClassName('price')</code> - Lấy TẤT CẢ giá</li>
+                <li><code>.style.display = 'none'</code> - Ẩn phần tử</li>
+                <li><code>.style.display = 'block'</code> - Hiện phần tử</li>
+                <li><code>for loop</code> - Duyệt qua từng giá</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Hover card → Card nổi lên và phóng to</li>
+                <li>Click "Toggle Price" lần 1 → Giá ẩn</li>
+                <li>Click lần 2 → Giá hiện lại</li>
+                <li>Responsive: Thu nhỏ màn hình → Grid tự điều chỉnh</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        var pricesVisible = true;
+        
+        /**
+         * HÀM BẬT/TẮT HIỂN THỊ GIÁ
+         */
+        function togglePrice() {
+            console.log('Toggle price button clicked');
+            console.log('Current state:', pricesVisible ? 'Visible' : 'Hidden');
+            
+            var prices = document.getElementsByClassName('price');
+            console.log('Number of prices:', prices.length);
+            
+            if (pricesVisible) {
+                // Ẩn tất cả giá
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'none';
+                    console.log('Hidden price', i + 1);
+                }
+                pricesVisible = false;
+            } else {
+                // Hiện tất cả giá
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'block';
+                    console.log('Shown price', i + 1);
+                }
+                pricesVisible = true;
+            }
+            
+            console.log('New state:', pricesVisible ? 'Visible' : 'Hidden');
+        }
+    </script>
+</body>
+</html>

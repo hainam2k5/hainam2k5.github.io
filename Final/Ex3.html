@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ex3</title>
+    <style>
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            color: black;
+        }
+        
+        .form-group input {
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .password-strength {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .weak { background-color: white; color: red; }
+        .medium { background-color: white; color: yellow; }
+        .strong { background-color: white; color: green; }
+        
+        </style>
+</head>
+<body>
+    <h2>Ex 3</h2>
+        <form class="registration-form">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="username" minlength="5" maxlength="15">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" onkeyup="checkPasswordStrength()">
+                <div id="strength" class="password-strength" style="display:none;"></div>
+            </div>
+            <div class="form-group">
+                <label>Profile Picture:</label>
+                <input type="file" accept=".jpg,.png">
+            </div>
+            <button type="submit">Đăng Ký</button>
+        </form>
+<script>
+    function checkPasswordStrength() {
+            var password = document.getElementById('password').value;
+            var strength = document.getElementById('strength');
+            
+            if (password.length === 0) {
+                strength.style.display = 'none';
+                return;
+            }
+            
+            strength.style.display = 'block';
+            var hasNumbers = /\d/.test(password);
+            var hasLetters = /[a-zA-Z]/.test(password);
+            
+            if (password.length <= 5 || !hasNumbers || !hasLetters) {
+                strength.className = 'password-strength weak';
+                strength.textContent = 'Weak';
+            } else if (password.length < 10) {
+                strength.className = 'password-strength medium';
+                strength.textContent = 'Medium';
+            } else { 
+                strength.className = 'password-strength strong';
+                strength.textContent = 'Strong';
+            }
+        }
+</script>
+</body>
+</html>

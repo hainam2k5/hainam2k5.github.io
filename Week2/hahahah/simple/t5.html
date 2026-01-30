@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+            border-bottom: none;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 4px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h2>Exercise 5: Tabbed Content Interface</h2>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">Features &reg; -></div>
+            <div class="tab" onclick="switchTab(1)">Pricing &euro; -></div>
+            <div class="tab" onclick="switchTab(2)">Reviews -></div>
+            <div class="tab" onclick="switchTab(3)">Support -></div>
+        </div>
+        <div class="tab-content active" id="content0">
+            <h3>Features</h3>
+            <p>Our product includes amazing features like responsive design, fast performance, and user-friendly interface.</p>
+        </div>
+        <div class="tab-content" id="content1">
+            <h3>Pricing</h3>
+            <p>Basic Plan: $9.99/month | Premium Plan: $19.99/month | Enterprise: Contact us</p>
+        </div>
+        <div class="tab-content" id="content2">
+            <h3>Reviews</h3>
+            <p>Our customers love us! Average rating: 4.8/5 stars based on 1,234 reviews.</p>
+        </div>
+        <div class="tab-content" id="content3">
+            <h3>Support</h3>
+            <p>24/7 customer support available via email, phone, and live chat.</p>
+        </div>
+        <script>
+            function switchTab(tabIndex) {
+                var tabs = document.querySelectorAll('.tab');
+                var contents = document.querySelectorAll('.tab-content');
+                
+                tabs.forEach(tab => tab.classList.remove('active'));
+                contents.forEach(content => content.classList.remove('active'));
+                
+                tabs[tabIndex].classList.add('active');
+                contents[tabIndex].classList.add('active');
+            }
+        </script>
+    </body>
+</html>

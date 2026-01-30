@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 1: User Registration Form</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 1:
+    ==========================================
+    YÊU CẦU:
+    1. Form có 3 trường: Username, Password, Profile Picture
+    2. Validation:
+       - Username: 5-15 ký tự
+       - Password: phải có số và chữ
+       - File: JPG/PNG
+    3. Sử dụng Flexbox layout
+    4. Password strength indicator CẬP NHẬT REAL-TIME
+    
+    JAVASCRIPT: Cần để hiển thị password strength khi gõ
+    -->
+    
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* BODY */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        /* CONTAINER */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 15px;
+        }
+        
+        /* FLEXBOX LAYOUT */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* LABEL */
+        label {
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        /* INPUT */
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        /* PASSWORD STRENGTH INDICATOR */
+        #strength {
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .weak {
+            background-color: #ffcccc;
+            color: #cc0000;
+            border: 2px solid #cc0000;
+        }
+        
+        .medium {
+            background-color: #fff4cc;
+            color: #cc8800;
+            border: 2px solid #cc8800;
+        }
+        
+        .strong {
+            background-color: #ccffcc;
+            color: #00cc00;
+            border: 2px solid #00cc00;
+        }
+        
+        /* HELPER TEXT */
+        .helper-text {
+            font-size: 12px;
+            color: #888;
+            font-style: italic;
+        }
+        
+        /* BUTTON */
+        button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* EXPLANATION */
+        .explanation {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-left: 4px solid #007bff;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .explanation ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bài 1: Form Đăng Ký User</h1>
+        
+        <form>
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    minlength="5" 
+                    maxlength="15"
+                    placeholder="Nhập 5-15 ký tự"
+                    required
+                >
+                <span class="helper-text">Từ 5 đến 15 ký tự</span>
+            </div>
+            
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input 
+                    type="password" 
+                    id="password"
+                    onkeyup="checkPasswordStrength()"
+                    placeholder="Nhập password"
+                    required
+                >
+                <span class="helper-text">Phải có cả chữ và số</span>
+                <div id="strength"></div>
+            </div>
+            
+            <!-- Profile Picture -->
+            <div class="form-group">
+                <label for="profile">Profile Picture:</label>
+                <input 
+                    type="file" 
+                    id="profile"
+                    accept=".jpg,.png"
+                >
+                <span class="helper-text">Chỉ JPG hoặc PNG</span>
+            </div>
+            
+            <button type="submit">Đăng Ký</button>
+        </form>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>minlength="5"</code> - Tối thiểu 5 ký tự</li>
+                <li><code>maxlength="15"</code> - Tối đa 15 ký tự</li>
+                <li><code>required</code> - Bắt buộc nhập</li>
+                <li><code>accept=".jpg,.png"</code> - Chỉ JPG/PNG</li>
+                <li><code>onkeyup="checkPasswordStrength()"</code> - Gọi hàm khi nhả phím</li>
+            </ul>
+            
+            <h2>🎨 Giải Thích CSS Flexbox:</h2>
+            <ul>
+                <li><code>display: flex;</code> - Kích hoạt Flexbox</li>
+                <li><code>flex-direction: column;</code> - Sắp xếp theo cột dọc</li>
+                <li><code>gap: 20px;</code> - Khoảng cách giữa items</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+function checkPasswordStrength() {
+    // Lấy giá trị password
+    var password = document.getElementById('password').value;
+    var strength = document.getElementById('strength');
+    
+    // Nếu rỗng, ẩn indicator
+    if (password.length === 0) {
+        strength.innerHTML = '';
+        strength.className = '';
+        return;
+    }
+    
+    // Kiểm tra có số và chữ
+    var hasNumbers = /\d/.test(password);
+    var hasLetters = /[a-zA-Z]/.test(password);
+    
+    // Đánh giá độ mạnh
+    if (password.length < 6 || !hasNumbers || !hasLetters) {
+        strength.innerHTML = 'Weak - Yếu';
+        strength.className = 'weak';
+    } else if (password.length < 10) {
+        strength.innerHTML = 'Medium - Trung bình';
+        strength.className = 'medium';
+    } else {
+        strength.innerHTML = 'Strong - Mạnh';
+        strength.className = 'strong';
+    }
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>document.getElementById()</code> - Lấy phần tử theo ID</li>
+                <li><code>.value</code> - Lấy giá trị input</li>
+                <li><code>/\d/</code> - Regex kiểm tra có số</li>
+                <li><code>/[a-zA-Z]/</code> - Regex kiểm tra có chữ</li>
+                <li><code>.test()</code> - Kiểm tra chuỗi có khớp regex</li>
+                <li><code>.innerHTML</code> - Thay đổi nội dung HTML</li>
+                <li><code>.className</code> - Thay đổi class để CSS tự động style</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Gõ "abc" → Weak (thiếu số)</li>
+                <li>Gõ "123" → Weak (thiếu chữ)</li>
+                <li>Gõ "abc123" → Medium (6 ký tự, có số và chữ)</li>
+                <li>Gõ "abc1234567" → Strong (10+ ký tự)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * HÀM KIỂM TRA ĐỘ MẠNH PASSWORD
+         * Được gọi mỗi khi user gõ phím trong ô password
+         */
+        function checkPasswordStrength() {
+            // BƯỚC 1: Lấy giá trị password
+            var password = document.getElementById('password').value;
+            var strength = document.getElementById('strength');
+            
+            // BƯỚC 2: Nếu rỗng, ẩn indicator
+            if (password.length === 0) {
+                strength.innerHTML = '';
+                strength.className = '';
+                return;
+            }
+            
+            // BƯỚC 3: Kiểm tra có số và chữ không
+            var hasNumbers = /\d/.test(password);  // \d tìm số
+            var hasLetters = /[a-zA-Z]/.test(password);  // a-zA-Z tìm chữ
+            
+            // BƯỚC 4: Đánh giá độ mạnh
+            if (password.length < 6 || !hasNumbers || !hasLetters) {
+                // WEAK: < 6 ký tự HOẶC thiếu số HOẶC thiếu chữ
+                strength.innerHTML = 'Weak - Yếu';
+                strength.className = 'weak';
+            } else if (password.length < 10) {
+                // MEDIUM: 6-9 ký tự và có cả số và chữ
+                strength.innerHTML = 'Medium - Trung bình';
+                strength.className = 'medium';
+            } else {
+                // STRONG: 10+ ký tự và có cả số và chữ
+                strength.innerHTML = 'Strong - Mạnh';
+                strength.className = 'strong';
+            }
+        }
+    </script>
+</body>
+</html>

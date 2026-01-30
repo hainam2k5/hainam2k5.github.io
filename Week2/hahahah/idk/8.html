@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 8: Newsletter Subscription</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 8:
+    ==========================================
+    YÊU CẦU:
+    1. Form: Full Name, Email, Radio buttons, Checkboxes
+    2. Validation:
+       - Email phải có @ và domain (.)
+       - Ít nhất 1 interest được chọn
+    3. Sử dụng CSS Grid layout
+    4. Success message khi valid
+    
+    JAVASCRIPT: Cần để validation
+    -->
+    
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== BODY ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== HEADING ===== */
+        h1 {
+            color: #f5576c;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        /* ===== FORM với CSS GRID ===== */
+        form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            /* Giải thích CSS GRID:
+            - display: grid → Kích hoạt CSS Grid
+            - grid-template-columns: 1fr → 1 cột chiếm toàn bộ
+            - gap: 25px → Khoảng cách giữa các grid items
+            */
+        }
+        
+        /* ===== FORM GROUP ===== */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* ===== LABEL ===== */
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        /* ===== INPUT ===== */
+        input[type="text"],
+        input[type="email"] {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #f5576c;
+            box-shadow: 0 0 10px rgba(245, 87, 108, 0.2);
+        }
+        
+        /* ===== RADIO và CHECKBOX GROUPS ===== */
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* ===== RADIO/CHECKBOX LABELS ===== */
+        .radio-group label,
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            cursor: pointer;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+            /* Giải thích:
+            - display: flex → Sắp xếp checkbox/radio và text theo hàng ngang
+            - align-items: center → Căn giữa dọc
+            - cursor: pointer → Con trỏ dạng tay
+            */
+        }
+        
+        .radio-group label:hover,
+        .checkbox-group label:hover {
+            background-color: #ffe3e8;
+        }
+        
+        /* ===== RADIO/CHECKBOX INPUT ===== */
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            /* Giải thích:
+            - margin-right → Khoảng cách với text bên phải
+            - width, height → Kích thước radio/checkbox
+            */
+        }
+        
+        /* ===== SUBMIT BUTTON ===== */
+        button[type="submit"] {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 87, 108, 0.6);
+        }
+        
+        /* ===== SUCCESS MESSAGE ===== */
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #28a745;
+            margin-top: 25px;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        /* ===== EXPLANATION ===== */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #f5576c;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 Bài 8: Newsletter Subscription</h1>
+        <p class="subtitle">Stay updated with our latest news</p>
+        
+        <form onsubmit="validateNewsletter(event)">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="John Doe">
+            </div>
+            
+            <!-- Email -->
+            <div class="form-group">
+                <label for="newsEmail">Email Address</label>
+                <input type="email" id="newsEmail" placeholder="john@example.com">
+            </div>
+            
+            <!-- Subscription Type (Radio) -->
+            <div class="form-group">
+                <label>Subscription Type</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="subscription" value="monthly">
+                        📅 Monthly
+                    </label>
+                    <label>
+                        <input type="radio" name="subscription" value="yearly">
+                        📆 Yearly
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Interests (Checkboxes) -->
+            <div class="form-group">
+                <label>Interests (Select at least one)</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" class="interest">
+                        💻 Technology
+                    </label>
+                    <label>
+                        <input type="checkbox" class="interest">
+                        ⚽ Sports
+                    </label>
+                    <label>
+                        <input type="checkbox" class="interest">
+                        ✈️ Travel
+                    </label>
+                    <label>
+                        <input type="checkbox" class="interest">
+                        🍕 Food
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit">✉️ Subscribe Now</button>
+        </form>
+        
+        <div class="success-message" id="newsSuccess">
+            <strong>🎉 Subscription Successful!</strong><br>
+            Thank you for subscribing!
+        </div>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>type="radio"</code> - Radio button (chọn 1 trong nhiều)</li>
+                <li><code>name="subscription"</code> - Nhóm radio cùng name</li>
+                <li><code>type="checkbox"</code> - Checkbox (chọn nhiều)</li>
+                <li><code>class="interest"</code> - Class chung cho checkboxes</li>
+            </ul>
+            
+            <h2>🎨 CSS Grid và Flexbox:</h2>
+            <ul>
+                <li><code>display: grid</code> - Kích hoạt CSS Grid cho form</li>
+                <li><code>grid-template-columns: 1fr</code> - 1 cột chiếm toàn bộ</li>
+                <li><code>gap: 25px</code> - Khoảng cách giữa grid items</li>
+                <li><code>display: flex</code> - Flexbox cho radio/checkbox labels</li>
+                <li><code>align-items: center</code> - Căn giữa dọc</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+function validateNewsletter(event) {
+    event.preventDefault();
+    
+    var email = document.getElementById('newsEmail').value;
+    var interests = document.querySelectorAll('.interest:checked');
+    
+    // Validation
+    if (email.includes('@') && email.includes('.') && interests.length > 0) {
+        document.getElementById('newsSuccess').classList.add('show');
+    } else {
+        alert('⚠️ Email cần có @ và . + Chọn ít nhất 1 interest');
+    }
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>querySelectorAll('.interest:checked')</code> - Lấy checkboxes đã check</li>
+                <li><code>:checked</code> - CSS selector cho input được chọn</li>
+                <li><code>.includes('@')</code> - Kiểm tra chuỗi có chứa @</li>
+                <li><code>interests.length > 0</code> - Có ít nhất 1 interest</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Email "test" → Alert (thiếu @)</li>
+                <li>Email "test@example.com" + không check → Alert</li>
+                <li>Email "test@example.com" + 1 interest → Success</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function validateNewsletter(event) {
+            event.preventDefault();
+            console.log('Newsletter form submitted');
+            
+            var email = document.getElementById('newsEmail').value;
+            var interests = document.querySelectorAll('.interest:checked');
+            
+            console.log('Email:', email);
+            console.log('Interests selected:', interests.length);
+            
+            if (email.includes('@') && email.includes('.') && interests.length > 0) {
+                console.log('✓ Validation passed');
+                
+                document.getElementById('newsSuccess').classList.add('show');
+                
+                // Reset
+                document.getElementById('fullName').value = '';
+                document.getElementById('newsEmail').value = '';
+                for (var i = 0; i < interests.length; i++) {
+                    interests[i].checked = false;
+                }
+            } else {
+                console.log('✗ Validation failed');
+                alert('⚠️ Email phải có @ và domain + Chọn ít nhất 1 interest');
+            }
+        }
+    </script>
+</body>
+</html>

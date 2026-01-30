@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 1: User Registration Form</title>
+    
+    <!--
+    ==========================================
+    CSS CƠ BẢN - GIẢI THÍCH:
+    ==========================================
+    - * selector: Áp dụng cho TẤT CẢ phần tử
+    - body: Style cho toàn trang
+    - .container: Khung chứa nội dung
+    - form: Style cho form
+    - .form-group: Nhóm label + input
+    - input: Style cho các ô nhập
+    - button: Style cho nút
+    - hover: Hiệu ứng khi rê chuột
+    -->
+    
+    <style>
+        /* Reset margin và padding cho tất cả phần tử */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Style cho body - toàn trang */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        /* Container chứa nội dung chính */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Tiêu đề chính */
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        /* Style cho form */
+        form {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        /* Nhóm form (label + input) */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        /* Label */
+        label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        /* Input fields */
+        input[type="text"],
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        /* Hiệu ứng khi focus vào input */
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        /* Password strength indicator */
+        #strength {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Màu cho các mức độ password */
+        .weak {
+            background-color: #ffcccc;
+            color: #cc0000;
+            border: 2px solid #cc0000;
+        }
+        
+        .medium {
+            background-color: #fff4cc;
+            color: #cc8800;
+            border: 2px solid #cc8800;
+        }
+        
+        .strong {
+            background-color: #ccffcc;
+            color: #00cc00;
+            border: 2px solid #00cc00;
+        }
+        
+        /* Button */
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        /* Hiệu ứng hover cho button */
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Phần giải thích */
+        .explanation {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-left: 4px solid #007bff;
+            margin: 20px 0;
+        }
+        
+        /* Code block */
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* List styling */
+        ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Exercise 1: User Registration Form</h1>
+        
+        <!--
+        ==========================================
+        MÔ TẢ BÀI TẬP:
+        ==========================================
+        Tạo form đăng ký user với các yêu cầu:
+        1. Có 3 trường: Username, Password, Profile Picture
+        2. Validation:
+           - Username: 5-15 ký tự
+           - Password: phải có cả số và chữ
+           - File: chỉ chấp nhận JPG hoặc PNG
+        3. Password strength indicator hiển thị Weak/Medium/Strong
+        4. Cập nhật real-time khi user gõ password
+        5. Sử dụng Flexbox layout
+        -->
+        
+        <h2>Form Đăng Ký</h2>
+        
+        <form>
+            <div class="form-group">
+                <label for="username">Username (5-15 ký tự):</label>
+                <input type="text" id="username" minlength="5" maxlength="15" placeholder="Nhập username...">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (phải có số và chữ):</label>
+                <input type="password" id="password" onkeyup="checkPasswordStrength()" placeholder="Nhập password...">
+                <div id="strength"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="profilePic">Profile Picture (JPG hoặc PNG):</label>
+                <input type="file" id="profilePic" accept=".jpg,.png">
+            </div>
+        </form>
+        
+        <hr>
+        
+        <div class="explanation">
+            <h2>Giải Thích CSS:</h2>
+            <pre>
+* selector - Áp dụng cho tất cả phần tử (reset margin, padding)
+body - Style cho toàn trang (font, background, padding)
+.container - Khung chứa nội dung (max-width, margin auto để căn giữa)
+form - Style cho form (background, padding, border)
+.form-group - Nhóm label + input (margin-bottom để tạo khoảng cách)
+input - Style cho ô nhập (width 100%, padding, border)
+input:focus - Hiệu ứng khi click vào input (đổi màu border)
+button:hover - Hiệu ứng khi rê chuột lên button
+transition - Hiệu ứng chuyển đổi mượt mà
+            </pre>
+        </div>
+        
+        <h2>Giải Thích Code JavaScript:</h2>
+        <pre>
+1. Lấy giá trị password từ input
+2. Kiểm tra độ dài và có số/chữ không
+3. Dựa vào kết quả để đánh giá Weak/Medium/Strong
+4. Thêm class tương ứng để CSS tự động style
+        </pre>
+    </div>
+    
+    <script>
+        /**
+         * HÀM KIỂM TRA ĐỘ MẠNH CỦA PASSWORD
+         */
+        function checkPasswordStrength() {
+            // BƯỚC 1: Lấy giá trị password
+            var password = document.getElementById('password').value;
+            var strength = document.getElementById('strength');
+            
+            // BƯỚC 2: Nếu rỗng, ẩn indicator
+            if (password.length === 0) {
+                strength.innerHTML = '';
+                strength.className = ''; // Xóa class
+                return;
+            }
+            
+            // BƯỚC 3: Kiểm tra có số và chữ
+            var hasNumbers = /\d/.test(password);
+            var hasLetters = /[a-zA-Z]/.test(password);
+            
+            // BƯỚC 4: Đánh giá và thêm class CSS
+            if (password.length < 6 || !hasNumbers || !hasLetters) {
+                strength.innerHTML = 'Weak - Yếu';
+                strength.className = 'weak'; // Thêm class weak
+            } 
+            else if (password.length < 10) {
+                strength.innerHTML = 'Medium - Trung bình';
+                strength.className = 'medium'; // Thêm class medium
+            } 
+            else {
+                strength.innerHTML = 'Strong - Mạnh';
+                strength.className = 'strong'; // Thêm class strong
+            }
+        }
+    </script>
+    
+    <div class="container" style="margin-top: 30px;">
+        <h2>Kiến Thức CSS Quan Trọng:</h2>
+        <table>
+            <tr>
+                <th>Thuộc tính CSS</th>
+                <th>Mô tả</th>
+                <th>Ví dụ</th>
+            </tr>
+            <tr>
+                <td><strong>padding</strong></td>
+                <td>Khoảng cách bên trong</td>
+                <td>padding: 20px;</td>
+            </tr>
+            <tr>
+                <td><strong>margin</strong></td>
+                <td>Khoảng cách bên ngoài</td>
+                <td>margin: 10px;</td>
+            </tr>
+            <tr>
+                <td><strong>border</strong></td>
+                <td>Viền</td>
+                <td>border: 1px solid #ddd;</td>
+            </tr>
+            <tr>
+                <td><strong>border-radius</strong></td>
+                <td>Bo góc</td>
+                <td>border-radius: 8px;</td>
+            </tr>
+            <tr>
+                <td><strong>background-color</strong></td>
+                <td>Màu nền</td>
+                <td>background-color: #f5f5f5;</td>
+            </tr>
+            <tr>
+                <td><strong>color</strong></td>
+                <td>Màu chữ</td>
+                <td>color: #333;</td>
+            </tr>
+            <tr>
+                <td><strong>font-family</strong></td>
+                <td>Font chữ</td>
+                <td>font-family: Arial;</td>
+            </tr>
+            <tr>
+                <td><strong>transition</strong></td>
+                <td>Hiệu ứng chuyển đổi</td>
+                <td>transition: all 0.3s;</td>
+            </tr>
+            <tr>
+                <td><strong>box-shadow</strong></td>
+                <td>Đổ bóng</td>
+                <td>box-shadow: 0 2px 5px rgba(0,0,0,0.1);</td>
+            </tr>
+        </table>
+        
+        <h2>CSS Selectors:</h2>
+        <ul>
+            <li><strong>* </strong> - Tất cả phần tử</li>
+            <li><strong>element</strong> - Theo tên thẻ (body, h1, p)</li>
+            <li><strong>.class</strong> - Theo class (.container, .form-group)</li>
+            <li><strong>#id</strong> - Theo ID (#username, #password)</li>
+            <li><strong>element:hover</strong> - Khi rê chuột</li>
+            <li><strong>element:focus</strong> - Khi click vào (input)</li>
+        </ul>
+        
+        <h2>Box Model trong CSS:</h2>
+        <pre>
+┌─────────────────────────────────────┐
+│           MARGIN (bên ngoài)        │
+│  ┌───────────────────────────────┐  │
+│  │     BORDER (viền)             │  │
+│  │  ┌─────────────────────────┐  │  │
+│  │  │  PADDING (bên trong)    │  │  │
+│  │  │  ┌───────────────────┐  │  │  │
+│  │  │  │   CONTENT         │  │  │  │
+│  │  │  │   (nội dung)      │  │  │  │
+│  │  │  └───────────────────┘  │  │  │
+│  │  └─────────────────────────┘  │  │
+│  └───────────────────────────────┘  │
+└─────────────────────────────────────┘
+        </pre>
+    </div>
+
+</body>
+</html>

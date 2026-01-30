@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 5: Tabbed Content Interface</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 5:
+    ==========================================
+    YÊU CẦU:
+    1. 4 tabs: Features, Pricing, Reviews, Support
+    2. HTML entities: ®, €, →
+    3. Mũi tên (→) chỉ tab active
+    4. Hiển thị nội dung tương ứng khi click
+    5. Sử dụng classList.add() và classList.remove()
+    
+    JAVASCRIPT: Cần để chuyển đổi tabs
+    -->
+    
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== BODY ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== HEADING ===== */
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 36px;
+        }
+        
+        /* ===== TABS CONTAINER với FLEXBOX ===== */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 0;
+            border-bottom: 3px solid #e0e0e0;
+            /* Giải thích:
+            - display: flex → Sắp xếp tabs theo hàng ngang
+            - gap: 10px → Khoảng cách giữa các tabs
+            - border-bottom → Đường line dưới tabs
+            */
+        }
+        
+        /* ===== TAB BUTTON ===== */
+        .tab {
+            flex: 1;
+            padding: 18px 30px;
+            background-color: #f5f5f5;
+            border: none;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            /* Giải thích:
+            - flex: 1 → Mỗi tab chiếm đều nhau
+            - border-top-left-radius → Bo góc trên trái
+            - border-bottom: transparent → Viền dưới trong suốt
+            */
+        }
+        
+        /* ===== TAB HOVER ===== */
+        .tab:hover {
+            background-color: #e8e8e8;
+            color: #667eea;
+        }
+        
+        /* ===== ACTIVE TAB ===== */
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 3px solid #667eea;
+            transform: translateY(3px);
+            /* Giải thích:
+            - .tab.active → Chọn tab có class active
+            - transform: translateY(3px) → Dịch xuống 3px
+            */
+        }
+        
+        /* ===== TAB CONTENT ===== */
+        .tab-content {
+            display: none;
+            padding: 40px;
+            background-color: #f8f9fa;
+            border-radius: 0 0 10px 10px;
+            /* Giải thích:
+            - display: none → Ẩn mặc định
+            - border-radius: 0 0 10px 10px → Bo góc dưới trái và phải
+            */
+        }
+        
+        /* ===== ACTIVE CONTENT ===== */
+        .tab-content.active {
+            display: block;
+            /* Giải thích:
+            - display: block → Hiện khi có class active
+            */
+        }
+        
+        .tab-content h3 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-content p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .tab-content ul {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        /* ===== EXPLANATION ===== */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📑 Bài 5: Tabbed Content Interface</h1>
+        
+        <!-- TABS -->
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab(0)">Features &reg; &rarr;</button>
+            <button class="tab" onclick="switchTab(1)">Pricing &euro;</button>
+            <button class="tab" onclick="switchTab(2)">Reviews</button>
+            <button class="tab" onclick="switchTab(3)">Support</button>
+        </div>
+        
+        <!-- TAB CONTENTS -->
+        <div class="tab-content active">
+            <h3>✨ Features &reg;</h3>
+            <p>Our product includes amazing features:</p>
+            <ul>
+                <li>Responsive design</li>
+                <li>Fast performance</li>
+                <li>User-friendly interface</li>
+                <li>24/7 availability</li>
+            </ul>
+        </div>
+        
+        <div class="tab-content">
+            <h3>💰 Pricing &euro;</h3>
+            <p><strong>Basic:</strong> 9.99 &euro;/month</p>
+            <p><strong>Premium:</strong> 19.99 &euro;/month</p>
+            <p><strong>Enterprise:</strong> Contact us</p>
+        </div>
+        
+        <div class="tab-content">
+            <h3>⭐ Reviews</h3>
+            <p>Average rating: 4.8/5 stars</p>
+            <p>Based on 1,234 reviews</p>
+        </div>
+        
+        <div class="tab-content">
+            <h3>🛠️ Support</h3>
+            <p>24/7 customer support available</p>
+            <ul>
+                <li>Email support</li>
+                <li>Phone support</li>
+                <li>Live chat</li>
+            </ul>
+        </div>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>class="tab active"</code> - Tab đầu tiên có class active</li>
+                <li><code>onclick="switchTab(0)"</code> - Truyền số index (0,1,2,3)</li>
+                <li><code>class="tab-content active"</code> - Content đầu hiển thị</li>
+            </ul>
+            
+            <h2>🔤 HTML Entities:</h2>
+            <ul>
+                <li><code>&amp;reg;</code> → &reg; (Registered)</li>
+                <li><code>&amp;euro;</code> → &euro; (Euro)</li>
+                <li><code>&amp;rarr;</code> → &rarr; (Right arrow)</li>
+            </ul>
+            
+            <h2>🎨 Giải Thích CSS Chi Tiết:</h2>
+            <ul>
+                <li><code>display: flex</code> - Sắp xếp tabs theo hàng ngang</li>
+                <li><code>gap: 10px</code> - Khoảng cách giữa tabs</li>
+                <li><code>flex: 1</code> - Mỗi tab chiếm đều nhau</li>
+                <li><code>border-top-left-radius</code> - Bo góc trên trái</li>
+                <li><code>border-top-right-radius</code> - Bo góc trên phải</li>
+                <li><code>.tab.active</code> - Chọn tab có class active</li>
+                <li><code>transform: translateY(3px)</code> - Dịch xuống 3px</li>
+                <li><code>display: none</code> - Ẩn content mặc định</li>
+                <li><code>display: block</code> - Hiện content khi active</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+function switchTab(index) {
+    // Lấy tất cả tabs và contents
+    var tabs = document.querySelectorAll('.tab');
+    var contents = document.querySelectorAll('.tab-content');
+    
+    // Xóa class "active" khỏi TẤT CẢ
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+        contents[i].classList.remove('active');
+    }
+    
+    // Thêm class "active" cho tab được chọn
+    tabs[index].classList.add('active');
+    contents[index].classList.add('active');
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>querySelectorAll('.tab')</code> - Lấy TẤT CẢ tabs</li>
+                <li><code>.classList.remove('active')</code> - Xóa class active</li>
+                <li><code>.classList.add('active')</code> - Thêm class active</li>
+                <li><code>tabs[index]</code> - Truy cập tab thứ index</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Click "Pricing" → Chuyển sang tab Pricing</li>
+                <li>Mũi tên → chỉ tab active</li>
+                <li>Chỉ 1 tab và 1 content hiện tại 1 thời điểm</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(index) {
+            console.log('Switching to tab:', index);
+            
+            var tabs = document.querySelectorAll('.tab');
+            var contents = document.querySelectorAll('.tab-content');
+            
+            // Xóa active khỏi tất cả
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+                contents[i].classList.remove('active');
+            }
+            
+            // Thêm active cho tab được chọn
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+            
+            var tabNames = ['Features', 'Pricing', 'Reviews', 'Support'];
+            console.log('Active tab:', tabNames[index]);
+        }
+    </script>
+</body>
+</html>

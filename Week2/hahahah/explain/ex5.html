@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 5: Tabbed Content Interface</title>
+    
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body */
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Header */
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 38px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        /* Tabs container */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 0;
+            border-bottom: 3px solid #e0e0e0;
+        }
+        
+        /* Tab button */
+        .tab {
+            flex: 1;
+            padding: 18px 30px;
+            background-color: #f5f5f5;
+            border: none;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+        
+        /* Tab hover */
+        .tab:hover {
+            background-color: #e8e8e8;
+            color: #667eea;
+        }
+        
+        /* Active tab */
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 3px solid #667eea;
+            transform: translateY(3px);
+        }
+        
+        /* Arrow icon for active tab */
+        .tab.active::after {
+            content: " →";
+            font-size: 20px;
+            margin-left: 8px;
+            animation: arrowBounce 1s infinite;
+        }
+        
+        /* Arrow animation */
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+        
+        /* Tab content */
+        .tab-content {
+            display: none;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 0 0 10px 10px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Active content */
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Content heading */
+        .tab-content h3 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .tab-content p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .tab-content ul {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        /* Explanation */
+        .explanation {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 6px solid #fdcb6e;
+        }
+        
+        h2 {
+            color: #2d3436;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        /* Code */
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #e83e8c;
+            font-family: monospace;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+        
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* Lists */
+        ol, ul {
+            margin-left: 30px;
+            line-height: 2;
+        }
+        
+        hr {
+            margin: 40px 0;
+            border: none;
+            border-top: 3px solid #667eea;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📑 Exercise 5: Tabbed Content Interface</h1>
+        
+        <div class="explanation">
+            <h2>📋 Mô Tả Bài Tập:</h2>
+            <ol>
+                <li>Tạo 4 tabs: Features, Pricing, Reviews, Support</li>
+                <li>HTML entities: ®, €, →</li>
+                <li>Mũi tên (→) chỉ tab active</li>
+                <li>Hiển thị nội dung tương ứng khi click</li>
+                <li>Sử dụng <code>classList.add()</code> và <code>classList.remove()</code></li>
+            </ol>
+        </div>
+        <!--html-->
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab(0)">Features ®</button>
+            <button class="tab" onclick="switchTab(1)">Pricing &euro;</button>
+            <button class="tab" onclick="switchTab(2)">Reviews</button>
+            <button class="tab" onclick="switchTab(3)">Support</button>
+        </div>
+        
+        <!-- Tab Contents -->
+        <div class="tab-content active">
+            <h3>✨ Features ®</h3>
+            <p>Our product includes amazing features:</p>
+            <ul>
+                <li>🎨 Responsive design that works on all devices</li>
+                <li>⚡ Lightning-fast performance</li>
+                <li>🔒 Enterprise-grade security</li>
+                <li>🌐 Multi-language support</li>
+                <li>📱 Mobile-first approach</li>
+            </ul>
+        </div>
+        
+        <div class="tab-content">
+            <h3>💰 Pricing €</h3>
+            <p><strong>Basic Plan:</strong> 9.99 €/month</p>
+            <ul>
+                <li>Up to 10 users</li>
+                <li>Basic support</li>
+            </ul>
+            <p><strong>Premium Plan:</strong> 19.99 €/month</p>
+            <ul>
+                <li>Unlimited users</li>
+                <li>Priority support</li>
+                <li>Advanced features</li>
+            </ul>
+            <p><strong>Enterprise:</strong> Contact us for custom pricing</p>
+        </div>
+        
+        <div class="tab-content">
+            <h3>⭐ Reviews</h3>
+            <p>Our customers love us!</p>
+            <p><strong>Average rating:</strong> 4.8/5 stars ⭐⭐⭐⭐⭐</p>
+            <p>Based on 1,234 reviews from satisfied customers worldwide.</p>
+            <ul>
+                <li>"Best product I've ever used!" - John D.</li>
+                <li>"Excellent customer support!" - Sarah M.</li>
+                <li>"Great value for money!" - Mike T.</li>
+            </ul>
+        </div>
+        
+        <div class="tab-content">
+            <h3>🛠️ Support</h3>
+            <p>We're here to help you 24/7!</p>
+            <ul>
+                <li>📧 Email support: support@example.com</li>
+                <li>📞 Phone: 1-800-123-4567</li>
+                <li>💬 Live chat available on our website</li>
+                <li>📚 Comprehensive documentation</li>
+                <li>🎥 Video tutorials</li>
+            </ul>
+        </div>
+        /end html/
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 CSS Highlights:</h2>
+            <pre>
+/* FLEXBOX TABS */
+.tabs-container {
+    display: flex;  → Sắp xếp tabs theo hàng ngang
+    gap: 10px;  → Khoảng cách giữa các tabs
+}
+
+/* ACTIVE TAB EFFECT */
+.tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: translateY(3px);  → Di chuyển xuống
+}
+
+/* AUTO ARROW FOR ACTIVE TAB */
+.tab.active::after {
+    content: " →";  → Tự động thêm mũi tên
+    animation: arrowBounce 1s infinite;
+}
+
+/* FADE IN ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+function switchTab(index) {
+    // Lấy tất cả tabs và contents
+    var tabs = document.querySelectorAll('.tab');
+    var contents = document.querySelectorAll('.tab-content');
+    
+    // Xóa class "active" khỏi TẤT CẢ
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+        contents[i].classList.remove('active');
+    }
+    
+    // Thêm class "active" vào tab được chọn
+    tabs[index].classList.add('active');
+    contents[index].classList.add('active');
+}
+        </pre>
+        
+        <h2>📚 CSS Properties:</h2>
+        <table>
+            <tr>
+                <th>Property</th>
+                <th>Mô tả</th>
+                <th>Ví dụ</th>
+            </tr>
+            <tr>
+                <td><code>display: flex</code></td>
+                <td>Flexbox layout</td>
+                <td>Sắp xếp phần tử linh hoạt</td>
+            </tr>
+            <tr>
+                <td><code>gap</code></td>
+                <td>Khoảng cách giữa flex items</td>
+                <td>gap: 10px;</td>
+            </tr>
+            <tr>
+                <td><code>::after</code></td>
+                <td>Thêm nội dung sau phần tử</td>
+                <td>content: " →";</td>
+            </tr>
+            <tr>
+                <td><code>@keyframes</code></td>
+                <td>Định nghĩa animation</td>
+                <td>@keyframes fadeIn { ... }</td>
+            </tr>
+            <tr>
+                <td><code>animation</code></td>
+                <td>Áp dụng animation</td>
+                <td>animation: fadeIn 0.5s ease;</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li><strong>Khởi động:</strong> Tab "Features" active, có mũi tên →</li>
+            <li><strong>Click "Pricing":</strong> Chuyển sang tab Pricing với animation</li>
+            <li><strong>Click "Reviews":</strong> Hiện nội dung Reviews</li>
+            <li><strong>Hover tabs:</strong> Thấy hiệu ứng đổi màu</li>
+        </ol>
+    </div>
+    /** JavaScript**/
+    <script>
+        /**
+         * HÀM CHUYỂN ĐỔI TAB
+         */
+        function switchTab(index) {
+            console.log('📑 Switching to tab:', index);
+            
+            var tabs = document.querySelectorAll('.tab');
+            var contents = document.querySelectorAll('.tab-content');
+            
+            // Xóa active khỏi tất cả
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+                contents[i].classList.remove('active');
+                console.log('Removed active from tab', i);
+            }
+            
+            // Thêm active cho tab được chọn
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+            
+            var tabNames = ['Features', 'Pricing', 'Reviews', 'Support'];
+            console.log('✓ Active tab:', tabNames[index]);
+        }
+    </script>
+
+</body>
+</html>

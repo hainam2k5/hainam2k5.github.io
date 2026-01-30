@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 2: Computer Parts Price List</title>
+    
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Heading */
+        h1 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 32px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Table header */
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Table cells */
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+        
+        /* Table row hover effect */
+        table tr:hover td {
+            background-color: #f0f0f0;
+            transform: scale(1.02);
+        }
+        
+        /* Zebra striping */
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* Button styling */
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Button hover effect */
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* Button active effect */
+        button:active {
+            transform: translateY(0);
+        }
+        
+        /* Explanation box */
+        .explanation {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e7ff 100%);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        /* Pre tag for code */
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* CSS properties table */
+        .css-table {
+            margin: 20px 0;
+        }
+        
+        .css-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .css-table td {
+            font-size: 14px;
+        }
+        
+        /* Code inline */
+        code {
+            background-color: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        
+        /* List styling */
+        ul, ol {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        ul li, ol li {
+            margin-bottom: 10px;
+        }
+        
+        /* Strong text */
+        strong {
+            color: #667eea;
+        }
+        
+        /* HR line */
+        hr {
+            margin: 40px 0;
+            border: none;
+            border-top: 3px solid #667eea;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+/*html*/>
+<body>
+    <div class="container">
+        <h1>💻 Exercise 2: Computer Parts Price List</h1>
+        
+        <div class="explanation">
+            <h2>📋 Mô Tả Bài Tập:</h2>
+            <p>Tạo bảng giá linh kiện máy tính với các yêu cầu:</p>
+            <ol>
+                <li>Tạo table với 4 linh kiện và giá</li>
+                <li>Có các HTML entities: ©, ™, •</li>
+                <li>Có viền và padding cho table</li>
+                <li>Nút "Change Color" để đổi màu text thành đỏ</li>
+                <li>Sử dụng hàm <code>changeColor()</code> và <code>getElementById()</code></li>
+            </ol>
+        </div>
+        
+        <h2>🛒 Bảng Giá Linh Kiện</h2>
+        
+        <table id="partsTable">
+            <thead>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Graphics Card ™</td>
+                    <td>$599.99</td>
+                </tr>
+                <tr>
+                    <td>Processor ©</td>
+                    <td>$399.99</td>
+                </tr>
+                <tr>
+                    <td>● RAM Module</td>
+                    <td>$129.99</td>
+                </tr>
+                <tr>
+                    <td>Motherboard</td>
+                    <td>$249.99</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button onclick="changeColor()">🎨 Change Color to Red</button>
+        
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 Giải Thích CSS:</h2>
+            <pre>
+/* GRADIENT BACKGROUND */
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+→ Tạo màu nền gradient từ xanh sang tím
+
+/* TABLE STYLING */
+border-collapse: collapse; → Gộp viền table
+box-shadow: 0 5px 15px rgba(0,0,0,0.1); → Đổ bóng
+
+/* HOVER EFFECT */
+table tr:hover td {
+    background-color: #f0f0f0;
+    transform: scale(1.02);  → Phóng to nhẹ khi hover
+}
+
+/* BUTTON EFFECT */
+button:hover {
+    transform: translateY(-3px);  → Nổi lên khi hover
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* ZEBRA STRIPING */
+table tr:nth-child(even) → Hàng chẵn có màu khác
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+function changeColor() {
+    // Lấy table theo ID
+    var table = document.getElementById('partsTable');
+    
+    // Lấy TẤT CẢ các thẻ td
+    var cells = table.getElementsByTagName('td');
+    
+    // Duyệt qua từng cell và đổi màu
+    for (var i = 0; i < cells.length; i++) {
+        cells[i].style.color = 'red';
+    }
+    
+    alert('✓ Đã đổi màu tất cả text thành đỏ!');
+}
+        </pre>
+        
+        <h2>📚 CSS Properties Được Sử Dụng:</h2>
+        <table class="css-table">
+            <tr>
+                <th>Property</th>
+                <th>Mô tả</th>
+                <th>Giá trị</th>
+            </tr>
+            <tr>
+                <td><code>linear-gradient()</code></td>
+                <td>Tạo màu gradient</td>
+                <td>linear-gradient(135deg, color1, color2)</td>
+            </tr>
+            <tr>
+                <td><code>border-collapse</code></td>
+                <td>Gộp viền table</td>
+                <td>collapse / separate</td>
+            </tr>
+            <tr>
+                <td><code>box-shadow</code></td>
+                <td>Đổ bóng</td>
+                <td>x y blur spread color</td>
+            </tr>
+            <tr>
+                <td><code>transform</code></td>
+                <td>Biến đổi vị trí/kích thước</td>
+                <td>scale(), translateY(), rotate()</td>
+            </tr>
+            <tr>
+                <td><code>transition</code></td>
+                <td>Hiệu ứng chuyển đổi</td>
+                <td>all 0.3s ease</td>
+            </tr>
+            <tr>
+                <td><code>:nth-child(even)</code></td>
+                <td>Chọn phần tử chẵn</td>
+                <td>nth-child(odd), nth-child(2n)</td>
+            </tr>
+            <tr>
+                <td><code>text-transform</code></td>
+                <td>Đổi chữ hoa/thường</td>
+                <td>uppercase / lowercase / capitalize</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li>Click button "Change Color to Red"</li>
+            <li>Kiểm tra tất cả text trong các ô td có đổi màu đỏ</li>
+            <li>Hover chuột lên các hàng → Thấy hiệu ứng phóng to</li>
+            <li>Hover lên button → Thấy button nổi lên</li>
+        </ol>
+    </div>
+    /*JavaScript*/
+    <script>
+        /**
+         * HÀM ĐỔI MÀU TEXT THÀNH ĐỎ
+         */
+        function changeColor() {
+            console.log('🎨 Bắt đầu đổi màu...');
+            
+            // BƯỚC 1: Lấy table theo ID
+            var table = document.getElementById('partsTable');
+            console.log('✓ Đã lấy table');
+            
+            // BƯỚC 2: Lấy TẤT CẢ các thẻ td
+            var cells = table.getElementsByTagName('td');
+            console.log('Số lượng cells:', cells.length);
+            
+            // BƯỚC 3: Duyệt và đổi màu
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].style.color = 'red';
+                console.log('✓ Đã đổi màu cell', i + 1);
+            }
+            
+            alert('✓ Đã đổi màu tất cả text thành đỏ!');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 7: Contact Form</title>
+    
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Header */
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            font-size: 22px;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        /* Form styling */
+        form {
+            margin-bottom: 30px;
+        }
+        
+        /* Form group */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        /* Label */
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        label::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        /* Input fields */
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        
+        /* Focus effect */
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* Textarea */
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* Submit button */
+        button[type="submit"] {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        button::before {
+            content: "📧 ";
+        }
+        
+        /* Success message */
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+            margin-top: 20px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Explanation */
+        .explanation {
+            background: linear-gradient(135deg, #fff5e1 0%, #ffe4b5 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 6px solid #ffa500;
+        }
+        
+        /* Code */
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #e83e8c;
+            font-family: monospace;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 2px solid #667eea;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Exercise 7: Contact Form</h1>
+        <p class="subtitle">Get in touch with us</p>
+        
+        <form onsubmit="validateContact(event)">
+            <div class="form-group">
+                <label for="contactName">Name</label>
+                <input type="text" id="contactName" placeholder="Enter your name...">
+            </div>
+            
+            <div class="form-group">
+                <label for="contactEmail">Email</label>
+                <input type="email" id="contactEmail" placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="contactMessage">Message</label>
+                <textarea id="contactMessage" placeholder="Type your message here..."></textarea>
+            </div>
+            
+            <button type="submit">Send Message</button>
+        </form>
+        
+        <div class="success-message" id="contactSuccess">
+            <strong>✓ Success!</strong><br>
+            Your message has been sent successfully. We'll get back to you soon!
+        </div>
+        /html end/
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 CSS Highlights:</h2>
+            <pre>
+/* LABEL WITH REQUIRED ASTERISK */
+label::after {
+    content: " *";  → Tự động thêm dấu *
+    color: #e74c3c;
+}
+
+/* FOCUS EFFECT */
+input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+}
+
+/* FULL WIDTH BUTTON */
+button[type="submit"] {
+    width: 100%;  → Chiếm toàn bộ chiều rộng
+}
+
+/* SUCCESS MESSAGE ANIMATION */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+function validateContact(event) {
+    event.preventDefault();  // Ngăn reload trang
+    
+    var name = document.getElementById('contactName').value;
+    var email = document.getElementById('contactEmail').value;
+    var message = document.getElementById('contactMessage').value;
+    
+    // Kiểm tra tất cả fields có giá trị
+    if (name && email && message) {
+        // Hiện success message
+        document.getElementById('contactSuccess').classList.add('show');
+        
+        // Reset form
+        document.getElementById('contactName').value = '';
+        document.getElementById('contactEmail').value = '';
+        document.getElementById('contactMessage').value = '';
+    } else {
+        alert('⚠️ Please fill in all fields!');
+    }
+}
+        </pre>
+        
+        <h2>📚 CSS Properties:</h2>
+        <table>
+            <tr>
+                <th>Property</th>
+                <th>Mô tả</th>
+            </tr>
+            <tr>
+                <td><code>::after</code></td>
+                <td>Thêm nội dung sau phần tử</td>
+            </tr>
+            <tr>
+                <td><code>:focus</code></td>
+                <td>Style khi focus vào input</td>
+            </tr>
+            <tr>
+                <td><code>box-shadow</code></td>
+                <td>Đổ bóng cho phần tử</td>
+            </tr>
+            <tr>
+                <td><code>transition</code></td>
+                <td>Hiệu ứng chuyển đổi</td>
+            </tr>
+            <tr>
+                <td><code>resize</code></td>
+                <td>Cho phép resize textarea</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li><strong>Để trống:</strong> Click Submit → Alert "Please fill in all fields"</li>
+            <li><strong>Điền đủ:</strong> Click Submit → Success message xuất hiện</li>
+            <li><strong>Focus input:</strong> Thấy border đổi màu xanh</li>
+            <li><strong>Hover button:</strong> Button nổi lên</li>
+        </ol>
+    </div>
+    /JavaScript/
+    <script>
+        function validateContact(event) {
+            event.preventDefault();
+            console.log('📧 Form submitted');
+            
+            var name = document.getElementById('contactName').value;
+            var email = document.getElementById('contactEmail').value;
+            var message = document.getElementById('contactMessage').value;
+            
+            console.log('Name:', name);
+            console.log('Email:', email);
+            console.log('Message:', message);
+            
+            if (name && email && message) {
+                console.log('✓ All fields filled');
+                
+                var successMsg = document.getElementById('contactSuccess');
+                successMsg.classList.add('show');
+                
+                // Reset form
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactEmail').value = '';
+                document.getElementById('contactMessage').value = '';
+                
+                console.log('✓ Form reset');
+            } else {
+                console.log('✗ Missing fields');
+                alert('⚠️ Please fill in all fields!');
+            }
+        }
+    </script>
+
+</body>
+</html>

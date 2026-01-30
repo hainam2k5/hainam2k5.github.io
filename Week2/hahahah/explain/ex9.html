@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 9: Product Showcase</title>
+    
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Header */
+        h1 {
+            color: #4facfe;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 42px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            font-size: 24px;
+            border-left: 5px solid #4facfe;
+            padding-left: 15px;
+        }
+        
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        /* Product Card */
+        .product-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Hover effect */
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(79, 172, 254, 0.4);
+            border-color: #4facfe;
+        }
+        
+        /* Product card gradient background on hover */
+        .product-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+        
+        .product-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* Card content */
+        .product-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Product name */
+        .product-card h3 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+        
+        /* Price */
+        .product-price {
+            color: #4facfe;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        /* Description */
+        .product-card p {
+            color: #666;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        
+        /* Toggle button */
+        .toggle-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 30px;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 172, 254, 0.6);
+        }
+        
+        .toggle-btn::before {
+            content: "💰 ";
+        }
+        
+        /* Explanation */
+        .explanation {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 6px solid #fcb69f;
+        }
+        
+        /* Code */
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #e83e8c;
+            font-family: monospace;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        hr {
+            margin: 40px 0;
+            border: none;
+            border-top: 3px solid #4facfe;
+            opacity: 0.3;
+        }
+        
+        strong {
+            color: #4facfe;
+        }
+        
+        /* Hidden price */
+        .price.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛍️ Exercise 9: Product Showcase</h1>
+        <p class="subtitle">Premium Tech Products</p>
+        
+        <div class="explanation">
+            <h2>📋 Mô Tả Bài Tập:</h2>
+            <ol>
+                <li>Hiển thị 4 product cards với tên, giá, mô tả</li>
+                <li>HTML entities: ®, €, →</li>
+                <li>Sử dụng CSS Grid layout</li>
+                <li>Box-shadow và hover effects</li>
+                <li>Nút "Toggle Price" để ẩn/hiện giá</li>
+                <li>Sử dụng <code>getElementsByClassName()</code></li>
+            </ol>
+        </div>
+        <!-- HTML -->
+        <h2>🏆 Our Products</h2>
+        
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+                <h3>Smart Watch ®</h3>
+                <p class="product-price price">->299 €</p>
+                <p>Track your fitness goals and stay connected on the go </p>
+            </div>
+            
+            <!-- Product 2 -->
+            <div class="product-card">
+                <h3>Wireless Earbuds</h3>
+                <p class="product-price price">->149 €</p>
+                <p>Premium sound quality with active noise cancellation </p>
+            </div>
+            
+            <!-- Product 3 -->
+            <div class="product-card">
+                <h3>Laptop Stand ®</h3>
+                <p class="product-price price">->79 €</p>
+                <p>Ergonomic design for comfort and better posture </p>
+            </div>
+            
+            <!-- Product 4 -->
+            <div class="product-card">
+                <h3>USB Hub</h3>
+                <p class="product-price price">->39 €</p>
+                <p>Expand your connectivity with 7 ports </p>
+            </div>
+        </div>
+        
+        <button class="toggle-btn" onclick="togglePrice()">Toggle Price Display</button>
+        /html end/
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 CSS Grid Layout:</h2>
+            <pre>
+/* RESPONSIVE GRID */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+→ auto-fit: Tự động điều chỉnh số cột
+→ minmax(250px, 1fr): Tối thiểu 250px, tối đa chia đều
+
+/* CARD HOVER EFFECT */
+.product-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 15px 40px rgba(79, 172, 254, 0.4);
+}
+
+/* GRADIENT OVERLAY */
+.product-card::before {
+    content: "";
+    background: linear-gradient(...);
+    opacity: 0;  → Ẩn mặc định
+}
+.product-card:hover::before {
+    opacity: 1;  → Hiện khi hover
+}
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+var pricesVisible = true;
+
+function togglePrice() {
+    var prices = document.getElementsByClassName('price');
+    
+    if (pricesVisible) {
+        // Ẩn giá
+        for (var i = 0; i < prices.length; i++) {
+            prices[i].style.display = 'none';
+        }
+        pricesVisible = false;
+    } else {
+        // Hiện giá
+        for (var i = 0; i < prices.length; i++) {
+            prices[i].style.display = 'block';
+        }
+        pricesVisible = true;
+    }
+}
+        </pre>
+        
+        <h2>📚 CSS Grid Properties:</h2>
+        <table>
+            <tr>
+                <th>Property</th>
+                <th>Mô tả</th>
+                <th>Ví dụ</th>
+            </tr>
+            <tr>
+                <td><code>display: grid</code></td>
+                <td>Kích hoạt CSS Grid</td>
+                <td>Tạo grid container</td>
+            </tr>
+            <tr>
+                <td><code>grid-template-columns</code></td>
+                <td>Định nghĩa cột</td>
+                <td>repeat(4, 1fr)</td>
+            </tr>
+            <tr>
+                <td><code>auto-fit</code></td>
+                <td>Tự động điều chỉnh</td>
+                <td>Responsive tự động</td>
+            </tr>
+            <tr>
+                <td><code>minmax()</code></td>
+                <td>Min và max size</td>
+                <td>minmax(250px, 1fr)</td>
+            </tr>
+            <tr>
+                <td><code>gap</code></td>
+                <td>Khoảng cách</td>
+                <td>gap: 30px</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Transform Properties:</h2>
+        <table>
+            <tr>
+                <th>Transform</th>
+                <th>Mô tả</th>
+            </tr>
+            <tr>
+                <td><code>translateY(-10px)</code></td>
+                <td>Di chuyển lên 10px</td>
+            </tr>
+            <tr>
+                <td><code>scale(1.03)</code></td>
+                <td>Phóng to 103%</td>
+            </tr>
+            <tr>
+                <td><code>rotate(45deg)</code></td>
+                <td>Xoay 45 độ</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li><strong>Responsive:</strong> Thu nhỏ cửa sổ → Grid tự điều chỉnh</li>
+            <li><strong>Hover card:</strong> Thấy card nổi lên và có background gradient</li>
+            <li><strong>Click Toggle:</strong> Giá ẩn/hiện</li>
+            <li><strong>Box shadow:</strong> Mỗi card có bóng đổ</li>
+        </ol>
+    </div>
+    /JavaScript/
+    <script>
+        var pricesVisible = true;
+        
+        function togglePrice() {
+            console.log('💰 Toggle price button clicked');
+            console.log('Current state:', pricesVisible ? 'Visible' : 'Hidden');
+            
+            var prices = document.getElementsByClassName('price');
+            console.log('Number of prices:', prices.length);
+            
+            if (pricesVisible) {
+                // Ẩn tất cả giá
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'none';
+                    console.log('Hidden price', i + 1);
+                }
+                pricesVisible = false;
+            } else {
+                // Hiện tất cả giá
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'block';
+                    console.log('Shown price', i + 1);
+                }
+                pricesVisible = true;
+            }
+            
+            console.log('New state:', pricesVisible ? 'Visible' : 'Hidden');
+        }
+    </script>
+
+</body>
+</html>

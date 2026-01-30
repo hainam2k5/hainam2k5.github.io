@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 8: Newsletter Subscription</title>
+    
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body */
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Header */
+        h1 {
+            color: #f5576c;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 38px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            font-size: 22px;
+            border-left: 5px solid #f5576c;
+            padding-left: 15px;
+        }
+        
+        /* Form with CSS Grid */
+        form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        /* Form group */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Label */
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        /* Input */
+        input[type="text"],
+        input[type="email"] {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #f5576c;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(245, 87, 108, 0.2);
+        }
+        
+        /* Radio and Checkbox groups */
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* Radio/Checkbox label */
+        .radio-group label,
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            cursor: pointer;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .radio-group label:hover,
+        .checkbox-group label:hover {
+            background-color: #ffe3e8;
+        }
+        
+        /* Radio/Checkbox input */
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        /* Submit button */
+        button[type="submit"] {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 87, 108, 0.6);
+        }
+        
+        button::before {
+            content: "✉️ ";
+        }
+        
+        /* Success message */
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #28a745;
+            margin-top: 25px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Explanation */
+        .explanation {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 6px solid #8ec5fc;
+        }
+        
+        /* Code */
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #e83e8c;
+            font-family: monospace;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 2px solid #f5576c;
+            opacity: 0.3;
+        }
+        
+        strong {
+            color: #f5576c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 Exercise 8: Newsletter Subscription</h1>
+        <p class="subtitle">Stay updated with our latest news</p>
+        
+        <form onsubmit="validateNewsletter(event)">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="newsEmail">Email Address</label>
+                <input type="email" id="newsEmail" placeholder="john@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Subscription Type</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="subscription" value="monthly">
+                        📅 Monthly - Get updates every month
+                    </label>
+                    <label>
+                        <input type="radio" name="subscription" value="yearly">
+                        📆 Yearly - Get annual summary
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Interests (Select at least one)</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" class="interest">
+                        💻 Technology & Programming
+                    </label>
+                    <label>
+                        <input type="checkbox" class="interest">
+                        ⚽ Sports & Fitness
+                    </label>
+                    <label>
+                        <input type="checkbox" class="interest">
+                        ✈️ Travel & Adventure
+                    </label>
+                    <label>
+                        <input type="checkbox" class="interest">
+                        🍕 Food & Cooking
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit">Subscribe Now</button>
+        </form>
+        
+        <div class="success-message" id="newsSuccess">
+            <strong>🎉 Subscription Successful!</strong><br>
+            Thank you for subscribing to our newsletter!
+        </div>
+        /end html/
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 CSS Grid Layout:</h2>
+            <pre>
+/* FORM WITH CSS GRID */
+form {
+    display: grid;
+    grid-template-columns: 1fr;  → 1 cột
+    gap: 25px;  → Khoảng cách giữa các items
+}
+
+/* RADIO/CHECKBOX HOVER EFFECT */
+.radio-group label:hover {
+    background-color: #ffe3e8;  → Đổi màu khi hover
+}
+
+/* CUSTOM RADIO/CHECKBOX STYLE */
+input[type="radio"],
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+function validateNewsletter(event) {
+    event.preventDefault();
+    
+    var email = document.getElementById('newsEmail').value;
+    var interests = document.querySelectorAll('.interest:checked');
+    
+    // Validation: email có @ và . + ít nhất 1 interest
+    if (email.includes('@') && email.includes('.') && interests.length > 0) {
+        document.getElementById('newsSuccess').classList.add('show');
+    } else {
+        alert('⚠️ Please enter valid email and select at least one interest');
+    }
+}
+        </pre>
+        
+        <h2>📚 CSS Properties:</h2>
+        <table>
+            <tr>
+                <th>Property</th>
+                <th>Mô tả</th>
+            </tr>
+            <tr>
+                <td><code>display: grid</code></td>
+                <td>CSS Grid layout</td>
+            </tr>
+            <tr>
+                <td><code>grid-template-columns</code></td>
+                <td>Định nghĩa cột trong grid</td>
+            </tr>
+            <tr>
+                <td><code>gap</code></td>
+                <td>Khoảng cách giữa grid items</td>
+            </tr>
+            <tr>
+                <td><code>flex-direction: column</code></td>
+                <td>Sắp xếp theo cột dọc</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li><strong>Email không hợp lệ:</strong> "test" → Alert</li>
+            <li><strong>Không chọn interest:</strong> → Alert</li>
+            <li><strong>Hợp lệ:</strong> Email có @ và . + 1 interest → Success</li>
+            <li><strong>Hover options:</strong> Background đổi màu hồng nhạt</li>
+        </ol>
+    </div>
+    /JavaScript/
+    <script>
+        function validateNewsletter(event) {
+            event.preventDefault();
+            console.log('📰 Newsletter form submitted');
+            
+            var email = document.getElementById('newsEmail').value;
+            var interests = document.querySelectorAll('.interest:checked');
+            
+            console.log('Email:', email);
+            console.log('Interests selected:', interests.length);
+            
+            if (email.includes('@') && email.includes('.') && interests.length > 0) {
+                console.log('✓ Validation passed');
+                
+                var successMsg = document.getElementById('newsSuccess');
+                successMsg.classList.add('show');
+                
+                // Reset
+                document.getElementById('fullName').value = '';
+                document.getElementById('newsEmail').value = '';
+                
+                for (var i = 0; i < interests.length; i++) {
+                    interests[i].checked = false;
+                }
+                
+                console.log('✓ Form reset');
+            } else {
+                console.log('✗ Validation failed');
+                alert('⚠️ Please enter valid email and select at least one interest');
+            }
+        }
+    </script>
+
+</body>
+</html>

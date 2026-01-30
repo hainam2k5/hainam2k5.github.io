@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 4: Restaurant Menu</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 4:
+    ==========================================
+    YÊU CẦU:
+    1. Menu 4 sections: Appetizers, Main Course, Desserts, Drinks
+    2. HTML entities: ®, §, ≥
+    3. Button "Filter Menu" lọc món chay
+    4. Sử dụng getElementsByClassName()
+    5. Sử dụng classList.contains()
+    
+    JAVASCRIPT: Cần để lọc menu
+    -->
+    
+    <style>
+        /* ===== RESET CSS ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Giải thích:
+            - margin: 0; padding: 0; → Xóa khoảng cách mặc định
+            - box-sizing: border-box; → padding và border tính vào width
+            */
+        }
+        
+        /* ===== BODY ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fd79a8 100%);
+            min-height: 100vh;
+            padding: 30px;
+            /* Giải thích:
+            - linear-gradient(135deg, color1, color2) → Màu gradient
+            - 135deg → Góc nghiêng
+            - min-height: 100vh → Tối thiểu bằng chiều cao màn hình
+            */
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            /* Giải thích:
+            - max-width: 1000px → Rộng tối đa 1000px
+            - margin: 0 auto → Căn giữa (0 trên/dưới, auto trái/phải)
+            - border-radius: 20px → Bo góc 20px
+            - box-shadow: x y blur spread color → Đổ bóng
+            */
+        }
+        
+        /* ===== HEADING ===== */
+        h1 {
+            color: #d63031;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            /* Giải thích:
+            - text-align: center → Căn giữa
+            - text-transform: uppercase → Chữ in hoa
+            - letter-spacing: 3px → Khoảng cách giữa các chữ
+            */
+        }
+        
+        /* ===== MENU SECTION ===== */
+        .menu-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+            border-radius: 12px;
+            border-left: 6px solid #d63031;
+            /* Giải thích:
+            - margin: 30px 0 → 30px trên/dưới, 0 trái/phải
+            - padding: 20px → Khoảng cách bên trong
+            - border-left: width style color → Viền bên trái
+            */
+        }
+        
+        .menu-section h3 {
+            color: #d63031;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        /* ===== MENU ITEM ===== */
+        .menu-item {
+            background-color: white;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #d63031;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            /* Giải thích:
+            - transition: all 0.3s → Hiệu ứng chuyển đổi mượt 0.3s
+            - display: flex → Kích hoạt Flexbox
+            - justify-content: space-between → Căn 2 đầu
+            */
+        }
+        
+        /* ===== VEGETARIAN ITEM ===== */
+        .menu-item.vegetarian {
+            border-left-color: #00b894;
+            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+            /* Giải thích:
+            - .menu-item.vegetarian → Chọn phần tử có CẢ 2 class
+            - border-left-color → Đổi màu viền trái
+            */
+        }
+        
+        /* ===== HOVER EFFECT ===== */
+        .menu-item:hover {
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 0 5px 20px rgba(214, 48, 49, 0.3);
+            /* Giải thích:
+            - transform: translateX(10px) → Dịch sang phải 10px
+            - scale(1.02) → Phóng to 102%
+            */
+        }
+        
+        /* ===== HIDDEN CLASS ===== */
+        .hidden {
+            display: none;
+            /* Giải thích:
+            - display: none → Ẩn hoàn toàn, không chiếm không gian
+            */
+        }
+        
+        /* ===== BUTTON ===== */
+        button {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.4);
+            transition: all 0.3s;
+            display: block;
+            margin: 30px auto;
+            /* Giải thích:
+            - cursor: pointer → Con trỏ chuột dạng tay
+            - display: block; margin: auto → Căn giữa button
+            */
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 184, 148, 0.6);
+            /* Giải thích:
+            - translateY(-5px) → Dịch lên trên 5px
+            */
+        }
+        
+        /* ===== EXPLANATION ===== */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #d63031;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Bài 4: Menu Nhà Hàng</h1>
+        
+        <!-- APPETIZERS -->
+        <div class="menu-section">
+            <h3>Appetizers &reg;</h3>
+            <div class="menu-item vegetarian">
+                <span>Fresh Garden Salad</span>
+                <span>&ge; $8.99</span>
+            </div>
+            <div class="menu-item">
+                <span>Crispy Chicken Wings</span>
+                <span>&ge; $12.99</span>
+            </div>
+        </div>
+        
+        <!-- MAIN COURSE -->
+        <div class="menu-section">
+            <h3>Main Course &sect;</h3>
+            <div class="menu-item">
+                <span>Grilled Steak</span>
+                <span>&ge; $24.99</span>
+            </div>
+            <div class="menu-item vegetarian">
+                <span>Pasta Primavera</span>
+                <span>&ge; $16.99</span>
+            </div>
+        </div>
+        
+        <!-- DESSERTS -->
+        <div class="menu-section">
+            <h3>Desserts</h3>
+            <div class="menu-item vegetarian">
+                <span>Vanilla Ice Cream</span>
+                <span>&ge; $6.99</span>
+            </div>
+            <div class="menu-item vegetarian">
+                <span>Chocolate Cake</span>
+                <span>&ge; $7.99</span>
+            </div>
+        </div>
+        
+        <!-- DRINKS -->
+        <div class="menu-section">
+            <h3>Drinks</h3>
+            <div class="menu-item vegetarian">
+                <span>Fresh Soda</span>
+                <span>&ge; $2.99</span>
+            </div>
+            <div class="menu-item">
+                <span>Premium Coffee</span>
+                <span>&ge; $3.99</span>
+            </div>
+        </div>
+        
+        <button onclick="filterMenu()">🌱 Filter Menu</button>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>class="menu-item"</code> - Class chung cho tất cả món</li>
+                <li><code>class="menu-item vegetarian"</code> - Món có 2 class</li>
+                <li><code>onclick="filterMenu()"</code> - Gọi hàm khi click</li>
+            </ul>
+            
+            <h2>🔤 HTML Entities:</h2>
+            <ul>
+                <li><code>&amp;reg;</code> → &reg; (Registered)</li>
+                <li><code>&amp;sect;</code> → &sect; (Section)</li>
+                <li><code>&amp;ge;</code> → &ge; (Greater or equal)</li>
+            </ul>
+            
+            <h2>🎨 Giải Thích CSS Chi Tiết:</h2>
+            <ul>
+                <li><code>linear-gradient(135deg, color1, color2)</code> - Tạo màu gradient góc 135°</li>
+                <li><code>box-shadow: x y blur spread color</code> - Đổ bóng (x: ngang, y: dọc, blur: độ mờ)</li>
+                <li><code>border-left: 6px solid #color</code> - Viền trái dày 6px</li>
+                <li><code>display: flex</code> - Kích hoạt Flexbox</li>
+                <li><code>justify-content: space-between</code> - Căn 2 đầu</li>
+                <li><code>transform: translateX(10px)</code> - Dịch sang phải 10px</li>
+                <li><code>transform: scale(1.02)</code> - Phóng to 102%</li>
+                <li><code>transition: all 0.3s</code> - Hiệu ứng chuyển đổi mượt</li>
+                <li><code>.menu-item.vegetarian</code> - Chọn phần tử có CẢ 2 class</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+var showAll = true;
+
+function filterMenu() {
+    var items = document.getElementsByClassName('menu-item');
+    
+    if (showAll) {
+        // Ẩn món KHÔNG chay
+        for (var i = 0; i < items.length; i++) {
+            if (!items[i].classList.contains('vegetarian')) {
+                items[i].classList.add('hidden');
+            }
+        }
+        showAll = false;
+    } else {
+        // Hiện tất cả
+        for (var i = 0; i < items.length; i++) {
+            items[i].classList.remove('hidden');
+        }
+        showAll = true;
+    }
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>var showAll = true</code> - Biến theo dõi trạng thái</li>
+                <li><code>getElementsByClassName('menu-item')</code> - Lấy TẤT CẢ có class</li>
+                <li><code>.classList.contains('vegetarian')</code> - Kiểm tra có class không</li>
+                <li><code>.classList.add('hidden')</code> - Thêm class hidden</li>
+                <li><code>.classList.remove('hidden')</code> - Xóa class hidden</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Click "Filter Menu" lần 1 → Chỉ hiện món chay</li>
+                <li>Click lần 2 → Hiện lại tất cả</li>
+                <li>Có 5 món chay, 3 món không chay</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        var showAll = true;
+        
+        function filterMenu() {
+            console.log('Filter menu clicked');
+            
+            var items = document.getElementsByClassName('menu-item');
+            console.log('Tổng số món:', items.length);
+            
+            if (showAll) {
+                var hiddenCount = 0;
+                for (var i = 0; i < items.length; i++) {
+                    if (!items[i].classList.contains('vegetarian')) {
+                        items[i].classList.add('hidden');
+                        hiddenCount++;
+                    }
+                }
+                console.log('Đã ẩn', hiddenCount, 'món không chay');
+                showAll = false;
+            } else {
+                for (var i = 0; i < items.length; i++) {
+                    items[i].classList.remove('hidden');
+                }
+                console.log('Đã hiện tất cả món');
+                showAll = true;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task 7</title>
+    <style>
+    .contact-form {
+            max-width: 500px;
+        }
+        
+        .contact-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .success-message {
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Exercise 7: Contact Form</h2>
+        <form class="contact-form" onsubmit="validateContact(event)">
+            <label>Name:</label>
+            <input type="text" id="contactName">
+            
+            <label>Email:</label>
+            <input type="email" id="contactEmail">
+            
+            <label>Message:</label>
+            <textarea id="contactMessage"></textarea>
+            
+            <button type="submit">Submit</button>
+            <div id="contactSuccess" class="success-message">Form submitted successfully!</div>
+        </form>
+        <script>
+            function validateContact(event) {
+            event.preventDefault();
+            var name = document.getElementById('contactName').value;
+            var email = document.getElementById('contactEmail').value;
+            var message = document.getElementById('contactMessage').value;
+            
+            if (name && email && message) {
+                document.getElementById('contactSuccess').style.display = 'block';
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+        </script>
+</body>
+</html>

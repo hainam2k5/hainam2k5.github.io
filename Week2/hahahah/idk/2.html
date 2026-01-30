@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 2: Computer Parts Price List</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 2:
+    ==========================================
+    YÊU CẦU:
+    1. Table với 4 linh kiện và giá
+    2. HTML entities: ©, ™, •
+    3. Table có borders và padding
+    4. Button "Change Color" đổi text thành ĐỎ
+    5. Sử dụng changeColor() và getElementById()
+    
+    JAVASCRIPT: Cần để đổi màu text
+    -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        
+        /* TABLE STYLING */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        
+        table th {
+            background-color: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            border: 1px solid #5568d3;
+        }
+        
+        table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+        
+        /* ZEBRA STRIPING */
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        table tr:hover td {
+            background-color: #e8e8e8;
+        }
+        
+        /* BUTTON */
+        button {
+            background-color: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+        
+        button:hover {
+            background-color: #5568d3;
+        }
+        
+        /* EXPLANATION */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💻 Bài 2: Bảng Giá Linh Kiện</h1>
+        
+        <table id="partsTable">
+            <thead>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Graphics Card &trade;</td>
+                    <td>$599.99</td>
+                </tr>
+                <tr>
+                    <td>Processor &copy;</td>
+                    <td>$399.99</td>
+                </tr>
+                <tr>
+                    <td>&bull; RAM Module</td>
+                    <td>$129.99</td>
+                </tr>
+                <tr>
+                    <td>Motherboard</td>
+                    <td>$249.99</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button onclick="changeColor()">Change Color to Red</button>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>&lt;table&gt;</code> - Tạo table</li>
+                <li><code>&lt;thead&gt;</code> - Phần header của table</li>
+                <li><code>&lt;tbody&gt;</code> - Phần body của table</li>
+                <li><code>&lt;tr&gt;</code> - Table row (hàng)</li>
+                <li><code>&lt;th&gt;</code> - Table header cell</li>
+                <li><code>&lt;td&gt;</code> - Table data cell</li>
+                <li><code>id="partsTable"</code> - ID để JavaScript lấy table</li>
+                <li><code>onclick="changeColor()"</code> - Gọi hàm khi click</li>
+            </ul>
+            
+            <h2>🔤 HTML Entities:</h2>
+            <ul>
+                <li><code>&amp;trade;</code> → &trade; (Trademark)</li>
+                <li><code>&amp;copy;</code> → &copy; (Copyright)</li>
+                <li><code>&amp;bull;</code> → &bull; (Bullet)</li>
+            </ul>
+            
+            <h2>🎨 Giải Thích CSS:</h2>
+            <ul>
+                <li><code>border-collapse: collapse;</code> - Gộp viền cells</li>
+                <li><code>:nth-child(even)</code> - Chọn hàng chẵn</li>
+                <li><code>:hover</code> - Style khi rê chuột</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+function changeColor() {
+    // Lấy table theo ID
+    var table = document.getElementById('partsTable');
+    
+    // Lấy TẤT CẢ thẻ td trong table
+    var cells = table.getElementsByTagName('td');
+    
+    // Duyệt qua từng cell và đổi màu
+    for (var i = 0; i < cells.length; i++) {
+        cells[i].style.color = 'red';
+    }
+    
+    alert('Đã đổi màu thành đỏ!');
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>document.getElementById('partsTable')</code> - Lấy table theo ID</li>
+                <li><code>getElementsByTagName('td')</code> - Lấy TẤT CẢ thẻ td</li>
+                <li><code>for loop</code> - Vòng lặp duyệt qua từng cell</li>
+                <li><code>cells[i]</code> - Truy cập cell thứ i</li>
+                <li><code>.style.color</code> - Đổi màu chữ</li>
+                <li><code>alert()</code> - Hiển thị popup thông báo</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Click button "Change Color to Red"</li>
+                <li>Tất cả text trong cells sẽ đổi màu đỏ</li>
+                <li>Có 8 cells (4 hàng x 2 cột)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * HÀM ĐỔI MÀU TEXT THÀNH ĐỎ
+         * Được gọi khi user click button
+         */
+        function changeColor() {
+            console.log('Button clicked - Bắt đầu đổi màu');
+            
+            // BƯỚC 1: Lấy table theo ID
+            var table = document.getElementById('partsTable');
+            console.log('Đã lấy table:', table);
+            
+            // BƯỚC 2: Lấy TẤT CẢ thẻ td trong table
+            var cells = table.getElementsByTagName('td');
+            console.log('Số lượng cells:', cells.length);
+            
+            // BƯỚC 3: Duyệt qua từng cell
+            for (var i = 0; i < cells.length; i++) {
+                // Đổi màu chữ thành đỏ
+                cells[i].style.color = 'red';
+                console.log('Đã đổi màu cell', i + 1);
+            }
+            
+            // Thông báo hoàn thành
+            alert('✓ Đã đổi màu tất cả text thành đỏ!');
+        }
+    </script>
+</body>
+</html>

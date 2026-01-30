@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task 6</title>
+    <style>
+        nav {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        nav a:hover {
+            color: #007bff;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Exercise 6: Bookstore Navigation</h2>
+        <button onclick="toggleMenu()">Toggle Menu</button>
+        <nav id="mainNav" style="margin-top: 15px;">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li>&bull;</li>
+                <li><a href="#">Books &copy;</a></li>
+                <li>&bull;</li>
+                <li><a href="#">Authors &trade;</a></li>
+                <li>&bull;</li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+        <script>
+            function toggleMenu() {
+            var nav = document.getElementById('mainNav');
+            nav.classList.toggle('hidden');
+        }
+        </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+        <table id="partsTable">
+            <tr>
+                <th>Part Name</th>
+                <th>Price</th>
+            </tr>
+        </table>
+        <button onclick="changeColor()">Change Color</button>
+        <script>
+            function changeColor() {
+            var table = document.getElementById('partsTable');
+            var cells = table.getElementsByTagName('td');
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].style.color = 'red';
+            }
+        }
+        </script>
+</body>
+</html>

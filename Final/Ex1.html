@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ex 1</title>
+    <style>
+    .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .product-card {
+            border: 1px solid rgb(166, 204, 30);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px black(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px black(0,0,0,0.2);
+        }
+        
+        .product-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .product-price {
+            color: black;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        </style>  
+</head>
+<body>
+    <h2>Ex1</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <h3>Truyện tranh®</h3>
+                <p class="product-price price">→299 €</p>
+                <p>Hài, Viễn tưởng, Ẩm thực.</p>
+            </div>
+            <div class="product-card">
+                <h3>Tai nghe</h3>
+                <p class="product-price price">→149 €</p>
+                <p>Không dây, Có dây, Tai nghe chụp.</p>
+            </div>
+            <div class="product-card">
+                <h3>Máy tính®</h3>
+                <p class="product-price price">→79 €</p>
+                <p>Dell, Hp, Asus.</p>
+            </div>
+            <div class="product-card">
+                <h3>Sạc dự phòng</h3>
+                <p class="product-price price">→39 €</p>
+                <p>Cukteck, Xiaomi, Sam Sung.</p>
+            </div>
+        </div>
+        <button onclick="togglePrice()">Toggle Price</button>
+        <script>
+            var pricesVisible = true;
+        function togglePrice() {
+            var prices = document.getElementsByClassName('price');
+            if (pricesVisible) {
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'none';
+                }
+                pricesVisible = false;
+            } else {
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'block';
+                }
+                pricesVisible = true;
+            }
+        }
+        </script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 7: Contact Form</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 7:
+    ==========================================
+    YÊU CẦU:
+    1. Form với 3 fields: Name, Email, Message
+    2. Labels và submit button
+    3. Spacing và borders phù hợp
+    4. Validation:
+       - Kiểm tra fields có rỗng không
+       - Hiện success message khi hợp lệ
+    
+    JAVASCRIPT: Cần để validation
+    -->
+    
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== BODY ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Giải thích:
+            - display: flex → Kích hoạt Flexbox
+            - align-items: center → Căn giữa dọc
+            - justify-content: center → Căn giữa ngang
+            */
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== HEADING ===== */
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        /* ===== FORM GROUP ===== */
+        .form-group {
+            margin-bottom: 25px;
+            /* Giải thích:
+            - margin-bottom → Khoảng cách dưới mỗi form group
+            */
+        }
+        
+        /* ===== LABEL ===== */
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+            /* Giải thích:
+            - display: block → Label chiếm cả dòng
+            - margin-bottom → Khoảng cách với input bên dưới
+            */
+        }
+        
+        /* ===== INPUT và TEXTAREA ===== */
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+            /* Giải thích:
+            - width: 100% → Chiếm toàn bộ chiều rộng
+            - padding: 15px → Khoảng cách bên trong
+            - border: 2px solid #ddd → Viền 2px màu xám
+            - transition → Hiệu ứng chuyển đổi mượt
+            */
+        }
+        
+        /* ===== FOCUS STATE ===== */
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+            /* Giải thích:
+            - outline: none → Xóa viền mặc định khi focus
+            - box-shadow → Đổ bóng khi focus
+            */
+        }
+        
+        /* ===== TEXTAREA ===== */
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            /* Giải thích:
+            - resize: vertical → Chỉ cho phép kéo dãn theo chiều dọc
+            - min-height → Chiều cao tối thiểu
+            */
+        }
+        
+        /* ===== SUBMIT BUTTON ===== */
+        button[type="submit"] {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+            /* Giải thích:
+            - width: 100% → Button rộng toàn bộ
+            */
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* ===== SUCCESS MESSAGE ===== */
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+            margin-top: 20px;
+            /* Giải thích:
+            - display: none → Ẩn mặc định
+            - border-left → Viền trái dày 5px
+            */
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        /* ===== EXPLANATION ===== */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Bài 7: Contact Form</h1>
+        <p class="subtitle">Get in touch with us</p>
+        
+        <form onsubmit="validateContact(event)">
+            <!-- Name Field -->
+            <div class="form-group">
+                <label for="contactName">Name</label>
+                <input type="text" id="contactName" placeholder="Your name...">
+            </div>
+            
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="contactEmail">Email</label>
+                <input type="email" id="contactEmail" placeholder="your@email.com">
+            </div>
+            
+            <!-- Message Field -->
+            <div class="form-group">
+                <label for="contactMessage">Message</label>
+                <textarea id="contactMessage" placeholder="Your message..."></textarea>
+            </div>
+            
+            <button type="submit">📧 Send Message</button>
+        </form>
+        
+        <div class="success-message" id="contactSuccess">
+            <strong>✓ Success!</strong><br>
+            Your message has been sent successfully!
+        </div>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>&lt;form&gt;</code> - Thẻ form</li>
+                <li><code>onsubmit="validateContact(event)"</code> - Gọi hàm khi submit</li>
+                <li><code>type="text"</code> - Input text thường</li>
+                <li><code>type="email"</code> - Input email (có validation)</li>
+                <li><code>&lt;textarea&gt;</code> - Ô nhập nhiều dòng</li>
+                <li><code>placeholder</code> - Text gợi ý trong input</li>
+            </ul>
+            
+            <h2>🎨 Giải Thích CSS Chi Tiết:</h2>
+            <ul>
+                <li><code>display: block</code> - Label chiếm cả dòng</li>
+                <li><code>width: 100%</code> - Input rộng toàn bộ</li>
+                <li><code>padding: 15px</code> - Khoảng cách bên trong</li>
+                <li><code>border: 2px solid #ddd</code> - Viền 2px màu xám</li>
+                <li><code>outline: none</code> - Xóa viền mặc định khi focus</li>
+                <li><code>:focus</code> - Pseudo-class khi input được chọn</li>
+                <li><code>resize: vertical</code> - Textarea chỉ kéo dãn dọc</li>
+                <li><code>min-height</code> - Chiều cao tối thiểu</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+function validateContact(event) {
+    event.preventDefault();  // Ngăn reload trang
+    
+    var name = document.getElementById('contactName').value;
+    var email = document.getElementById('contactEmail').value;
+    var message = document.getElementById('contactMessage').value;
+    
+    if (name && email && message) {
+        // Hiện success message
+        document.getElementById('contactSuccess').classList.add('show');
+        
+        // Reset form
+        document.getElementById('contactName').value = '';
+        document.getElementById('contactEmail').value = '';
+        document.getElementById('contactMessage').value = '';
+    } else {
+        alert('⚠️ Please fill in all fields!');
+    }
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>event.preventDefault()</code> - Ngăn form reload trang</li>
+                <li><code>.value</code> - Lấy giá trị input</li>
+                <li><code>if (name && email && message)</code> - Kiểm tra tất cả có giá trị</li>
+                <li><code>.classList.add('show')</code> - Thêm class show</li>
+                <li><code>.value = ''</code> - Xóa nội dung input (reset)</li>
+                <li><code>alert()</code> - Hiện popup thông báo</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Để trống → Click Submit → Alert</li>
+                <li>Điền đủ → Click Submit → Success message</li>
+                <li>Form tự động reset sau khi submit</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function validateContact(event) {
+            event.preventDefault();
+            console.log('Form submitted');
+            
+            var name = document.getElementById('contactName').value;
+            var email = document.getElementById('contactEmail').value;
+            var message = document.getElementById('contactMessage').value;
+            
+            console.log('Name:', name);
+            console.log('Email:', email);
+            console.log('Message:', message);
+            
+            if (name && email && message) {
+                console.log('✓ All fields filled');
+                
+                var successMsg = document.getElementById('contactSuccess');
+                successMsg.classList.add('show');
+                
+                // Reset form
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactEmail').value = '';
+                document.getElementById('contactMessage').value = '';
+                
+                console.log('✓ Form reset');
+            } else {
+                console.log('✗ Missing fields');
+                alert('⚠️ Please fill in all fields!');
+            }
+        }
+    </script>
+</body>
+</html>

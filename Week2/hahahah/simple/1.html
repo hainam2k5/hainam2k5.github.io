@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML/CSS Exercises Complete</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .exercise {
+            background: white;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        /* Exercise 1: Registration Form */
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .password-strength {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .weak { background-color: #ffcccc; color: #cc0000; }
+        .medium { background-color: #fff4cc; color: #cc8800; }
+        .strong { background-color: #ccffcc; color: #00cc00; }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Exercise 2 & 3: Tables */
+        table {
+            width: 100%;
+            max-width: 600px;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .striped tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        #result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            display: none;
+        }
+        
+        /* Exercise 4: Restaurant Menu */
+        .menu-section {
+            margin: 15px 0;
+        }
+        
+        .menu-section h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .menu-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-left: 3px solid #007bff;
+        }
+        
+        .menu-item.vegetarian {
+            border-left-color: #28a745;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Exercise 5: Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+            border-bottom: none;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 4px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Exercise 6: Navigation */
+        nav {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        nav a:hover {
+            color: #007bff;
+        }
+        
+        /* Exercise 7: Contact Form */
+        .contact-form {
+            max-width: 500px;
+        }
+        
+        .contact-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .success-message {
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        /* Exercise 8: Newsletter */
+        .newsletter-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            max-width: 500px;
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* Exercise 9: Product Cards */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .product-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .product-price {
+            color: #007bff;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Exercise 1: User Registration Form -->
+    <div class="exercise">
+        <h2>Exercise 1: User Registration Form</h2>
+        <form class="registration-form">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="username" minlength="5" maxlength="15">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" onkeyup="checkPasswordStrength()">
+                <div id="strength" class="password-strength" style="display:none;"></div>
+            </div>
+            <div class="form-group">
+                <label>Profile Picture:</label>
+                <input type="file" accept=".jpg,.png">
+            </div>
+        </form>
+    </div>
+
+    <!-- Exercise 2: Computer Parts Price List -->
+    <div class="exercise">
+        <h2>Exercise 2: Computer Parts Price List</h2>
+        <table id="partsTable">
+            <tr>
+                <th>Part Name</th>
+                <th>Price</th>
+            </tr>
+            <tr>
+                <td>Graphics Card &trade;</td>
+                <td>$599.99</td>
+            </tr>
+            <tr>
+                <td>Processor &copy;</td>
+                <td>$399.99</td>
+            </tr>
+            <tr>
+                <td>&bull; RAM Module</td>
+                <td>$129.99</td>
+            </tr>
+            <tr>
+                <td>Motherboard</td>
+                <td>$249.99</td>
+            </tr>
+        </table>
+        <button onclick="changeColor()">Change Color</button>
+    </div>
+
+    <!-- Exercise 3: Student Grade Calculator -->
+    <div class="exercise">
+        <h2>Exercise 3: Student Grade Calculator</h2>
+        <table class="striped">
+            <tr>
+                <th>Subject</th>
+                <th>Grade</th>
+            </tr>
+            <tr>
+                <td>Mathematics &reg;</td>
+                <td class="grade">85</td>
+            </tr>
+            <tr>
+                <td>Science &sect;</td>
+                <td class="grade">92</td>
+            </tr>
+            <tr>
+                <td>English &ge;</td>
+                <td class="grade">78</td>
+            </tr>
+            <tr>
+                <td>History</td>
+                <td class="grade">88</td>
+            </tr>
+        </table>
+        <button onclick="calculateAverage()">Calculate Average</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- Exercise 4: Restaurant Menu -->
+    <div class="exercise">
+        <h2>Exercise 4: Restaurant Menu</h2>
+        <div class="menu-section">
+            <h3>Appetizers &reg;</h3>
+            <div class="menu-item vegetarian">Salad &ge; $8.99</div>
+            <div class="menu-item">Chicken Wings &ge; $12.99</div>
+        </div>
+        <div class="menu-section">
+            <h3>Main Course &sect;</h3>
+            <div class="menu-item">Steak &ge; $24.99</div>
+            <div class="menu-item vegetarian">Pasta Primavera &ge; $16.99</div>
+        </div>
+        <div class="menu-section">
+            <h3>Desserts</h3>
+            <div class="menu-item vegetarian">Ice Cream &ge; $6.99</div>
+            <div class="menu-item vegetarian">Cake &ge; $7.99</div>
+        </div>
+        <div class="menu-section">
+            <h3>Drinks</h3>
+            <div class="menu-item vegetarian">Soda &ge; $2.99</div>
+            <div class="menu-item">Coffee &ge; $3.99</div>
+        </div>
+        <button onclick="filterMenu()">Filter Menu</button>
+    </div>
+
+    <!-- Exercise 5: Tabbed Content Interface -->
+    <div class="exercise">
+        <h2>Exercise 5: Tabbed Content Interface</h2>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">Features &reg; &rarr;</div>
+            <div class="tab" onclick="switchTab(1)">Pricing &euro;</div>
+            <div class="tab" onclick="switchTab(2)">Reviews</div>
+            <div class="tab" onclick="switchTab(3)">Support</div>
+        </div>
+        <div class="tab-content active" id="content0">
+            <h3>Features</h3>
+            <p>Our product includes amazing features like responsive design, fast performance, and user-friendly interface.</p>
+        </div>
+        <div class="tab-content" id="content1">
+            <h3>Pricing</h3>
+            <p>Basic Plan: $9.99/month | Premium Plan: $19.99/month | Enterprise: Contact us</p>
+        </div>
+        <div class="tab-content" id="content2">
+            <h3>Reviews</h3>
+            <p>Our customers love us! Average rating: 4.8/5 stars based on 1,234 reviews.</p>
+        </div>
+        <div class="tab-content" id="content3">
+            <h3>Support</h3>
+            <p>24/7 customer support available via email, phone, and live chat.</p>
+        </div>
+    </div>
+
+    <!-- Exercise 6: Bookstore Navigation -->
+    <div class="exercise">
+        <h2>Exercise 6: Bookstore Navigation</h2>
+        <button onclick="toggleMenu()">Toggle Menu</button>
+        <nav id="mainNav" style="margin-top: 15px;">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li>&bull;</li>
+                <li><a href="#">Books &copy;</a></li>
+                <li>&bull;</li>
+                <li><a href="#">Authors &trade;</a></li>
+                <li>&bull;</li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Exercise 7: Contact Form -->
+    <div class="exercise">
+        <h2>Exercise 7: Contact Form</h2>
+        <form class="contact-form" onsubmit="validateContact(event)">
+            <label>Name:</label>
+            <input type="text" id="contactName">
+            
+            <label>Email:</label>
+            <input type="email" id="contactEmail">
+            
+            <label>Message:</label>
+            <textarea id="contactMessage"></textarea>
+            
+            <button type="submit">Submit</button>
+            <div id="contactSuccess" class="success-message">Form submitted successfully!</div>
+        </form>
+    </div>
+
+    <!-- Exercise 8: Newsletter Subscription -->
+    <div class="exercise">
+        <h2>Exercise 8: Newsletter Subscription</h2>
+        <form class="newsletter-form" onsubmit="validateNewsletter(event)">
+            <div>
+                <label>Full Name:</label>
+                <input type="text" id="fullName">
+            </div>
+            
+            <div>
+                <label>Email:</label>
+                <input type="email" id="newsEmail">
+            </div>
+            
+            <div class="radio-group">
+                <label>Subscription Type:</label>
+                <label><input type="radio" name="subscription" value="monthly"> Monthly</label>
+                <label><input type="radio" name="subscription" value="yearly"> Yearly</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <label>Interests:</label>
+                <label><input type="checkbox" class="interest"> Technology</label>
+                <label><input type="checkbox" class="interest"> Sports</label>
+                <label><input type="checkbox" class="interest"> Travel</label>
+                <label><input type="checkbox" class="interest"> Food</label>
+            </div>
+            
+            <button type="submit">Subscribe</button>
+            <div id="newsSuccess" class="success-message">Subscription successful!</div>
+        </form>
+    </div>
+
+    <!-- Exercise 9: Product Showcase -->
+    <div class="exercise">
+        <h2>Exercise 9: Product Showcase</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <h3>Smart Watch &reg;</h3>
+                <p class="product-price price">299 &euro;</p>
+                <p>Track your fitness and stay connected &rarr;</p>
+            </div>
+            <div class="product-card">
+                <h3>Wireless Earbuds</h3>
+                <p class="product-price price">149 &euro;</p>
+                <p>Premium sound quality &rarr;</p>
+            </div>
+            <div class="product-card">
+                <h3>Laptop Stand &reg;</h3>
+                <p class="product-price price">79 &euro;</p>
+                <p>Ergonomic design for comfort &rarr;</p>
+            </div>
+            <div class="product-card">
+                <h3>USB Hub</h3>
+                <p class="product-price price">39 &euro;</p>
+                <p>Expand your connectivity &rarr;</p>
+            </div>
+        </div>
+        <button onclick="togglePrice()">Toggle Price</button>
+    </div>
+
+    <script>
+        // Exercise 1: Password Strength
+        function checkPasswordStrength() {
+            var password = document.getElementById('password').value;
+            var strength = document.getElementById('strength');
+            
+            if (password.length === 0) {
+                strength.style.display = 'none';
+                return;
+            }
+            
+            strength.style.display = 'block';
+            var hasNumbers = /\d/.test(password);
+            var hasLetters = /[a-zA-Z]/.test(password);
+            
+            if (password.length < 6 || !hasNumbers || !hasLetters) {
+                strength.className = 'password-strength weak';
+                strength.textContent = 'Weak';
+            } else if (password.length < 10) {
+                strength.className = 'password-strength medium';
+                strength.textContent = 'Medium';
+            } else {
+                strength.className = 'password-strength strong';
+                strength.textContent = 'Strong';
+            }
+        }
+
+        // Exercise 2: Change Color
+        function changeColor() {
+            var table = document.getElementById('partsTable');
+            var cells = table.getElementsByTagName('td');
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].style.color = 'red';
+            }
+        }
+
+        // Exercise 3: Calculate Average
+        function calculateAverage() {
+            var grades = document.querySelectorAll('.grade');
+            var total = 0;
+            for (var i = 0; i < grades.length; i++) {
+                total += parseInt(grades[i].textContent);
+            }
+            var average = total / grades.length;
+            var result = document.getElementById('result');
+            result.style.display = 'block';
+            result.textContent = 'Average Grade: ' + average.toFixed(2);
+        }
+
+        // Exercise 4: Filter Menu
+        var showAll = true;
+        function filterMenu() {
+            var items = document.getElementsByClassName('menu-item');
+            if (showAll) {
+                for (var i = 0; i < items.length; i++) {
+                    if (!items[i].classList.contains('vegetarian')) {
+                        items[i].classList.add('hidden');
+                    }
+                }
+                showAll = false;
+            } else {
+                for (var i = 0; i < items.length; i++) {
+                    items[i].classList.remove('hidden');
+                }
+                showAll = true;
+            }
+        }
+
+        // Exercise 5: Switch Tab
+        function switchTab(index) {
+            var tabs = document.querySelectorAll('.tab');
+            var contents = document.querySelectorAll('.tab-content');
+            
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+                contents[i].classList.remove('active');
+            }
+            
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+        }
+
+        // Exercise 6: Toggle Menu
+        function toggleMenu() {
+            var nav = document.getElementById('mainNav');
+            nav.classList.toggle('hidden');
+        }
+
+        // Exercise 7: Contact Form Validation
+        function validateContact(event) {
+            event.preventDefault();
+            var name = document.getElementById('contactName').value;
+            var email = document.getElementById('contactEmail').value;
+            var message = document.getElementById('contactMessage').value;
+            
+            if (name && email && message) {
+                document.getElementById('contactSuccess').style.display = 'block';
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        // Exercise 8: Newsletter Validation
+        function validateNewsletter(event) {
+            event.preventDefault();
+            var email = document.getElementById('newsEmail').value;
+            var interests = document.querySelectorAll('.interest:checked');
+            
+            if (email.includes('@') && email.includes('.') && interests.length > 0) {
+                document.getElementById('newsSuccess').style.display = 'block';
+            } else {
+                alert('Please enter a valid email and select at least one interest');
+            }
+        }
+
+        // Exercise 9: Toggle Price
+        var pricesVisible = true;
+        function togglePrice() {
+            var prices = document.getElementsByClassName('price');
+            if (pricesVisible) {
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'none';
+                }
+                pricesVisible = false;
+            } else {
+                for (var i = 0; i < prices.length; i++) {
+                    prices[i].style.display = 'block';
+                }
+                pricesVisible = true;
+            }
+        }
+    </script>
+</body>
+</html>

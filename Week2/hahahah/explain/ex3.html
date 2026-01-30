@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 3: Student Grade Calculator</title>
+    /*css*/
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body with gradient background */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        /* Header */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 3px solid #84fab0;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        
+        /* Table styling with alternating colors */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        /* Table header */
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        table th {
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Table cells */
+        table td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        /* Alternating row colors (zebra striping) */
+        table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        table tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        
+        /* Hover effect on rows */
+        table tbody tr:hover {
+            background-color: #e8f5e9;
+            transform: scale(1.01);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Grade cells highlight */
+        .grade {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        /* Button */
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.4s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(-2px);
+        }
+        
+        /* Result display */
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        /* Animation for result */
+        
+        
+        /* Explanation box */
+        .explanation {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 6px solid #ff6b6b;
+        }
+        
+        /* Code block */
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 2px solid #667eea;
+        }
+        
+        /* Inline code */
+        code {
+            background-color: #f4f4f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #e83e8c;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* List */
+        ul, ol {
+            margin-left: 30px;
+            line-height: 2;
+        }
+        
+        li {
+            margin-bottom: 12px;
+        }
+        
+        /* CSS table */
+        .css-table {
+            margin: 25px 0;
+        }
+        
+        .css-table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        /* HR */
+        hr {
+            margin: 40px 0;
+            border: none;
+            border-top: 3px solid #84fab0;
+            opacity: 0.5;
+        }
+        
+        /* Strong text */
+        strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Exercise 3: Student Grade Calculator</h1>
+        
+        <div class="explanation">
+            <h2>📋 Mô Tả Bài Tập:</h2>
+            <ol>
+                <li>Table hiển thị 4 môn học và điểm số</li>
+                <li>HTML entities: ®, §, ≥</li>
+                <li>Màu nền <strong>xen kẽ</strong> cho các hàng (alternating rows)</li>
+                <li>Nút "Calculate Average" để tính điểm trung bình</li>
+                <li>Sử dụng <code>querySelectorAll('.grade')</code></li>
+            </ol>
+        </div>
+        /* HTML Table */
+        <h2>🎓 Bảng Điểm Học Sinh</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mathematics ®</td>
+                    <td class="grade">85</td>
+                </tr>
+                <tr>
+                    <td>Science §</td>
+                    <td class="grade">92</td>
+                </tr>
+                <tr>
+                    <td>English >=</td>
+                    <td class="grade">78</td>
+                </tr>
+                <tr>
+                    <td>History</td>
+                    <td class="grade">88</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button onclick="calculateAverage()">🧮 Calculate Average</button>
+        <div id="result"></div>
+        
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 CSS Highlights:</h2>
+            <pre>
+/* ALTERNATING ROW COLORS - Màu xen kẽ */
+table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;  → Hàng lẻ (1, 3, 5...)
+}
+table tbody tr:nth-child(even) {
+    background-color: #ffffff;  → Hàng chẵn (2, 4, 6...)
+}
+
+/* HOVER EFFECT - Hiệu ứng khi hover */
+table tbody tr:hover {
+    background-color: #e8f5e9;
+    transform: scale(1.01);  → Phóng to nhẹ
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* ANIMATION - Hiệu ứng xuất hiện */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+function calculateAverage() {
+    // Lấy TẤT CẢ phần tử có class="grade"
+    var grades = document.querySelectorAll('.grade');
+    
+    var total = 0;
+    // Cộng tất cả điểm
+    for (var i = 0; i < grades.length; i++) {
+        total += parseInt(grades[i].textContent);
+    }
+    
+    // Tính trung bình
+    var average = total / grades.length;
+    
+    // Hiển thị kết quả
+    var result = document.getElementById('result');
+    result.style.display = 'block';
+    result.innerHTML = '📊 Average Grade: ' + average.toFixed(2);
+}
+        </pre>
+        
+        <h2>📚 CSS Properties:</h2>
+        <table class="css-table">
+            <tr>
+                <th>Property</th>
+                <th>Mô tả</th>
+                <th>Ví dụ</th>
+            </tr>
+            <tr>
+                <td><code>:nth-child(odd)</code></td>
+                <td>Chọn phần tử lẻ (1,3,5...)</td>
+                <td>tr:nth-child(odd)</td>
+            </tr>
+            <tr>
+                <td><code>:nth-child(even)</code></td>
+                <td>Chọn phần tử chẵn (2,4,6...)</td>
+                <td>tr:nth-child(even)</td>
+            </tr>
+            <tr>
+                <td><code>@keyframes</code></td>
+                <td>Định nghĩa animation</td>
+                <td>@keyframes slideIn { ... }</td>
+            </tr>
+            <tr>
+                <td><code>animation</code></td>
+                <td>Áp dụng animation</td>
+                <td>animation: slideIn 0.5s ease;</td>
+            </tr>
+            <tr>
+                <td><code>text-shadow</code></td>
+                <td>Đổ bóng cho text</td>
+                <td>text-shadow: 2px 2px 4px rgba(0,0,0,0.1);</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Kiến Thức Quan Trọng:</h2>
+        <ul>
+            <li><strong>querySelectorAll('.grade')</strong> - Lấy TẤT CẢ phần tử có class="grade"</li>
+            <li><strong>parseInt()</strong> - Chuyển chuỗi thành số nguyên</li>
+            <li><strong>toFixed(2)</strong> - Làm tròn đến 2 chữ số thập phân</li>
+            <li><strong>nth-child()</strong> - CSS selector để tạo màu xen kẽ</li>
+            <li><strong>Animation</strong> - Tạo hiệu ứng động cho kết quả</li>
+        </ul>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li><strong>Khởi động:</strong> Bảng hiển thị với màu xen kẽ</li>
+            <li><strong>Hover hàng:</strong> Thấy hàng phóng to và đổi màu</li>
+            <li><strong>Click button:</strong> Kết quả xuất hiện với animation</li>
+            <li><strong>Kiểm tra tính toán:</strong> (85+92+78+88)/4 = 85.75</li>
+        </ol>
+    </div>
+    /* JavaScript */
+    <script>
+        /**
+         * HÀM TÍNH ĐIỂM TRUNG BÌNH
+         */
+        function calculateAverage() {
+            console.log('🧮 Bắt đầu tính điểm trung bình...');
+            
+            // Lấy TẤT CẢ phần tử có class="grade"
+            var grades = document.querySelectorAll('.grade');
+            console.log('Số môn học:', grades.length);
+            
+            var total = 0;
+            
+            // Cộng tất cả điểm
+            for (var i = 0; i < grades.length; i++) {
+                var grade = parseInt(grades[i].textContent);
+                total += grade;
+                console.log('Môn', i + 1, ':', grade, '| Tổng:', total);
+            }
+            
+            // Tính trung bình
+            var average = total / grades.length;
+            console.log('✓ Điểm trung bình:', average.toFixed(2));
+            
+            // Hiển thị kết quả với animation
+            var result = document.getElementById('result');
+            result.style.display = 'block';
+            result.innerHTML = '📊 <strong>Average Grade: ' + average.toFixed(2) + '</strong>';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 6: Bookstore Navigation</title>
+    
+    <!--
+    ==========================================
+    GIẢI THÍCH BÀI TẬP 6:
+    ==========================================
+    YÊU CẦU:
+    1. Navigation với 4 links: Home, Books, Authors, Contact
+    2. HTML entities: ©, ™, •
+    3. Dấu bullet (•) giữa các links
+    4. Nút "Toggle Menu" ẩn/hiện menu
+    5. Sử dụng classList.toggle("hidden")
+    
+    JAVASCRIPT: Cần để toggle menu
+    -->
+    
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== BODY ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== HEADING ===== */
+        h1 {
+            color: #8e44ad;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
+        
+        /* ===== TOGGLE BUTTON ===== */
+        button {
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(142, 68, 173, 0.4);
+            transition: all 0.3s;
+            display: block;
+            margin-bottom: 20px;
+            /* Giải thích:
+            - display: block → Đổi thành block element
+            - margin-bottom → Khoảng cách dưới button
+            */
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(142, 68, 173, 0.6);
+        }
+        
+        /* ===== NAVIGATION với FLEXBOX ===== */
+        nav {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.5s;
+            /* Giải thích:
+            - transition: all 0.5s → Hiệu ứng chuyển đổi mượt
+            */
+        }
+        
+        /* ===== HIDDEN STATE ===== */
+        nav.hidden {
+            display: none;
+            /* Giải thích:
+            - .hidden → Class để ẩn menu
+            - display: none → Ẩn hoàn toàn
+            */
+        }
+        
+        /* ===== NAV LIST với FLEXBOX ===== */
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            /* Giải thích:
+            - list-style: none → Xóa bullet mặc định
+            - display: flex → Sắp xếp theo hàng ngang
+            - justify-content: center → Căn giữa
+            - align-items: center → Căn giữa theo chiều dọc
+            - gap: 20px → Khoảng cách giữa items
+            - flex-wrap: wrap → Tự động xuống hàng nếu hết chỗ
+            */
+        }
+        
+        nav li {
+            display: inline;
+        }
+        
+        /* ===== LINKS ===== */
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            /* Giải thích:
+            - text-decoration: none → Xóa gạch chân link
+            */
+        }
+        
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            color: #3498db;
+            /* Giải thích:
+            - rgba(255, 255, 255, 0.2) → Màu trắng trong suốt 20%
+            */
+        }
+        
+        /* ===== BULLET SEPARATOR ===== */
+        .bullet {
+            color: #3498db;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        /* ===== EXPLANATION ===== */
+        .explanation {
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .explanation h2 {
+            color: #8e44ad;
+            margin-bottom: 15px;
+        }
+        
+        .explanation ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .explanation code {
+            background-color: #e8e8e8;
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-family: monospace;
+        }
+        
+        .explanation pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Bài 6: Bookstore Navigation</h1>
+        
+        <button onclick="toggleMenu()">☰ Toggle Menu</button>
+        
+        <nav id="mainNav">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li class="bullet">&bull;</li>
+                <li><a href="#">Books &copy;</a></li>
+                <li class="bullet">&bull;</li>
+                <li><a href="#">Authors &trade;</a></li>
+                <li class="bullet">&bull;</li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+        
+        <!-- GIẢI THÍCH -->
+        <div class="explanation">
+            <h2>📚 Giải Thích HTML:</h2>
+            <ul>
+                <li><code>&lt;nav&gt;</code> - Thẻ semantic cho navigation</li>
+                <li><code>&lt;ul&gt;</code> - Unordered list (danh sách không số)</li>
+                <li><code>&lt;li&gt;</code> - List item (mục trong danh sách)</li>
+                <li><code>id="mainNav"</code> - ID để JavaScript lấy nav</li>
+                <li><code>onclick="toggleMenu()"</code> - Gọi hàm khi click</li>
+            </ul>
+            
+            <h2>🔤 HTML Entities:</h2>
+            <ul>
+                <li><code>&amp;copy;</code> → &copy; (Copyright)</li>
+                <li><code>&amp;trade;</code> → &trade; (Trademark)</li>
+                <li><code>&amp;bull;</code> → &bull; (Bullet)</li>
+            </ul>
+            
+            <h2>🎨 Giải Thích CSS Chi Tiết:</h2>
+            <ul>
+                <li><code>display: flex</code> - Sắp xếp items theo hàng ngang</li>
+                <li><code>justify-content: center</code> - Căn giữa theo chiều ngang</li>
+                <li><code>align-items: center</code> - Căn giữa theo chiều dọc</li>
+                <li><code>gap: 20px</code> - Khoảng cách giữa items</li>
+                <li><code>flex-wrap: wrap</code> - Tự động xuống hàng nếu hết chỗ</li>
+                <li><code>list-style: none</code> - Xóa bullet mặc định của ul</li>
+                <li><code>text-decoration: none</code> - Xóa gạch chân link</li>
+                <li><code>rgba(255, 255, 255, 0.2)</code> - Màu trắng trong suốt 20%</li>
+                <li><code>.hidden { display: none; }</code> - Class để ẩn menu</li>
+            </ul>
+            
+            <h2>💻 JavaScript Code:</h2>
+            <pre>
+function toggleMenu() {
+    var nav = document.getElementById('mainNav');
+    
+    // Toggle class "hidden"
+    // Nếu có → Xóa (menu hiện)
+    // Nếu không → Thêm (menu ẩn)
+    nav.classList.toggle('hidden');
+    
+    if (nav.classList.contains('hidden')) {
+        console.log('Menu đã BỊ ẨN');
+    } else {
+        console.log('Menu đã ĐƯỢC HIỆN');
+    }
+}
+            </pre>
+            
+            <h2>🔍 Giải Thích JavaScript:</h2>
+            <ul>
+                <li><code>document.getElementById('mainNav')</code> - Lấy nav theo ID</li>
+                <li><code>.classList.toggle('hidden')</code> - Bật/tắt class hidden</li>
+                <li><code>.classList.contains('hidden')</code> - Kiểm tra có class không</li>
+                <li><strong>Toggle:</strong> Nếu có class → Xóa, không có → Thêm</li>
+            </ul>
+            
+            <h2>🎯 Test:</h2>
+            <ul>
+                <li>Click "Toggle Menu" lần 1 → Menu ẩn</li>
+                <li>Click lần 2 → Menu hiện</li>
+                <li>Hover links → Thấy hiệu ứng</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * HÀM BẬT/TẮT MENU
+         */
+        function toggleMenu() {
+            console.log('Toggle menu button clicked');
+            
+            var nav = document.getElementById('mainNav');
+            
+            // Toggle class "hidden"
+            nav.classList.toggle('hidden');
+            
+            // Kiểm tra trạng thái
+            if (nav.classList.contains('hidden')) {
+                console.log('✗ Menu đã BỊ ẨN');
+                console.log('Class hiện tại:', nav.className);
+            } else {
+                console.log('✓ Menu đã ĐƯỢC HIỆN');
+                console.log('Class hiện tại:', nav.className || '(no class)');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 6: Bookstore Navigation</title>
+    
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body */
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        /* Header */
+        h1 {
+            color: #8e44ad;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            font-size: 24px;
+            border-left: 5px solid #8e44ad;
+            padding-left: 15px;
+        }
+        
+        /* Toggle button */
+        .toggle-btn {
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(142, 68, 173, 0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(142, 68, 173, 0.6);
+        }
+        
+        .toggle-btn::before {
+            content: "☰ ";
+            font-size: 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.5s;
+        }
+        
+        /* Hidden state */
+        nav.hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        
+        /* Navigation list */
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        nav li {
+            display: inline;
+        }
+        
+        /* Links */
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            color: #3498db;
+        }
+        
+        /* Bullet separator */
+        .bullet {
+            color: #3498db;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        /* Explanation */
+        .explanation {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 6px solid #fdcb6e;
+        }
+        
+        /* Code */
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #e83e8c;
+            font-family: monospace;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+        
+        table th {
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin-left: 30px;
+            line-height: 2.2;
+        }
+        
+        hr {
+            margin: 40px 0;
+            border: none;
+            border-top: 3px solid #8e44ad;
+            opacity: 0.3;
+        }
+        
+        strong {
+            color: #8e44ad;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Exercise 6: Bookstore Navigation</h1>
+        
+        <div class="explanation">
+            <h2>📋 Mô Tả Bài Tập:</h2>
+            <ol>
+                <li>Tạo navigation với 4 links: Home, Books, Authors, Contact</li>
+                <li>HTML entities: ©, ™, • (bullet)</li>
+                <li>Dấu bullet (•) giữa các links</li>
+                <li>Nút "Toggle Menu" để ẩn/hiện menu</li>
+                <li>Sử dụng <code>classList.toggle("hidden")</code></li>
+            </ol>
+        </div>
+        /html/
+        <h2>🏪 Bookstore Website</h2>
+        
+        <button class="toggle-btn" onclick="toggleMenu()">Toggle Menu</button>
+        
+        <nav id="mainNav">
+            <ul>
+                <li><a href="#home">🏠 Home</a></li>
+                <li class="bullet">●</li>
+                <li><a href="#books">📖 Books ©</a></li>
+                <li class="bullet">●</li>
+                <li><a href="#authors">✍️ Authors ™</a></li>
+                <li class="bullet">●</li>
+                <li><a href="#contact">📧 Contact</a></li>
+            </ul>
+        </nav>
+        /html end/
+        <hr>
+        
+        <div class="explanation">
+            <h2>🎨 CSS Highlights:</h2>
+            <pre>
+/* FLEXBOX NAVIGATION */
+nav ul {
+    display: flex;  → Sắp xếp theo hàng ngang
+    justify-content: center;  → Căn giữa
+    gap: 20px;  → Khoảng cách giữa items
+}
+
+/* HIDDEN STATE WITH TRANSITION */
+nav.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* HOVER EFFECT ON LINKS */
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);  → Nổi lên
+}
+
+/* BUTTON ICON */
+.toggle-btn::before {
+    content: "☰ ";  → Thêm hamburger icon tự động
+}
+            </pre>
+        </div>
+        
+        <h2>💻 JavaScript Code:</h2>
+        <pre>
+function toggleMenu() {
+    var nav = document.getElementById('mainNav');
+    
+    // Toggle class "hidden"
+    // Nếu có → Xóa (menu hiện)
+    // Nếu không → Thêm (menu ẩn)
+    nav.classList.toggle('hidden');
+    
+    // Kiểm tra trạng thái
+    if (nav.classList.contains('hidden')) {
+        console.log('Menu đã BỊ ẨN');
+    } else {
+        console.log('Menu đã ĐƯỢC HIỆN');
+    }
+}
+        </pre>
+        
+        <h2>📚 Kiến Thức Quan Trọng:</h2>
+        <table>
+            <tr>
+                <th>Method/Property</th>
+                <th>Mô tả</th>
+                <th>Ví dụ</th>
+            </tr>
+            <tr>
+                <td><code>classList.toggle()</code></td>
+                <td>Bật/tắt class</td>
+                <td>element.classList.toggle('hidden')</td>
+            </tr>
+            <tr>
+                <td><code>classList.contains()</code></td>
+                <td>Kiểm tra có class không</td>
+                <td>element.classList.contains('active')</td>
+            </tr>
+            <tr>
+                <td><code>display: flex</code></td>
+                <td>Flexbox layout</td>
+                <td>Sắp xếp linh hoạt</td>
+            </tr>
+            <tr>
+                <td><code>::before</code></td>
+                <td>Thêm nội dung trước phần tử</td>
+                <td>content: "☰ ";</td>
+            </tr>
+            <tr>
+                <td><code>transition</code></td>
+                <td>Hiệu ứng chuyển đổi</td>
+                <td>transition: all 0.3s;</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Toggle Pattern:</h2>
+        <table>
+            <tr>
+                <th>Trạng thái</th>
+                <th>Trước toggle</th>
+                <th>Sau toggle</th>
+            </tr>
+            <tr>
+                <td>Menu hiện</td>
+                <td>class=""</td>
+                <td>class="hidden"</td>
+            </tr>
+            <tr>
+                <td>Menu ẩn</td>
+                <td>class="hidden"</td>
+                <td>class=""</td>
+            </tr>
+        </table>
+        
+        <h2>🎯 Test Cases:</h2>
+        <ol>
+            <li><strong>Khởi động:</strong> Menu hiển thị với 4 links</li>
+            <li><strong>Click "Toggle Menu":</strong> Menu ẩn đi</li>
+            <li><strong>Click lần 2:</strong> Menu hiện lại</li>
+            <li><strong>Hover links:</strong> Thấy hiệu ứng nổi lên và đổi màu</li>
+            <li><strong>Mở Console:</strong> Xem log trạng thái menu</li>
+        </ol>
+        
+        <h2>📱 Ứng Dụng Thực Tế:</h2>
+        <ul>
+            <li><strong>Mobile Menu:</strong> Hamburger menu trên điện thoại</li>
+            <li><strong>Sidebar:</strong> Menu bên responsive</li>
+            <li><strong>Dropdown:</strong> Menu thả xuống</li>
+            <li><strong>Accordion:</strong> Mở/đóng sections</li>
+        </ul>
+    </div>
+    /JavaScript/
+    <script>
+        /**
+         * HÀM BẬT/TẮT MENU
+         */
+        function toggleMenu() {
+            console.log('☰ Toggle menu button clicked');
+            
+            var nav = document.getElementById('mainNav');
+            
+            // Toggle class "hidden"
+            nav.classList.toggle('hidden');
+            
+            // Kiểm tra và log trạng thái
+            if (nav.classList.contains('hidden')) {
+                console.log('✗ Menu đã BỊ ẨN');
+                console.log('Class hiện tại:', nav.className);
+            } else {
+                console.log('✓ Menu đã ĐƯỢC HIỆN');
+                console.log('Class hiện tại:', nav.className || '(no class)');
+            }
+        }
+    </script>
+
+</body>
+</html>

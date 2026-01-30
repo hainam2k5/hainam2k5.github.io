@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task 8'</title>
+    <style>
+        .newsletter-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            max-width: 500px;
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Exercise 8: Newsletter Subscription</h2>
+        <form class="newsletter-form" onsubmit="validateNewsletter(event)">
+            <div>
+                <label>Full Name:</label>
+                <input type="text" id="fullName">
+            </div>
+            
+            <div>
+                <label>Email:</label>
+                <input type="email" id="newsEmail">
+            </div>
+            
+            <div class="radio-group">
+                <label>Subscription Type:</label>
+                <label><input type="radio" name="subscription" value="monthly"> Monthly</label>
+                <label><input type="radio" name="subscription" value="yearly"> Yearly</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <label>Interests:</label>
+                <label><input type="checkbox" class="interest"> Technology</label>
+                <label><input type="checkbox" class="interest"> Sports</label>
+                <label><input type="checkbox" class="interest"> Travel</label>
+                <label><input type="checkbox" class="interest"> Food</label>
+            </div>
+            
+            <button type="submit">Subscribe</button>
+            <div id="newsSuccess" class="success-message" style="display: none;">
+    Subscription successful!
+            </div>
+        </form>
+        <script>
+            function validateNewsletter(event) {
+            event.preventDefault();
+            var email = document.getElementById('newsEmail').value;
+            var interests = document.querySelectorAll('.interest:checked');
+            
+            if (email.includes('@') && email.includes('.') && interests.length > 0) {
+                document.getElementById('newsSuccess').style.display = 'block';
+            } else {
+                alert('Please enter a valid email and select at least one interest');
+            }
+        }
+        </script>
+            
+</body>
+</html>
