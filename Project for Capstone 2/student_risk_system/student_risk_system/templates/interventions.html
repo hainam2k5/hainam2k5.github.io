@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Interventions{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <div class="page-eyebrow">{{ interventions|length }} logged</div>
+    <h1 class="page-title">Interventions</h1>
+    <div class="page-sub">Full case-management history across all advisors.</div>
+  </div>
+</div>
+
+<div class="panel">
+  {% if interventions %}
+  <table>
+    <thead>
+      <tr><th>Student</th><th>Action</th><th>Status</th><th>Advisor</th><th>Date</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      {% for iv in interventions %}
+      <tr>
+        <td><a href="{{ url_for('student_detail', student_id=iv.alert.student.id) }}">{{ iv.alert.student.name }}</a></td>
+        <td>{{ iv.action_type }}</td>
+        <td><span class="badge badge-status">{{ iv.status }}</span></td>
+        <td class="text-secondary">{{ iv.advisor.name }}</td>
+        <td class="text-secondary" style="font-size:12px;">{{ iv.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+        <td class="text-secondary" style="font-size:12.5px; max-width:260px;">{{ iv.notes }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">◍</div>
+    No interventions logged yet. Open a student with an alert to log one.
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

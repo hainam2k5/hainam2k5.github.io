@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Sentinel{% endblock %} · Student Risk Alert System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% if advisor %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <div>
+        <div class="brand-name">Sentinel</div>
+        <div class="brand-sub">Academic Risk DSS</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}">
+        <span class="nav-ic">▣</span> Dashboard
+      </a>
+      <a href="{{ url_for('students_list') }}" class="{{ 'active' if request.endpoint in ['students_list','student_detail','student_new'] }}">
+        <span class="nav-ic">☰</span> Students
+      </a>
+      <a href="{{ url_for('alerts_list') }}" class="{{ 'active' if request.endpoint=='alerts_list' }}">
+        <span class="nav-ic">▲</span> Alerts
+      </a>
+      <a href="{{ url_for('interventions_list') }}" class="{{ 'active' if request.endpoint=='interventions_list' }}">
+        <span class="nav-ic">◍</span> Interventions
+      </a>
+      <a href="{{ url_for('import_data') }}" class="{{ 'active' if request.endpoint=='import_data' }}">
+        <span class="nav-ic">⇧</span> Import data
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="advisor-chip">
+        <div class="avatar">{{ advisor.name[0] }}</div>
+        <div>
+          <div class="advisor-name">{{ advisor.name }}</div>
+          <div class="advisor-role">{{ advisor.role|capitalize }}</div>
+        </div>
+      </div>
+      <a href="{{ url_for('logout') }}" class="logout-link">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Import data{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <div class="page-eyebrow">Data pipeline</div>
+    <h1 class="page-title">Import student data</h1>
+    <div class="page-sub">Bulk-load or update student academic profiles. Risk is recomputed automatically for every row.</div>
+  </div>
+</div>
+
+<div class="panel-grid-2">
+  <div class="panel">
+    <div class="panel-head"><div class="panel-title">Upload CSV</div></div>
+    <form method="POST" enctype="multipart/form-data">
+      <label>CSV file</label>
+      <input type="file" name="csv_file" accept=".csv" required>
+      <p class="text-secondary" style="font-size:12.5px; margin-bottom:16px;">
+        Required columns: <span class="mono">student_code, name</span>.<br>
+        Optional: <span class="mono">program, cohort, gpa, attendance_rate, lms_activity_score, credits_failed</span>.
+        Existing students (matched by <span class="mono">student_code</span>) are updated, not duplicated.
+      </p>
+      <button class="btn btn-primary" type="submit">Upload & process</button>
+    </form>
+    <a href="{{ url_for('import_template') }}" class="btn btn-sm" style="margin-top:12px;">↓ Download CSV template</a>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-title">Or start with sample data</div></div>
+    <p class="text-secondary" style="font-size:12.5px; margin-bottom:16px;">
+      No dataset yet? Load 60 synthetic students with realistic GPA / attendance / LMS distributions
+      so you can demo the dashboard, alerts and interventions right away. You can always import your
+      real CSV later — new codes are added, existing ones are updated.
+    </p>
+    <form method="POST" action="{{ url_for('import_sample') }}">
+      <button class="btn" type="submit">Load 60 sample students</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

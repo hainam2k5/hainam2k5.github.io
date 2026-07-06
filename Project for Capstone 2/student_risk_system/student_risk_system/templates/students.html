@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Students{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <div class="page-eyebrow">{{ rows|length }} students shown</div>
+    <h1 class="page-title">Students</h1>
+    <div class="page-sub">Search by name or code, filter by current risk level.</div>
+  </div>
+  <a href="{{ url_for('student_new') }}" class="btn btn-primary">+ Add student</a>
+</div>
+
+<div class="toolbar">
+  <form method="GET" style="display:flex; gap:10px; align-items:center;">
+    <input type="text" name="q" placeholder="Search name or code…" value="{{ q }}">
+    <input type="hidden" name="level" value="{{ level }}">
+    <button class="btn btn-sm" type="submit">Search</button>
+  </form>
+  <div class="chip-filters">
+    <a href="{{ url_for('students_list', q=q) }}" class="chip {{ 'active' if not level }}">All</a>
+    <a href="{{ url_for('students_list', q=q, level='Critical') }}" class="chip {{ 'active' if level=='Critical' }}">Critical</a>
+    <a href="{{ url_for('students_list', q=q, level='High') }}" class="chip {{ 'active' if level=='High' }}">High</a>
+    <a href="{{ url_for('students_list', q=q, level='Medium') }}" class="chip {{ 'active' if level=='Medium' }}">Medium</a>
+    <a href="{{ url_for('students_list', q=q, level='Low') }}" class="chip {{ 'active' if level=='Low' }}">Low</a>
+  </div>
+</div>
+
+<div class="panel">
+  {% if rows %}
+  <table>
+    <thead>
+      <tr><th>Student</th><th>Program / cohort</th><th>Risk</th><th>Score & factors</th><th>Last computed</th></tr>
+    </thead>
+    <tbody>
+      {% for s, lr in rows %}
+      <tr class="row-link" onclick="window.location='{{ url_for('student_detail', student_id=s.id) }}'">
+        <td><strong>{{ s.name }}</strong><br><span class="text-secondary mono" style="font-size:11.5px">{{ s.student_code }}</span></td>
+        <td class="text-secondary">{{ s.program }}<br>{{ s.cohort }}</td>
+        <td>
+          {% if lr %}<span class="badge badge-{{ lr.risk_level }}">{{ lr.risk_level }}</span>
+          {% else %}<span class="badge badge-status">Not scored</span>{% endif %}
+        </td>
+        <td>
+          {% if lr %}
+          <div class="score-cell">
+            <span class="score-num">{{ lr.score }}</span>
+            <div class="riskbar">
+              <span class="f-gpa" style="width:{{ lr.factor_gpa }}%"></span>
+              <span class="f-attendance" style="width:{{ lr.factor_attendance }}%"></span>
+              <span class="f-lms" style="width:{{ lr.factor_lms }}%"></span>
+              <span class="f-failed" style="width:{{ lr.factor_failed_credits }}%"></span>
+            </div>
+          </div>
+          {% else %}<span class="text-secondary">—</span>{% endif %}
+        </td>
+        <td class="text-secondary" style="font-size:12px">
+          {{ lr.computed_at.strftime('%d/%m/%Y %H:%M') if lr else '—' }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">☰</div>
+    No students match. <a href="{{ url_for('import_data') }}">Import a CSV</a> to add records.
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

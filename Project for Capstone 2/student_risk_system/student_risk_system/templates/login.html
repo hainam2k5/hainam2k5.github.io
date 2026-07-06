@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block auth_content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="brand-mark">◈</span>
+      <div>
+        <div class="brand-name">Sentinel</div>
+        <div class="brand-sub">Academic Risk DSS</div>
+      </div>
+    </div>
+    <h1 class="auth-title">Advisor sign in</h1>
+    <p class="auth-sub">Early-warning system for at-risk students</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="advisor1@school.edu.vn" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" required>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Sign in</button>
+    </form>
+
+    <div class="auth-hint">
+      Demo accounts (seeded automatically):<br>
+      advisor1@school.edu.vn / advisor123<br>
+      advisor2@school.edu.vn / advisor123<br>
+      manager@school.edu.vn / manager123
+    </div>
+  </div>
+</div>
+{% endblock %}

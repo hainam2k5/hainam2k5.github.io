@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Add student{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <div class="page-eyebrow">New record</div>
+    <h1 class="page-title">Add student</h1>
+    <div class="page-sub">Risk will be computed automatically on save.</div>
+  </div>
+</div>
+
+<div class="panel" style="max-width:640px;">
+  <form method="POST">
+    <div class="field-row">
+      <div><label>Student code</label><input type="text" name="student_code" required placeholder="SV1001"></div>
+      <div><label>Full name</label><input type="text" name="name" required placeholder="Nguyen Van A"></div>
+    </div>
+    <div class="field-row">
+      <div><label>Program</label><input type="text" name="program" placeholder="Information Systems"></div>
+      <div><label>Cohort</label><input type="text" name="cohort" placeholder="K68"></div>
+    </div>
+    <div class="field-row">
+      <div><label>GPA (0–4)</label><input type="number" step="0.01" name="gpa" value="3.0"></div>
+      <div><label>Attendance rate (%)</label><input type="number" step="0.1" name="attendance_rate" value="90"></div>
+    </div>
+    <div class="field-row">
+      <div><label>LMS activity score (0–100)</label><input type="number" step="0.1" name="lms_activity_score" value="80"></div>
+      <div><label>Failed credits (this term)</label><input type="number" name="credits_failed" value="0"></div>
+    </div>
+    <button class="btn btn-primary" type="submit">Add student</button>
+  </form>
+</div>
+
+{% endblock %}
