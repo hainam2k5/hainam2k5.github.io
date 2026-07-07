@@ -66,6 +66,13 @@ Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm th
 - **Phân quyền theo ngành**: mỗi cố vấn chỉ thấy/quản lý sinh viên được gán cho mình
   (`advisor_id`); tài khoản `manager` thấy tất cả. Thêm cố vấn khác qua seed/SQL, gán
   SV bằng nút “Thêm sinh viên” trong bảng cố vấn.
+- **Nhập liệu CSV**: nút “Nhập CSV” + “Tải mẫu” ở trang Sinh viên (cột
+  `student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score`).
+- **KPI đánh giá** trên Tổng quan: thời gian xử lý cảnh báo TB, tỷ lệ hoàn thành can
+  thiệp, theo dõi ca rủi ro cao, cảnh báo đã xử lý — và **biểu đồ xu hướng rủi ro 14 ngày**.
+- **Chi tiết sinh viên (cho giảng viên)**: thẻ thông tin liên hệ (email `mailto:`),
+  xem bảng điểm từng SV, và **hộp chat trực tiếp** với sinh viên đó (kèm can thiệp,
+  cảnh báo, gửi thông báo).
 
 ### Tài khoản demo
 Đăng ký (tab **Đăng ký**) bằng đúng email để nhận dữ liệu mẫu (mật khẩu `Demo@12345`):
