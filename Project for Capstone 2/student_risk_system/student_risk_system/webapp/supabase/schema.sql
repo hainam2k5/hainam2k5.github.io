@@ -159,10 +159,14 @@ begin
   if existing is not null then
     update public.profiles set user_id = new.id where id = existing;
   else
+    -- SECURITY: public self-signups are ALWAYS students. The client-provided
+    -- role is ignored on purpose — an advisor/manager can only be created by
+    -- pre-provisioning a profile row (user_id null) with that email, which the
+    -- branch above then links to. This prevents privilege escalation via signup.
     insert into public.profiles (user_id, role, full_name, email, student_code, program, cohort)
     values (
       new.id,
-      coalesce(new.raw_user_meta_data->>'role', 'student'),
+      'student',
       coalesce(new.raw_user_meta_data->>'full_name', ''),
       new.email,
       nullif(new.raw_user_meta_data->>'student_code', ''),
@@ -191,7 +195,9 @@ drop policy if exists profiles_select on public.profiles;
 create policy profiles_select on public.profiles for select using (
   user_id = auth.uid()
   or my_role() in ('advisor','manager')
-  or role in ('advisor','manager')     -- anyone may read advisor/manager cards
+  -- signed-in users may read advisor/manager cards (e.g. a student sees their
+  -- assigned advisor). Anonymous visitors cannot — hence the auth.uid() guard.
+  or (auth.uid() is not null and role in ('advisor','manager'))
 );
 drop policy if exists profiles_insert on public.profiles;
 create policy profiles_insert on public.profiles for insert with check (

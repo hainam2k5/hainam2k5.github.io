@@ -163,7 +163,28 @@
   function renderStudents() {
     const levels = ["", "Critical", "High", "Medium", "Low"];
     view.innerHTML = `
-      <div class="page-head"><div><div class="page-title">${UI.esc(t("adv.studentsTitle"))}</div><div class="page-sub">${UI.esc(t("adv.studentsSub", { n: db.students.length }))}</div></div></div>
+      <div class="page-head">
+        <div><div class="page-title">${UI.esc(t("adv.studentsTitle"))}</div><div class="page-sub">${UI.esc(t("adv.studentsSub", { n: db.students.length }))}</div></div>
+        <button class="btn btn-primary" id="btnAddStudent">${UI.icon("plus", 16)} ${UI.esc(t("adv.addStudent"))}</button>
+      </div>
+      <div class="card hidden" id="addStudentCard">
+        <div class="card-head"><div class="card-title">${UI.icon("students")} ${UI.esc(t("adv.addStudent"))}</div></div>
+        <div class="field-grid">
+          <div class="field"><label>${UI.esc(t("form.fullName"))}</label><input type="text" id="asName" placeholder="Nguyễn Văn A"></div>
+          <div class="field"><label>${UI.esc(t("form.studentCode"))}</label><input type="text" id="asCode" placeholder="SV007"></div>
+          <div class="field"><label>${UI.esc(t("form.email"))}</label><input type="email" id="asEmail" placeholder="sv007@truong.edu.vn"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label>${UI.esc(t("form.program"))}</label><input type="text" id="asProgram"></div>
+          <div class="field"><label>${UI.esc(t("form.cohort"))}</label><input type="text" id="asCohort" placeholder="K69"></div>
+          <div class="field"><label>${UI.esc(t("label.attendance"))}</label><input type="number" id="asAtt" min="0" max="100" value="100"></div>
+        </div>
+        <div class="field-grid-2">
+          <div class="field"><label>${UI.esc(t("label.lms"))}</label><input type="number" id="asLms" min="0" max="100" value="100"></div>
+          <div class="field" style="display:flex;align-items:flex-end"><button class="btn btn-primary btn-block" id="asSave">${UI.esc(t("btn.save"))}</button></div>
+        </div>
+        <div class="muted-note">${UI.esc(t("adv.addStudentHint"))}</div>
+      </div>
       <div class="toolbar">
         <div class="search">${UI.icon("search", 16)}<input type="text" id="q" placeholder="${UI.esc(t("ph.search"))}" value="${UI.esc(studentFilter.q)}" /></div>
         <div class="chips">${levels.map((lv) => `<span class="chip ${studentFilter.level === lv ? "active" : ""}" data-lv="${lv}">${lv === "" ? UI.esc(t("status.All")) : UI.esc(UI.riskLabel(lv))}</span>`).join("")}</div>
@@ -177,6 +198,8 @@
       $("studentsCard").innerHTML = riskTable(rows);
       wireRows();
     };
+    $("btnAddStudent").onclick = () => $("addStudentCard").classList.toggle("hidden");
+    $("asSave").onclick = () => addStudent();
     $("q").oninput = (e) => { studentFilter.q = e.target.value; draw(); };
     view.querySelectorAll(".chip").forEach((c) => (c.onclick = () => { studentFilter.level = c.dataset.lv; renderStudents(); }));
     draw();
@@ -405,6 +428,24 @@
     if (error) return UI.toast(error.message, "error");
     UI.toast(t("toast.notifSent"), "success");
     $("notifTitle").value = ""; $("notifBody").value = "";
+  }
+
+  async function addStudent() {
+    const name = $("asName").value.trim();
+    if (!name) return UI.toast(t("toast.enterName"), "error");
+    const { error } = await sb.from("profiles").insert({
+      role: "student", full_name: name,
+      student_code: $("asCode").value.trim() || null,
+      email: $("asEmail").value.trim() || null,
+      program: $("asProgram").value.trim(),
+      cohort: $("asCohort").value.trim(),
+      advisor_id: me.id,
+      attendance_rate: GPA.numOr($("asAtt").value, 100),
+      lms_activity_score: GPA.numOr($("asLms").value, 100),
+    });
+    if (error) return UI.toast(error.message, "error");
+    UI.toast(t("toast.studentAdded"), "success");
+    await loadCore(); renderStudents();
   }
 
   async function assignAlert(alertId, student) {
