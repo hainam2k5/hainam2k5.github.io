@@ -73,6 +73,12 @@ Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm th
 - **Chi tiết sinh viên (cho giảng viên)**: thẻ thông tin liên hệ (email `mailto:`),
   xem bảng điểm từng SV, và **hộp chat trực tiếp** với sinh viên đó (kèm can thiệp,
   cảnh báo, gửi thông báo).
+- **Dự đoán vào vùng báo động** (`lib/predict.ts`, giải thích được — không hộp đen):
+  ước tính % khả năng một SV **chưa** báo động sẽ rơi vào vùng báo động, dựa trên
+  (1) độ gần ngưỡng của điểm rủi ro & từng chỉ số, và (2) xu hướng điểm rủi ro theo
+  lịch sử (chiếu 30 ngày, kèm ETA). Hiện ở cột **“Dự đoán”** trong danh sách SV, thẻ
+  dự đoán ở trang chi tiết (kèm lý do + gợi ý can thiệp sớm), và KPI **“Dự đoán sắp
+  báo động”** trên Tổng quan.
 
 ### Tài khoản demo
 Đăng ký (tab **Đăng ký**) bằng đúng email để nhận dữ liệu mẫu (mật khẩu `Demo@12345`):

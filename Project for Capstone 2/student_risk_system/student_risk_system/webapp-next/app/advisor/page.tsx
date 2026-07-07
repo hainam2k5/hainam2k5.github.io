@@ -13,6 +13,7 @@ import {
   CourseRow, AddCourseForm, AddStudentForm, IndicatorsBox, SendNotifBox, InterventionForm, FactorList,
   IV_TYPES, NewCourse, NewStudent,
 } from "@/components/advisor-parts";
+import { predictAlarm, type Prediction } from "@/lib/predict";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
 
 type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages";
@@ -209,6 +210,9 @@ export default function AdvisorPage() {
   const statusLabel = (s: string) => t("status." + s);
   const ivStatusLabel = (s: string) => t("iv." + s);
   const ivTypeLabel = (k: string) => { const v = t("ivtype." + k); return v === "ivtype." + k ? k : v; };
+  const bandToRisk = (b: string) => (({ alarm: "Critical", high: "High", watch: "Medium", safe: "Low", unscored: "Unscored" } as Record<string, string>)[b] || "Unscored");
+  const predOf = (s: Profile, a: Agg): Prediction =>
+    predictAlarm({ score: a.risk ? a.risk.score : null, cpa: a.cpa, attendance_rate: s.attendance_rate, lms_activity_score: s.lms_activity_score, failed_count: a.failed }, risks.filter((r) => r.student_id === s.id));
 
   const openStudent = (id: string) => { setSelectedId(id); setView("student"); };
 
@@ -398,7 +402,7 @@ export default function AdvisorPage() {
     return (
       <table>
         <thead><tr>
-          <th>{t("th.student")}</th><th>{t("th.studentId")}</th><th className="text-right">CPA</th><th>{t("th.riskScore")}</th><th>{t("th.level")}</th><th>{t("th.alert")}</th>
+          <th>{t("th.student")}</th><th>{t("th.studentId")}</th><th className="text-right">CPA</th><th>{t("th.riskScore")}</th><th>{t("th.level")}</th><th>{t("th.predict")}</th><th>{t("th.alert")}</th>
         </tr></thead>
         <tbody>
           {rows.map(({ s, a }) => (
@@ -408,6 +412,7 @@ export default function AdvisorPage() {
               <td className="text-right mono strong">{a.cpa === null ? "—" : a.cpa.toFixed(2)}</td>
               <td><div className="score-cell"><span className="score-num">{a.risk ? a.risk.score : "—"}</span><RiskBar risk={a.risk} /></div></td>
               <td><RiskBadge level={a.risk ? a.risk.risk_level : "Unscored"} /></td>
+              <td>{(() => { const p = predOf(s, a); return <span className={"badge badge-" + bandToRisk(p.band)}>{t("predict.band." + p.band)}</span>; })()}</td>
               <td>{openAlertFor(s.id) ? <span className="pill Open">{t("status.Open")}</span> : <span className="text-muted">—</span>}</td>
             </tr>
           ))}
@@ -440,6 +445,7 @@ export default function AdvisorPage() {
     }).length;
     const followupRate = highIds.length ? (followed / highIds.length) * 100 : null;
     const pct = (v: number | null) => (v === null ? "—" : v.toFixed(0) + "%");
+    const predictedCount = rows.filter((r) => predOf(r.s, r.a).predicted).length;
 
     // --- 14-day risk trend (count of Medium+ snapshots per day) ---
     const today0 = new Date(); today0.setHours(0, 0, 0, 0);
@@ -465,6 +471,7 @@ export default function AdvisorPage() {
           <div className="kpi"><div className="kpi-label">{t("kpi.openAlerts")}</div><div className="kpi-value tone-Critical">{openAlerts}</div></div>
           <div className="kpi"><div className="kpi-label">{t("kpi.highCrit")}</div><div className="kpi-value tone-High">{counts.High + counts.Critical}</div></div>
           <div className="kpi"><div className="kpi-label">{t("kpi.avgCpa")}</div><div className="kpi-value">{avgCpa === null ? "—" : avgCpa.toFixed(2)}</div></div>
+          <div className="kpi"><div className="kpi-label">{t("kpi.predicted")}</div><div className="kpi-value tone-High">{predictedCount}</div></div>
         </div>
         <div className="page-sub" style={{ fontWeight: 700, color: "var(--text)", margin: "2px 0 10px" }}>{t("adv.evaluation")}</div>
         <div className="kpi-grid">
@@ -553,6 +560,7 @@ export default function AdvisorPage() {
     const latestSem = semesters.find((s) => s.gpa !== null);
     const attachAlert = open || studentAlerts[0];
     const detailIvList = interventions.filter((iv) => studentAlerts.some((al) => al.id === iv.alert_id));
+    const pred = predOf(student, a);
     return (
       <>
         <a className="back-link" onClick={() => setView("students")}>{t("adv.back")}</a>
@@ -616,6 +624,27 @@ export default function AdvisorPage() {
             <div className="card">
               <div className="card-head"><div className="card-title"><Icon name="target" /> {t("card.riskFactors")}</div></div>
               <FactorList risk={risk} updated={risk ? fmtDate(risk.computed_at, locale, true) : ""} />
+            </div>
+            <div className="card">
+              <div className="card-head">
+                <div className="card-title"><Icon name="activity" /> {t("predict.title")}</div>
+                <span className={"badge badge-" + bandToRisk(pred.band)}>{t("predict.band." + pred.band)}</span>
+              </div>
+              {pred.band === "unscored" ? (
+                <div className="muted-note">{t("factor.noData")}</div>
+              ) : (
+                <>
+                  {pred.band !== "alarm" && <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>{t("predict.likelihood", { n: pred.likelihood })}</div>}
+                  {pred.etaDays !== null && <div className="muted-note" style={{ marginBottom: 6 }}>{t("predict.eta", { n: pred.etaDays })}</div>}
+                  {pred.reasons.length > 0 && (
+                    <ul style={{ margin: "6px 0 0", paddingLeft: 18, fontSize: 13, color: "var(--muted)" }}>
+                      {pred.reasons.map((r, i) => <li key={i}>{t("predict.reason." + r.key, r.params)}</li>)}
+                    </ul>
+                  )}
+                  {pred.predicted && <div className="muted-note" style={{ marginTop: 10 }}>{t("predict.suggest")}</div>}
+                  {pred.band === "safe" && <div className="muted-note" style={{ marginTop: 10 }}>{t("predict.stable")}</div>}
+                </>
+              )}
             </div>
             <IndicatorsBox student={student} onSave={saveIndicators} />
             <div className="card">
