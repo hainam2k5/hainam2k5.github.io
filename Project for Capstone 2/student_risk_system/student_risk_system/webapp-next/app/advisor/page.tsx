@@ -238,7 +238,7 @@ export default function AdvisorPage() {
             void fetch("/api/notify-grade", {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ to: st.email, studentName: st.full_name, courseName: course.name, r: fmt(r), m: fmt(m), f: fmt(f), total: g.total, letter: g.letter, lang }),
+              body: JSON.stringify({ studentId: st.id, courseName: course.name, r: fmt(r), m: fmt(m), f: fmt(f), total: g.total, letter: g.letter, lang }),
             }).catch(() => {});
           }
         } catch { /* ignore email errors */ }

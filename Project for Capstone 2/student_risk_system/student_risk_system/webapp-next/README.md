@@ -48,6 +48,18 @@ Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm th
 > Nếu **không** đặt `RESEND_API_KEY`, app vẫn chạy bình thường và **bỏ qua email**
 > (thông báo trong hệ thống vẫn hiển thị đầy đủ điểm thành phần).
 
+### Bảo mật dữ liệu sinh viên
+- **RLS** bảo vệ mọi bảng: SV chỉ đọc dữ liệu của mình, không sửa được điểm; khách
+  vãng lai không đọc được gì; đăng ký công khai luôn là Sinh viên (trigger ép role).
+- **Siết theo ngành (khuyến nghị)**: chạy `supabase/rls-major-scope.sql` trong SQL
+  Editor để cố vấn chỉ đọc/ghi được dữ liệu **sinh viên mình phụ trách** ngay ở tầng
+  database (mặc định app chỉ lọc ở giao diện). Manager vẫn thấy tất cả.
+- **API email** không nhận địa chỉ tùy ý: client gửi `studentId`, server tra email
+  qua đúng quyền RLS của cố vấn gọi; nội dung mail được escape HTML.
+- **Khi dùng thật (không phải demo)**: bật lại *Confirm email* trong Authentication
+  (tránh người lạ đăng ký bằng email SV đã cấp sẵn để chiếm hồ sơ), và đặt
+  **Site URL** = link Vercel trong Authentication → URL Configuration.
+
 ### Các tính năng bổ sung
 - **In bảng điểm**: nút “In bảng điểm” ở cổng SV → hộp thoại in cho **in máy (bản
   cứng)** hoặc **Save as PDF (bản mềm)**.
