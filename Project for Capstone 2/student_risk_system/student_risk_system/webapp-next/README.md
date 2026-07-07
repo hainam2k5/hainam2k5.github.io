@@ -35,6 +35,26 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...    # anon public key
 ```
 > Chỉ dùng key **anon/public** (an toàn nhờ RLS). Không đưa `service_role` vào đây.
 
+### Gửi điểm qua email (Resend — tùy chọn)
+Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm thành phần):
+1. Tạo tài khoản https://resend.com → **API Keys** → tạo key `re_...`.
+2. Thêm biến môi trường **server** (KHÔNG có `NEXT_PUBLIC_`) — trong `.env.local`
+   khi chạy local, và trong **Vercel → Settings → Environment Variables** khi deploy:
+   - `RESEND_API_KEY=re_...`
+   - `NOTIFY_FROM=Academic Risk Alert <onboarding@resend.dev>` (test) hoặc địa chỉ
+     thuộc **tên miền đã xác thực** trên Resend.
+> Địa chỉ test `onboarding@resend.dev` chỉ gửi tới đúng email tài khoản Resend của
+> bạn. Muốn gửi tới email SV bất kỳ → xác thực tên miền trong Resend.
+> Nếu **không** đặt `RESEND_API_KEY`, app vẫn chạy bình thường và **bỏ qua email**
+> (thông báo trong hệ thống vẫn hiển thị đầy đủ điểm thành phần).
+
+### Các tính năng bổ sung
+- **In bảng điểm**: nút “In bảng điểm” ở cổng SV → hộp thoại in cho **in máy (bản
+  cứng)** hoặc **Save as PDF (bản mềm)**.
+- **Phân quyền theo ngành**: mỗi cố vấn chỉ thấy/quản lý sinh viên được gán cho mình
+  (`advisor_id`); tài khoản `manager` thấy tất cả. Thêm cố vấn khác qua seed/SQL, gán
+  SV bằng nút “Thêm sinh viên” trong bảng cố vấn.
+
 ### Tài khoản demo
 Đăng ký (tab **Đăng ký**) bằng đúng email để nhận dữ liệu mẫu (mật khẩu `Demo@12345`):
 - Cố vấn: `advisor@demo.edu.vn` · Sinh viên rủi ro: `sv002@demo.edu.vn` / `sv004@demo.edu.vn`

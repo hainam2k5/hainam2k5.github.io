@@ -20,7 +20,7 @@ interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: 
 interface Core { students: Profile[]; courses: Course[]; risks: RiskScore[]; alerts: Alert[]; msgUnread: number; }
 
 export default function AdvisorPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, lang } = useI18n();
   const router = useRouter();
   const sb = supabase;
 
@@ -49,15 +49,24 @@ export default function AdvisorPage() {
 
   // ------------------------------------------------------------ core data
   async function fetchCore(): Promise<Core> {
-    const [stu, crs, rsk, alr, unread] = await Promise.all([
-      sb!.from("profiles").select("*").eq("role", "student").order("full_name"),
-      sb!.from("courses").select("*"),
-      sb!.from("risk_scores").select("*").order("computed_at", { ascending: false }),
-      sb!.from("alerts").select("*").order("created_at", { ascending: false }),
-      sb!.from("messages").select("id", { count: "exact", head: true }).eq("is_read", false).eq("sender_role", "student"),
+    // Advisors only manage students assigned to them (their major); managers see all.
+    const scope = !!me && me.role === "advisor";
+    let sQuery = sb!.from("profiles").select("*").eq("role", "student");
+    if (scope) sQuery = sQuery.eq("advisor_id", me!.id);
+    const stu = await sQuery.order("full_name");
+    const studentsData = (stu.data as Profile[]) || [];
+    const ids = studentsData.map((s) => s.id);
+
+    // apply the student-id filter BEFORE .order()/count (filters must precede transforms)
+    const applyScope = (q: any) => (scope ? q.in("student_id", ids) : q);
+    const [crs, rsk, alr, unread] = await Promise.all([
+      applyScope(sb!.from("courses").select("*")),
+      applyScope(sb!.from("risk_scores").select("*")).order("computed_at", { ascending: false }),
+      applyScope(sb!.from("alerts").select("*")).order("created_at", { ascending: false }),
+      applyScope(sb!.from("messages").select("id", { count: "exact", head: true }).eq("is_read", false).eq("sender_role", "student")),
     ]);
     return {
-      students: (stu.data as Profile[]) || [], courses: (crs.data as Course[]) || [],
+      students: studentsData, courses: (crs.data as Course[]) || [],
       risks: (rsk.data as RiskScore[]) || [], alerts: (alr.data as Alert[]) || [], msgUnread: unread.count || 0,
     };
   }
@@ -212,11 +221,29 @@ export default function AdvisorPage() {
       total_score: g.total, letter_grade: g.letter, grade_point: g.point, updated_at: new Date().toISOString(),
     }).eq("id", courseId);
     if (error) return toast(error.message, "error");
-    await sb.from("notifications").insert({ student_id: selectedId, sender_id: me!.id, type: "grade", title: t("notif.gradeTitle"), body: t("notif.gradeBody", { course: course.name }) });
+    const fmt = (v: string) => (v === "" ? "—" : v);
+    const notifBody = t("notif.gradeBodyDetailed", { course: course.name, r: fmt(r), m: fmt(m), f: fmt(f), total: g.total === null ? "—" : String(g.total), letter: g.letter || "—" });
+    await sb.from("notifications").insert({ student_id: selectedId, sender_id: me!.id, type: "grade", title: t("notif.gradeTitle"), body: notifBody });
     toast(t("toast.gradeSaved"), "success");
     const core = await loadCore();
     const st = core.students.find((x) => x.id === selectedId);
-    if (st) await recomputeStudent(st, core);
+    if (st) {
+      await recomputeStudent(st, core);
+      // best-effort email to the student (no-op if RESEND_API_KEY / email missing)
+      if (st.email) {
+        try {
+          const { data: sess } = await sb.auth.getSession();
+          const token = sess.session?.access_token;
+          if (token) {
+            void fetch("/api/notify-grade", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ to: st.email, studentName: st.full_name, courseName: course.name, r: fmt(r), m: fmt(m), f: fmt(f), total: g.total, letter: g.letter, lang }),
+            }).catch(() => {});
+          }
+        } catch { /* ignore email errors */ }
+      }
+    }
     await loadCore();
   }
 
@@ -553,17 +580,18 @@ export default function AdvisorPage() {
   const renderInterventions = () => {
     const alertMap: Record<string, Alert> = {};
     alerts.forEach((a) => (alertMap[a.id] = a));
+    const list = allIv.filter((iv) => alertMap[iv.alert_id]); // only this advisor's students
     return (
       <>
-        <div className="page-head"><div><div className="page-title">{t("adv.ivTitle")}</div><div className="page-sub">{t("adv.ivSub", { n: allIv.length })}</div></div></div>
+        <div className="page-head"><div><div className="page-title">{t("adv.ivTitle")}</div><div className="page-sub">{t("adv.ivSub", { n: list.length })}</div></div></div>
         <div className="card">
-          {allIv.length === 0 ? (
+          {list.length === 0 ? (
             <div className="empty"><Icon name="notes" size={30} />{t("empty.noIv")}</div>
           ) : (
             <table>
               <thead><tr><th>{t("th.time")}</th><th>{t("th.student")}</th><th>{t("th.type")}</th><th>{t("th.notes")}</th><th>{t("th.status")}</th></tr></thead>
               <tbody>
-                {allIv.map((iv) => { const al = alertMap[iv.alert_id]; const s = al ? studentById(al.student_id) : null; return (
+                {list.map((iv) => { const al = alertMap[iv.alert_id]; const s = al ? studentById(al.student_id) : null; return (
                   <tr key={iv.id} className={s ? "row-link" : ""} onClick={() => s && openStudent(s.id)}>
                     <td className="text-muted">{fmtDate(iv.created_at, locale, true)}</td><td>{s ? s.full_name : "—"}</td>
                     <td>{ivTypeLabel(iv.action_type)}</td><td className="text-muted">{iv.notes || "—"}</td>
@@ -579,8 +607,9 @@ export default function AdvisorPage() {
   };
 
   const renderMessages = () => {
+    const visibleIds = new Set(students.map((s) => s.id));
     const threads: Record<string, Message[]> = {};
-    allMsgs.forEach((m) => (threads[m.student_id] = threads[m.student_id] || []).push(m));
+    allMsgs.filter((m) => visibleIds.has(m.student_id)).forEach((m) => (threads[m.student_id] = threads[m.student_id] || []).push(m));
     const threadIds = Object.keys(threads).sort((a, b) => {
       const la = threads[a][threads[a].length - 1].created_at, lb = threads[b][threads[b].length - 1].created_at;
       return la < lb ? 1 : -1;
