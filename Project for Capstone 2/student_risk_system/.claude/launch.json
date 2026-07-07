@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "webapp",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "5173",
+        "--directory",
+        "student_risk_system/webapp"
+      ],
+      "port": 5173
+    }
+  ]
+}

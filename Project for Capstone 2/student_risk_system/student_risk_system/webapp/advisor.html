@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advisor Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/portal.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo">SR</div>
+      <div><div class="brand-name" data-i18n="brand.name">Cảnh báo Rủi ro Học tập</div><div class="brand-sub" data-i18n="brand.advisorSub">Bảng điều khiển cố vấn</div></div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div id="langMount"></div>
+    <div class="topbar-user">
+      <div class="avatar" id="userAvatar">?</div>
+      <div class="who"><b id="userName">…</b><small id="userMeta"></small></div>
+      <button class="btn btn-sm" id="logoutBtn" data-i18n="btn.logout">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="nav-label" data-i18n="nav.section">Điều hướng</div>
+      <nav class="nav" id="nav">
+        <a data-route="dashboard" data-ic="dashboard"><span data-i18n="nav.dashboard">Tổng quan</span></a>
+        <a data-route="students" data-ic="students"><span data-i18n="nav.students">Sinh viên</span></a>
+        <a data-route="alerts" data-ic="alert"><span data-i18n="nav.alerts">Cảnh báo</span> <span class="count" id="navAlerts">0</span></a>
+        <a data-route="interventions" data-ic="notes"><span data-i18n="nav.interventions">Can thiệp</span></a>
+        <a data-route="messages" data-ic="message"><span data-i18n="nav.messages">Tin nhắn</span> <span class="count" id="navMsgs">0</span></a>
+      </nav>
+    </aside>
+    <main class="main" id="view"><div class="empty" data-i18n="loading">Đang tải…</div></main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/gpa.js"></script>
+  <script src="assets/js/risk.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/advisor-app.js"></script>
+</body>
+</html>
