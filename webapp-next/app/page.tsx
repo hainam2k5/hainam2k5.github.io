@@ -6,6 +6,7 @@ import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClien
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { LangSwitch } from "@/components/common";
+import { PROGRAMS } from "@/lib/programs";
 
 export default function LoginPage() {
   const { t } = useI18n();
@@ -128,7 +129,10 @@ export default function LoginPage() {
                   <input type="text" value={regCohort} onChange={(e) => setRegCohort(e.target.value)} placeholder="K68" /></div>
               </div>
               <div className="field"><label>{t("form.program")}</label>
-                <input type="text" value={regProgram} onChange={(e) => setRegProgram(e.target.value)} placeholder="Hệ thống thông tin" /></div>
+                <select value={regProgram} onChange={(e) => setRegProgram(e.target.value)}>
+                  <option value="">{t("form.selectProgram")}</option>
+                  {PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}
+                </select></div>
               <div className="field"><label>{t("form.passwordMin")}</label>
                 <input type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="new-password" /></div>
               <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnRegister")}</button>
