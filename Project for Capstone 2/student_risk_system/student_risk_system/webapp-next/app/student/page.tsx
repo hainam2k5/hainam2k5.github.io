@@ -151,6 +151,7 @@ export default function StudentPage() {
             <div className="page-title">{t("student.hello", { name: me.full_name || t("student.helloDefault") })}</div>
             <div className="page-sub">{[me.student_code, me.program, me.cohort].filter(Boolean).join(" · ")}</div>
           </div>
+          <button className="btn no-print" onClick={() => window.print()}><Icon name="notes" size={16} /> {t("btn.print")}</button>
         </div>
 
         {banner && (
@@ -168,12 +169,25 @@ export default function StudentPage() {
         </div>
 
         <div className="grid-2">
-          <div>
+          <div id="printArea">
+            <div className="print-only" style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 18, fontWeight: 800 }}>{t("print.title")}</div>
+              <div>{[me.full_name, me.student_code, me.program, me.cohort].filter(Boolean).join(" · ")}</div>
+              <div className="muted-note">{t("print.printedAt", { date: fmtDate(new Date().toISOString(), locale, true) })}</div>
+            </div>
             <div className="card">
               <div className="card-head">
                 <div className="card-title"><Icon name="book" /> {t("card.transcript")}</div>
                 <div className="card-sub">{t("card.transcriptSub")}</div>
               </div>
+              {semesters.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+                  <span className="pill">CPA: <b style={{ marginLeft: 4 }}>{cpa === null ? "—" : cpa.toFixed(2)}</b></span>
+                  {semesters.map((s) => (
+                    <span className="pill" key={s.semester}>{t("sem.label", { sem: s.semester })}: <b style={{ marginLeft: 4 }}>{s.gpa === null ? "—" : s.gpa.toFixed(2)}</b></span>
+                  ))}
+                </div>
+              )}
               {semesters.length === 0 ? (
                 <div className="empty"><Icon name="inbox" size={30} />{t("empty.noGrades")}</div>
               ) : (

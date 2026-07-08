@@ -13,14 +13,15 @@ import {
   CourseRow, AddCourseForm, AddStudentForm, IndicatorsBox, SendNotifBox, InterventionForm, FactorList,
   IV_TYPES, NewCourse, NewStudent,
 } from "@/components/advisor-parts";
+import { predictAlarm, type Prediction } from "@/lib/predict";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
 
 type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages";
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
-interface Core { students: Profile[]; courses: Course[]; risks: RiskScore[]; alerts: Alert[]; msgUnread: number; }
+interface Core { students: Profile[]; courses: Course[]; risks: RiskScore[]; alerts: Alert[]; interventions: Intervention[]; msgUnread: number; }
 
 export default function AdvisorPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, lang } = useI18n();
   const router = useRouter();
   const sb = supabase;
 
@@ -40,8 +41,9 @@ export default function AdvisorPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [alertStatusFilter, setAlertStatusFilter] = useState("Open");
 
-  const [detailIv, setDetailIv] = useState<Intervention[]>([]);
-  const [allIv, setAllIv] = useState<Intervention[]>([]);
+  const [interventions, setInterventions] = useState<Intervention[]>([]);
+  const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
+  const [detailReply, setDetailReply] = useState("");
   const [allMsgs, setAllMsgs] = useState<Message[]>([]);
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   const [reply, setReply] = useState("");
@@ -49,20 +51,42 @@ export default function AdvisorPage() {
 
   // ------------------------------------------------------------ core data
   async function fetchCore(): Promise<Core> {
-    const [stu, crs, rsk, alr, unread] = await Promise.all([
-      sb!.from("profiles").select("*").eq("role", "student").order("full_name"),
-      sb!.from("courses").select("*"),
-      sb!.from("risk_scores").select("*").order("computed_at", { ascending: false }),
-      sb!.from("alerts").select("*").order("created_at", { ascending: false }),
-      sb!.from("messages").select("id", { count: "exact", head: true }).eq("is_read", false).eq("sender_role", "student"),
+    // Advisors only manage students assigned to them (their major); managers see all.
+    const scope = !!me && me.role === "advisor";
+    let sQuery = sb!.from("profiles").select("*").eq("role", "student");
+    // advisor sees their students + any not-yet-assigned student (so self-signups aren't orphaned)
+    if (scope) sQuery = sQuery.or("advisor_id.eq." + me!.id + ",advisor_id.is.null");
+    const stu = await sQuery.order("full_name");
+    const studentsData = (stu.data as Profile[]) || [];
+    const ids = studentsData.map((s) => s.id);
+
+    // apply the student-id filter BEFORE .order()/count (filters must precede transforms)
+    const applyScope = (q: any) => (scope ? q.in("student_id", ids) : q);
+    const [crs, rsk, alr, unread] = await Promise.all([
+      applyScope(sb!.from("courses").select("*")),
+      applyScope(sb!.from("risk_scores").select("*")).order("computed_at", { ascending: false }),
+      applyScope(sb!.from("alerts").select("*")).order("created_at", { ascending: false }),
+      applyScope(sb!.from("messages").select("id", { count: "exact", head: true }).eq("is_read", false).eq("sender_role", "student")),
     ]);
+    const alertsData = (alr.data as Alert[]) || [];
+    const alertIds = alertsData.map((a) => a.id);
+    let ivData: Intervention[] = [];
+    if (scope) {
+      if (alertIds.length) {
+        const ivRes = await sb!.from("interventions").select("*").in("alert_id", alertIds).order("created_at", { ascending: false });
+        ivData = (ivRes.data as Intervention[]) || [];
+      }
+    } else {
+      const ivRes = await sb!.from("interventions").select("*").order("created_at", { ascending: false });
+      ivData = (ivRes.data as Intervention[]) || [];
+    }
     return {
-      students: (stu.data as Profile[]) || [], courses: (crs.data as Course[]) || [],
-      risks: (rsk.data as RiskScore[]) || [], alerts: (alr.data as Alert[]) || [], msgUnread: unread.count || 0,
+      students: studentsData, courses: (crs.data as Course[]) || [],
+      risks: (rsk.data as RiskScore[]) || [], alerts: alertsData, interventions: ivData, msgUnread: unread.count || 0,
     };
   }
   function applyCore(c: Core) {
-    setStudents(c.students); setCourses(c.courses); setRisks(c.risks); setAlerts(c.alerts); setMsgUnread(c.msgUnread);
+    setStudents(c.students); setCourses(c.courses); setRisks(c.risks); setAlerts(c.alerts); setInterventions(c.interventions); setMsgUnread(c.msgUnread);
   }
   async function loadCore(): Promise<Core> { const c = await fetchCore(); applyCore(c); return c; }
 
@@ -140,21 +164,12 @@ export default function AdvisorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me]);
 
-  // load interventions for the detail view
+  // load this student's chat messages for the detail view (advisor ↔ student)
   useEffect(() => {
     if (view !== "student" || !selectedId || !sb) return;
-    const studentAlertIds = alerts.filter((a) => a.student_id === selectedId).map((a) => a.id);
-    if (!studentAlertIds.length) { setDetailIv([]); return; }
-    sb.from("interventions").select("*").in("alert_id", studentAlertIds).order("created_at", { ascending: false })
-      .then(({ data }) => setDetailIv((data as Intervention[]) || []));
-  }, [view, selectedId, alerts]);
-
-  // load all interventions for the interventions view
-  useEffect(() => {
-    if (view !== "interventions" || !sb) return;
-    sb.from("interventions").select("*").order("created_at", { ascending: false })
-      .then(({ data }) => setAllIv((data as Intervention[]) || []));
-  }, [view]);
+    sb.from("messages").select("*").eq("student_id", selectedId).order("created_at", { ascending: true })
+      .then(({ data }) => setDetailMsgs((data as Message[]) || []));
+  }, [view, selectedId, msgTick]);
 
   // load messages for the messages view (and on realtime tick)
   useEffect(() => {
@@ -196,6 +211,9 @@ export default function AdvisorPage() {
   const statusLabel = (s: string) => t("status." + s);
   const ivStatusLabel = (s: string) => t("iv." + s);
   const ivTypeLabel = (k: string) => { const v = t("ivtype." + k); return v === "ivtype." + k ? k : v; };
+  const bandToRisk = (b: string) => (({ alarm: "Critical", high: "High", watch: "Medium", safe: "Low", unscored: "Unscored" } as Record<string, string>)[b] || "Unscored");
+  const predOf = (s: Profile, a: Agg): Prediction =>
+    predictAlarm({ score: a.risk ? a.risk.score : null, cpa: a.cpa, attendance_rate: s.attendance_rate, lms_activity_score: s.lms_activity_score, failed_count: a.failed }, risks.filter((r) => r.student_id === s.id));
 
   const openStudent = (id: string) => { setSelectedId(id); setView("student"); };
 
@@ -212,11 +230,29 @@ export default function AdvisorPage() {
       total_score: g.total, letter_grade: g.letter, grade_point: g.point, updated_at: new Date().toISOString(),
     }).eq("id", courseId);
     if (error) return toast(error.message, "error");
-    await sb.from("notifications").insert({ student_id: selectedId, sender_id: me!.id, type: "grade", title: t("notif.gradeTitle"), body: t("notif.gradeBody", { course: course.name }) });
+    const fmt = (v: string) => (v === "" ? "—" : v);
+    const notifBody = t("notif.gradeBodyDetailed", { course: course.name, r: fmt(r), m: fmt(m), f: fmt(f), total: g.total === null ? "—" : String(g.total), letter: g.letter || "—" });
+    await sb.from("notifications").insert({ student_id: selectedId, sender_id: me!.id, type: "grade", title: t("notif.gradeTitle"), body: notifBody });
     toast(t("toast.gradeSaved"), "success");
     const core = await loadCore();
     const st = core.students.find((x) => x.id === selectedId);
-    if (st) await recomputeStudent(st, core);
+    if (st) {
+      await recomputeStudent(st, core);
+      // best-effort email to the student (no-op if RESEND_API_KEY / email missing)
+      if (st.email) {
+        try {
+          const { data: sess } = await sb.auth.getSession();
+          const token = sess.session?.access_token;
+          if (token) {
+            void fetch("/api/notify-grade", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ studentId: st.id, courseName: course.name, r: fmt(r), m: fmt(m), f: fmt(f), total: g.total, letter: g.letter, lang }),
+            }).catch(() => {});
+          }
+        } catch { /* ignore email errors */ }
+      }
+    }
     await loadCore();
   }
 
@@ -303,9 +339,52 @@ export default function AdvisorPage() {
     if (attachAlert.status === "Open") await sb.from("alerts").update({ status: "Acknowledged" }).eq("id", attachAlert.id);
     toast(t("toast.ivLogged"), "success");
     await loadCore();
-    // refresh detail interventions
-    const ids = alerts.filter((a) => a.student_id === selectedId).map((a) => a.id);
-    if (ids.length) { const { data } = await sb.from("interventions").select("*").in("alert_id", ids).order("created_at", { ascending: false }); setDetailIv((data as Intervention[]) || []); }
+  }
+  async function sendDetailReply(e: FormEvent) {
+    e.preventDefault();
+    if (!sb || !selectedId) return;
+    const body = detailReply.trim(); if (!body) return;
+    setDetailReply("");
+    const { error } = await sb.from("messages").insert({ student_id: selectedId, advisor_id: me!.id, sender_id: me!.id, sender_role: "advisor", body });
+    if (error) { toast(error.message, "error"); return; }
+    await sb.from("notifications").insert({ student_id: selectedId, sender_id: me!.id, type: "message", title: t("notif.advReplyTitle"), body });
+    setMsgTick((x) => x + 1);
+  }
+  function parseCsv(text: string): Record<string, string>[] {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim());
+    if (!lines.length) return [];
+    const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+    return lines.slice(1).map((line) => {
+      const cells = line.split(",");
+      const obj: Record<string, string> = {};
+      headers.forEach((h, i) => (obj[h] = (cells[i] || "").trim()));
+      return obj;
+    });
+  }
+  async function importCsv(file: File) {
+    if (!sb || !me) return;
+    const rows = parseCsv(await file.text());
+    let ok = 0, fail = 0;
+    for (const row of rows) {
+      const code = (row.student_code || row.code || "").trim();
+      const name = (row.full_name || row.name || "").trim();
+      if (!name && !code) continue;
+      const { error } = await sb.from("profiles").insert({
+        role: "student", full_name: name || code, student_code: code || null,
+        email: (row.email || "").trim() || null, program: (row.program || "").trim(), cohort: (row.cohort || "").trim(),
+        advisor_id: me.id, attendance_rate: numOr(row.attendance_rate, 100), lms_activity_score: numOr(row.lms_activity_score, 100),
+      });
+      if (error) fail++; else ok++;
+    }
+    toast(t("adv.importDone", { n: ok }) + (fail ? " · " + t("adv.importFail", { n: fail }) : ""), fail ? "error" : "success");
+    await loadCore();
+  }
+  function downloadTemplate() {
+    const csv = "student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score\nSV010,Nguyen Van A,sv010@truong.edu.vn,He thong thong tin,K69,90,80\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "students_template.csv"; a.click();
+    URL.revokeObjectURL(url);
   }
   async function sendReply(e: FormEvent) {
     e.preventDefault();
@@ -324,7 +403,7 @@ export default function AdvisorPage() {
     return (
       <table>
         <thead><tr>
-          <th>{t("th.student")}</th><th>{t("th.studentId")}</th><th className="text-right">CPA</th><th>{t("th.riskScore")}</th><th>{t("th.level")}</th><th>{t("th.alert")}</th>
+          <th>{t("th.student")}</th><th>{t("th.studentId")}</th><th className="text-right">CPA</th><th>{t("th.riskScore")}</th><th>{t("th.level")}</th><th>{t("th.predict")}</th><th>{t("th.alert")}</th>
         </tr></thead>
         <tbody>
           {rows.map(({ s, a }) => (
@@ -334,6 +413,7 @@ export default function AdvisorPage() {
               <td className="text-right mono strong">{a.cpa === null ? "—" : a.cpa.toFixed(2)}</td>
               <td><div className="score-cell"><span className="score-num">{a.risk ? a.risk.score : "—"}</span><RiskBar risk={a.risk} /></div></td>
               <td><RiskBadge level={a.risk ? a.risk.risk_level : "Unscored"} /></td>
+              <td>{(() => { const p = predOf(s, a); return <span className={"badge badge-" + bandToRisk(p.band)}>{t("predict.band." + p.band)}</span>; })()}</td>
               <td>{openAlertFor(s.id) ? <span className="pill Open">{t("status.Open")}</span> : <span className="text-muted">—</span>}</td>
             </tr>
           ))}
@@ -350,6 +430,37 @@ export default function AdvisorPage() {
     const cpaVals = rows.map((r) => r.a.cpa).filter((v): v is number => v !== null);
     const avgCpa = cpaVals.length ? cpaVals.reduce((x, y) => x + y, 0) / cpaVals.length : null;
     const topRisk = rows.filter((r) => r.a.risk).sort((x, y) => y.a.risk!.score - x.a.risk!.score).slice(0, 8);
+
+    // --- evaluation KPIs (from the PDF rubric) ---
+    const resolved = alerts.filter((a) => a.status === "Resolved" && a.resolved_at);
+    const avgHandleDays = resolved.length
+      ? resolved.reduce((s, a) => s + (new Date(a.resolved_at as string).getTime() - new Date(a.created_at).getTime()), 0) / resolved.length / 86400000
+      : null;
+    const ivTotal = interventions.length;
+    const ivCompleteRate = ivTotal ? (interventions.filter((iv) => iv.status === "Completed").length / ivTotal) * 100 : null;
+    const resolvedRate = alerts.length ? (alerts.filter((a) => a.status === "Resolved").length / alerts.length) * 100 : null;
+    const highIds = rows.filter((r) => r.a.risk && (r.a.risk.risk_level === "High" || r.a.risk.risk_level === "Critical")).map((r) => r.s.id);
+    const followed = highIds.filter((sid) => {
+      const aIds = alerts.filter((a) => a.student_id === sid).map((a) => a.id);
+      return interventions.some((iv) => aIds.includes(iv.alert_id));
+    }).length;
+    const followupRate = highIds.length ? (followed / highIds.length) * 100 : null;
+    const pct = (v: number | null) => (v === null ? "—" : v.toFixed(0) + "%");
+    const predictedCount = rows.filter((r) => predOf(r.s, r.a).predicted).length;
+
+    // --- 14-day risk trend (count of Medium+ snapshots per day) ---
+    const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+    const trend: { label: string; count: number }[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today0); d.setDate(d.getDate() - i);
+      const start = d.getTime(), end = start + 86400000;
+      const count = risks.filter((r) => {
+        const ts = new Date(r.computed_at).getTime();
+        return ts >= start && ts < end && (r.risk_level === "Medium" || r.risk_level === "High" || r.risk_level === "Critical");
+      }).length;
+      trend.push({ label: d.getDate() + "/" + (d.getMonth() + 1), count });
+    }
+    const trendMax = Math.max(1, ...trend.map((b) => b.count));
     return (
       <>
         <div className="page-head">
@@ -361,6 +472,14 @@ export default function AdvisorPage() {
           <div className="kpi"><div className="kpi-label">{t("kpi.openAlerts")}</div><div className="kpi-value tone-Critical">{openAlerts}</div></div>
           <div className="kpi"><div className="kpi-label">{t("kpi.highCrit")}</div><div className="kpi-value tone-High">{counts.High + counts.Critical}</div></div>
           <div className="kpi"><div className="kpi-label">{t("kpi.avgCpa")}</div><div className="kpi-value">{avgCpa === null ? "—" : avgCpa.toFixed(2)}</div></div>
+          <div className="kpi"><div className="kpi-label">{t("kpi.predicted")}</div><div className="kpi-value tone-High">{predictedCount}</div></div>
+        </div>
+        <div className="page-sub" style={{ fontWeight: 700, color: "var(--text)", margin: "2px 0 10px" }}>{t("adv.evaluation")}</div>
+        <div className="kpi-grid">
+          <div className="kpi"><div className="kpi-label">{t("kpi.avgHandle")}</div><div className="kpi-value">{avgHandleDays === null ? "—" : avgHandleDays.toFixed(1)}</div></div>
+          <div className="kpi"><div className="kpi-label">{t("kpi.ivComplete")}</div><div className="kpi-value">{pct(ivCompleteRate)}</div></div>
+          <div className="kpi"><div className="kpi-label">{t("kpi.followup")}</div><div className="kpi-value">{pct(followupRate)}</div></div>
+          <div className="kpi"><div className="kpi-label">{t("kpi.resolvedRate")}</div><div className="kpi-value">{pct(resolvedRate)}</div></div>
         </div>
         <div className="card">
           <div className="card-head"><div className="card-title"><Icon name="alert" /> {t("card.topRisk")}</div><a className="back-link" onClick={() => setView("students")}>{t("link.seeAll")}</a></div>
@@ -385,6 +504,18 @@ export default function AdvisorPage() {
             </table>
           )}
         </div>
+        <div className="card">
+          <div className="card-head"><div className="card-title"><Icon name="chart" /> {t("card.trend")}</div></div>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 110 }}>
+            {trend.map((b, i) => (
+              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }} title={String(b.count)}>
+                <div style={{ width: "100%", height: (b.count / trendMax) * 84 + "px", minHeight: b.count ? 4 : 0, background: "var(--primary)", borderRadius: "4px 4px 0 0" }} />
+                <div style={{ fontSize: 9, color: "var(--faint)" }}>{b.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="muted-note" style={{ marginTop: 8 }}>{t("trend.hint")}</div>
+        </div>
       </>
     );
   };
@@ -399,7 +530,13 @@ export default function AdvisorPage() {
       <>
         <div className="page-head">
           <div><div className="page-title">{t("adv.studentsTitle")}</div><div className="page-sub">{t("adv.studentsSub", { n: students.length })}</div></div>
-          <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <label className="btn"><Icon name="inbox" size={16} /> {t("adv.import")}
+              <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) importCsv(f); e.target.value = ""; }} />
+            </label>
+            <button className="btn" onClick={downloadTemplate}>{t("adv.importTemplate")}</button>
+            <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
+          </div>
         </div>
         {showAdd && <AddStudentForm onAdd={addStudent} />}
         <div className="toolbar">
@@ -423,6 +560,8 @@ export default function AdvisorPage() {
     const studentAlerts = alerts.filter((al) => al.student_id === student.id);
     const latestSem = semesters.find((s) => s.gpa !== null);
     const attachAlert = open || studentAlerts[0];
+    const detailIvList = interventions.filter((iv) => studentAlerts.some((al) => al.id === iv.alert_id));
+    const pred = predOf(student, a);
     return (
       <>
         <a className="back-link" onClick={() => setView("students")}>{t("adv.back")}</a>
@@ -475,8 +614,38 @@ export default function AdvisorPage() {
           </div>
           <div>
             <div className="card">
+              <div className="card-head"><div className="card-title"><Icon name="user" /> {t("adv.studentInfo")}</div></div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div className="spread"><span className="text-muted">{t("form.studentCode")}</span><b className="mono">{student.student_code || "—"}</b></div>
+                <div className="spread"><span className="text-muted">{t("form.program")}</span><b>{student.program || "—"}</b></div>
+                <div className="spread"><span className="text-muted">{t("form.cohort")}</span><b>{student.cohort || "—"}</b></div>
+                <div className="spread"><span className="text-muted">{t("adv.contactEmail")}</span>{student.email ? <a className="back-link" href={"mailto:" + student.email}>{student.email}</a> : <span className="text-muted">—</span>}</div>
+              </div>
+            </div>
+            <div className="card">
               <div className="card-head"><div className="card-title"><Icon name="target" /> {t("card.riskFactors")}</div></div>
               <FactorList risk={risk} updated={risk ? fmtDate(risk.computed_at, locale, true) : ""} />
+            </div>
+            <div className="card">
+              <div className="card-head">
+                <div className="card-title"><Icon name="activity" /> {t("predict.title")}</div>
+                <span className={"badge badge-" + bandToRisk(pred.band)}>{t("predict.band." + pred.band)}</span>
+              </div>
+              {pred.band === "unscored" ? (
+                <div className="muted-note">{t("factor.noData")}</div>
+              ) : (
+                <>
+                  {pred.band !== "alarm" && <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>{t("predict.likelihood", { n: pred.likelihood })}</div>}
+                  {pred.etaDays !== null && <div className="muted-note" style={{ marginBottom: 6 }}>{t("predict.eta", { n: pred.etaDays })}</div>}
+                  {pred.reasons.length > 0 && (
+                    <ul style={{ margin: "6px 0 0", paddingLeft: 18, fontSize: 13, color: "var(--muted)" }}>
+                      {pred.reasons.map((r, i) => <li key={i}>{t("predict.reason." + r.key, r.params)}</li>)}
+                    </ul>
+                  )}
+                  {pred.predicted && <div className="muted-note" style={{ marginTop: 10 }}>{t("predict.suggest")}</div>}
+                  {pred.band === "safe" && <div className="muted-note" style={{ marginTop: 10 }}>{t("predict.stable")}</div>}
+                </>
+              )}
             </div>
             <IndicatorsBox student={student} onSave={saveIndicators} />
             <div className="card">
@@ -499,9 +668,9 @@ export default function AdvisorPage() {
             </div>
             <div className="card">
               <div className="card-head"><div className="card-title"><Icon name="notes" /> {t("card.intervention")}</div></div>
-              {detailIv.length > 0 && (
+              {detailIvList.length > 0 && (
                 <div className="timeline" style={{ marginBottom: 6 }}>
-                  {detailIv.map((iv) => (
+                  {detailIvList.map((iv) => (
                     <div className="timeline-item" key={iv.id}>
                       <div className="timeline-meta">{fmtDate(iv.created_at, locale, true)} · <span className="pill">{ivStatusLabel(iv.status)}</span></div>
                       <div><b>{ivTypeLabel(iv.action_type)}</b>{iv.notes ? " — " + iv.notes : ""}</div>
@@ -512,6 +681,23 @@ export default function AdvisorPage() {
               {attachAlert ? <InterventionForm onAdd={(type, notes, status) => addIntervention(attachAlert, type, notes, status)} /> : <div className="muted-note">{t("iv.needAlert")}</div>}
             </div>
             <SendNotifBox onSend={sendNotification} />
+            <div className="card">
+              <div className="card-head"><div className="card-title"><Icon name="message" /> {t("card.chatStudent")}</div></div>
+              <div className="chat">
+                {detailMsgs.length === 0 ? (
+                  <div className="empty" style={{ padding: 16 }}><Icon name="message" size={26} />{t("empty.noChat")}</div>
+                ) : (
+                  detailMsgs.map((mm) => {
+                    const mine = mm.sender_role !== "student";
+                    return <div key={mm.id} className={"msg " + (mine ? "msg-me" : "msg-them")}>{mm.body}<div className="mm">{(mine ? t("you") : student.full_name) + " · " + fmtDate(mm.created_at, locale, true)}</div></div>;
+                  })
+                )}
+              </div>
+              <form className="msg-input" onSubmit={sendDetailReply}>
+                <input type="text" value={detailReply} onChange={(e) => setDetailReply(e.target.value)} placeholder={t("chat.phAdvisor")} autoComplete="off" />
+                <button className="btn btn-primary" type="submit">{t("btn.send")}</button>
+              </form>
+            </div>
           </div>
         </div>
       </>
@@ -553,17 +739,18 @@ export default function AdvisorPage() {
   const renderInterventions = () => {
     const alertMap: Record<string, Alert> = {};
     alerts.forEach((a) => (alertMap[a.id] = a));
+    const list = interventions.filter((iv) => alertMap[iv.alert_id]); // scoped to this advisor's students
     return (
       <>
-        <div className="page-head"><div><div className="page-title">{t("adv.ivTitle")}</div><div className="page-sub">{t("adv.ivSub", { n: allIv.length })}</div></div></div>
+        <div className="page-head"><div><div className="page-title">{t("adv.ivTitle")}</div><div className="page-sub">{t("adv.ivSub", { n: list.length })}</div></div></div>
         <div className="card">
-          {allIv.length === 0 ? (
+          {list.length === 0 ? (
             <div className="empty"><Icon name="notes" size={30} />{t("empty.noIv")}</div>
           ) : (
             <table>
               <thead><tr><th>{t("th.time")}</th><th>{t("th.student")}</th><th>{t("th.type")}</th><th>{t("th.notes")}</th><th>{t("th.status")}</th></tr></thead>
               <tbody>
-                {allIv.map((iv) => { const al = alertMap[iv.alert_id]; const s = al ? studentById(al.student_id) : null; return (
+                {list.map((iv) => { const al = alertMap[iv.alert_id]; const s = al ? studentById(al.student_id) : null; return (
                   <tr key={iv.id} className={s ? "row-link" : ""} onClick={() => s && openStudent(s.id)}>
                     <td className="text-muted">{fmtDate(iv.created_at, locale, true)}</td><td>{s ? s.full_name : "—"}</td>
                     <td>{ivTypeLabel(iv.action_type)}</td><td className="text-muted">{iv.notes || "—"}</td>
@@ -579,8 +766,9 @@ export default function AdvisorPage() {
   };
 
   const renderMessages = () => {
+    const visibleIds = new Set(students.map((s) => s.id));
     const threads: Record<string, Message[]> = {};
-    allMsgs.forEach((m) => (threads[m.student_id] = threads[m.student_id] || []).push(m));
+    allMsgs.filter((m) => visibleIds.has(m.student_id)).forEach((m) => (threads[m.student_id] = threads[m.student_id] || []).push(m));
     const threadIds = Object.keys(threads).sort((a, b) => {
       const la = threads[a][threads[a].length - 1].created_at, lb = threads[b][threads[b].length - 1].created_at;
       return la < lb ? 1 : -1;

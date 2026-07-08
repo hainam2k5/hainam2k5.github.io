@@ -35,6 +35,51 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...    # anon public key
 ```
 > Chỉ dùng key **anon/public** (an toàn nhờ RLS). Không đưa `service_role` vào đây.
 
+### Gửi điểm qua email (Resend — tùy chọn)
+Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm thành phần):
+1. Tạo tài khoản https://resend.com → **API Keys** → tạo key `re_...`.
+2. Thêm biến môi trường **server** (KHÔNG có `NEXT_PUBLIC_`) — trong `.env.local`
+   khi chạy local, và trong **Vercel → Settings → Environment Variables** khi deploy:
+   - `RESEND_API_KEY=re_...`
+   - `NOTIFY_FROM=Academic Risk Alert <onboarding@resend.dev>` (test) hoặc địa chỉ
+     thuộc **tên miền đã xác thực** trên Resend.
+> Địa chỉ test `onboarding@resend.dev` chỉ gửi tới đúng email tài khoản Resend của
+> bạn. Muốn gửi tới email SV bất kỳ → xác thực tên miền trong Resend.
+> Nếu **không** đặt `RESEND_API_KEY`, app vẫn chạy bình thường và **bỏ qua email**
+> (thông báo trong hệ thống vẫn hiển thị đầy đủ điểm thành phần).
+
+### Bảo mật dữ liệu sinh viên
+- **RLS** bảo vệ mọi bảng: SV chỉ đọc dữ liệu của mình, không sửa được điểm; khách
+  vãng lai không đọc được gì; đăng ký công khai luôn là Sinh viên (trigger ép role).
+- **Siết theo ngành (khuyến nghị)**: chạy `supabase/rls-major-scope.sql` trong SQL
+  Editor để cố vấn chỉ đọc/ghi được dữ liệu **sinh viên mình phụ trách** ngay ở tầng
+  database (mặc định app chỉ lọc ở giao diện). Manager vẫn thấy tất cả.
+- **API email** không nhận địa chỉ tùy ý: client gửi `studentId`, server tra email
+  qua đúng quyền RLS của cố vấn gọi; nội dung mail được escape HTML.
+- **Khi dùng thật (không phải demo)**: bật lại *Confirm email* trong Authentication
+  (tránh người lạ đăng ký bằng email SV đã cấp sẵn để chiếm hồ sơ), và đặt
+  **Site URL** = link Vercel trong Authentication → URL Configuration.
+
+### Các tính năng bổ sung
+- **In bảng điểm**: nút “In bảng điểm” ở cổng SV → hộp thoại in cho **in máy (bản
+  cứng)** hoặc **Save as PDF (bản mềm)**.
+- **Phân quyền theo ngành**: mỗi cố vấn chỉ thấy/quản lý sinh viên được gán cho mình
+  (`advisor_id`); tài khoản `manager` thấy tất cả. Thêm cố vấn khác qua seed/SQL, gán
+  SV bằng nút “Thêm sinh viên” trong bảng cố vấn.
+- **Nhập liệu CSV**: nút “Nhập CSV” + “Tải mẫu” ở trang Sinh viên (cột
+  `student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score`).
+- **KPI đánh giá** trên Tổng quan: thời gian xử lý cảnh báo TB, tỷ lệ hoàn thành can
+  thiệp, theo dõi ca rủi ro cao, cảnh báo đã xử lý — và **biểu đồ xu hướng rủi ro 14 ngày**.
+- **Chi tiết sinh viên (cho giảng viên)**: thẻ thông tin liên hệ (email `mailto:`),
+  xem bảng điểm từng SV, và **hộp chat trực tiếp** với sinh viên đó (kèm can thiệp,
+  cảnh báo, gửi thông báo).
+- **Dự đoán vào vùng báo động** (`lib/predict.ts`, giải thích được — không hộp đen):
+  ước tính % khả năng một SV **chưa** báo động sẽ rơi vào vùng báo động, dựa trên
+  (1) độ gần ngưỡng của điểm rủi ro & từng chỉ số, và (2) xu hướng điểm rủi ro theo
+  lịch sử (chiếu 30 ngày, kèm ETA). Hiện ở cột **“Dự đoán”** trong danh sách SV, thẻ
+  dự đoán ở trang chi tiết (kèm lý do + gợi ý can thiệp sớm), và KPI **“Dự đoán sắp
+  báo động”** trên Tổng quan.
+
 ### Tài khoản demo
 Đăng ký (tab **Đăng ký**) bằng đúng email để nhận dữ liệu mẫu (mật khẩu `Demo@12345`):
 - Cố vấn: `advisor@demo.edu.vn` · Sinh viên rủi ro: `sv002@demo.edu.vn` / `sv004@demo.edu.vn`

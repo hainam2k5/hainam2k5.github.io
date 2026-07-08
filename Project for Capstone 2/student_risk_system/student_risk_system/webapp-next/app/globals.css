@@ -44,6 +44,20 @@ h1, h2, h3 { margin: 0; }
 .text-muted { color: var(--muted); }
 .text-right { text-align: right; }
 .hidden { display: none !important; }
+.print-only { display: none; }
+
+/* ------------------------------------------------------------------ print */
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  body * { visibility: hidden; }
+  #printArea, #printArea * { visibility: visible; }
+  #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+  #printArea .card { border: none; box-shadow: none; padding: 0; margin: 0; }
+  #printArea table { font-size: 12px; }
+  #printArea .pill { border: 1px solid #d5dce8; }
+}
 
 /* --------------------------------------------------------------- top bar */
 .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; padding: 0 24px; position: sticky; top: 0; z-index: 40; }
