@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { Icon } from "@/lib/icons";
 import { numFmt, gradeClass } from "@/lib/format";
 import type { Course, Profile, RiskScore } from "@/lib/types";
+import { PROGRAMS } from "@/lib/programs";
 
 export const FACTOR_MAX = { gpa: 40, att: 30, lms: 15, fail: 15 };
 export const IV_TYPES = ["advising", "callEmail", "studyPlan", "referral", "followup"];
@@ -76,7 +77,7 @@ export function AddStudentForm({ onAdd }: { onAdd: (s: NewStudent) => void }) {
         <div className="field"><label>{t("form.email")}</label><input type="email" value={v.email} onChange={up("email")} placeholder="sv007@truong.edu.vn" /></div>
       </div>
       <div className="field-grid">
-        <div className="field"><label>{t("form.program")}</label><input type="text" value={v.program} onChange={up("program")} /></div>
+        <div className="field"><label>{t("form.program")}</label><select value={v.program} onChange={(e) => setV({ ...v, program: e.target.value })}><option value="">{t("form.selectProgram")}</option>{PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}</select></div>
         <div className="field"><label>{t("form.cohort")}</label><input type="text" value={v.cohort} onChange={up("cohort")} placeholder="K69" /></div>
         <div className="field"><label>{t("label.attendance")}</label><input type="number" value={v.att} onChange={up("att")} min="0" max="100" /></div>
       </div>
