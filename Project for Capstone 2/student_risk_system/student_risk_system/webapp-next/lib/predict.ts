@@ -58,7 +58,11 @@ export function predictAlarm(input: PredictInput, history: RiskScore[]): Predict
   if (input.lms_activity_score >= 52 && input.lms_activity_score <= 70) reasons.push({ key: "lmsNear", params: { lms: Math.round(input.lms_activity_score) } });
   if (score >= 30) reasons.push({ key: "closeScore", params: { score } });
 
-  const etaDays = slope > 0.05 ? Math.max(1, Math.round((ALARM_SCORE - score) / slope)) : null;
+  let etaDays: number | null = null;
+  if (slope > 0.05) {
+    const e = Math.round((ALARM_SCORE - score) / slope);
+    etaDays = e >= 1 && e <= 90 ? e : null; // only show a plausible, near-term ETA
+  }
   const band: PredBand = likelihood >= 60 ? "high" : likelihood >= 35 ? "watch" : "safe";
   return { band, likelihood, etaDays, reasons, predicted: band !== "safe" };
 }

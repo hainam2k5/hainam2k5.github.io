@@ -54,7 +54,8 @@ export default function AdvisorPage() {
     // Advisors only manage students assigned to them (their major); managers see all.
     const scope = !!me && me.role === "advisor";
     let sQuery = sb!.from("profiles").select("*").eq("role", "student");
-    if (scope) sQuery = sQuery.eq("advisor_id", me!.id);
+    // advisor sees their students + any not-yet-assigned student (so self-signups aren't orphaned)
+    if (scope) sQuery = sQuery.or("advisor_id.eq." + me!.id + ",advisor_id.is.null");
     const stu = await sQuery.order("full_name");
     const studentsData = (stu.data as Profile[]) || [];
     const ids = studentsData.map((s) => s.id);
