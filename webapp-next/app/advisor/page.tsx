@@ -845,7 +845,7 @@ export default function AdvisorPage() {
         <LangSwitch />
         <div className="topbar-user">
           <div className="avatar">{initials(me.full_name)}</div>
-          <div className="who"><b>{me.full_name || t("role.advisor")}</b><small>{me.role === "manager" ? t("role.manager") : t("meta.advisor")}</small></div>
+          <div className="who"><b>{me.full_name || t("role.advisor")}</b><small>{(me.role === "manager" ? t("role.manager") : t("meta.advisor")) + (me.role === "advisor" && me.program ? " · " + me.program : "")}</small></div>
           <button className="btn btn-sm" onClick={async () => { await sb?.auth.signOut(); router.replace("/"); }}>{t("btn.logout")}</button>
         </div>
       </div>
