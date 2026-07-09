@@ -203,7 +203,7 @@ export default function LoginPage() {
             {tab === "login" ? (
               <form onSubmit={onLogin}>
                 <div className="field"><label>{t("form.email")}</label>
-                  <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" /></div>
+                  <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="ban@gmail.com" required autoComplete="email" /></div>
                 <div className="field"><label>{t("form.password")}</label>
                   <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="••••••••" required autoComplete="current-password" /></div>
                 <div className="auth-forgot">
@@ -223,7 +223,8 @@ export default function LoginPage() {
                 <div className="field"><label>{t("form.fullName")}</label>
                   <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Nguyễn Văn A" required /></div>
                 <div className="field"><label>{t("form.email")}</label>
-                  <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" /></div>
+                  <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="ban@gmail.com" required autoComplete="email" />
+                  <div className="muted-note" style={{ marginTop: 6 }}>{t("form.emailHint")}</div></div>
 
                 {regRole === "student" ? (
                   <div className="field-grid-2">
@@ -260,7 +261,7 @@ export default function LoginPage() {
                 <div className="config-warn"><Icon name="alert" size={18} /><div>{t("login.configWarn")}</div></div>
               )}
               <div className="field"><label>{t("form.email")}</label>
-                <input type="email" value={fpEmail} onChange={(e) => setFpEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" autoFocus /></div>
+                <input type="email" value={fpEmail} onChange={(e) => setFpEmail(e.target.value)} placeholder="ban@gmail.com" required autoComplete="email" autoFocus /></div>
               <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnSendReset")}</button>
               <div className="auth-back">
                 <button type="button" className="link-btn" onClick={() => setForgotStep(null)}>{t("login.backToLogin")}</button>

@@ -74,7 +74,7 @@ export function AddStudentForm({ onAdd }: { onAdd: (s: NewStudent) => void }) {
       <div className="field-grid">
         <div className="field"><label>{t("form.fullName")}</label><input type="text" value={v.name} onChange={up("name")} placeholder="Nguyễn Văn A" /></div>
         <div className="field"><label>{t("form.studentCode")}</label><input type="text" value={v.code} onChange={up("code")} placeholder="SV007" /></div>
-        <div className="field"><label>{t("form.email")}</label><input type="email" value={v.email} onChange={up("email")} placeholder="sv007@truong.edu.vn" /></div>
+        <div className="field"><label>{t("form.email")}</label><input type="email" value={v.email} onChange={up("email")} placeholder="sv007@gmail.com" /></div>
       </div>
       <div className="field-grid">
         <div className="field"><label>{t("form.program")}</label><select value={v.program} onChange={(e) => setV({ ...v, program: e.target.value })}><option value="">{t("form.selectProgram")}</option>{PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}</select></div>

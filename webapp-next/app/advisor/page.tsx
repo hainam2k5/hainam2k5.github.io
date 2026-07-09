@@ -380,7 +380,7 @@ export default function AdvisorPage() {
     await loadCore();
   }
   function downloadTemplate() {
-    const csv = "student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score\nSV010,Nguyen Van A,sv010@truong.edu.vn,He thong thong tin,K69,90,80\n";
+    const csv = "student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score\nSV010,Nguyen Van A,sv010@gmail.com,He thong thong tin,K69,90,80\n";
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "students_template.csv"; a.click();
