@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClient";
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
-import { LangSwitch } from "@/components/common";
+import { BrandLogo, LangSwitch } from "@/components/common";
 import { gpaOf, bySemester, failedCount } from "@/lib/gpa";
 import { fmtDate, initials, numFmt, gradeClass } from "@/lib/format";
 import type { Profile, Course, Notification, Message } from "@/lib/types";
@@ -128,10 +128,7 @@ export default function StudentPage() {
   return (
     <>
       <div className="topbar">
-        <div className="brand">
-          <div className="brand-logo">SR</div>
-          <div><div className="brand-name">{t("brand.studentPortal")}</div><div className="brand-sub">{t("brand.studentSub")}</div></div>
-        </div>
+        <BrandLogo onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} title={t("brand.home")} />
         <div className="topbar-spacer" />
         <LangSwitch />
         <div className="bell" title={t("bell.title")} onClick={() => notifRef.current?.scrollIntoView({ behavior: "smooth" })}>

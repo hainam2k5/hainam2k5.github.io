@@ -5,9 +5,14 @@
 // script/style-src allow 'unsafe-inline' (there is no nonce pipeline here).
 // The high-value protections — clickjacking, MIME sniffing, referrer leakage,
 // and locking network egress to Supabase — are all enforced strictly.
+// Next.js dev mode (HMR/React Refresh) executes eval()'d bundles, so 'unsafe-eval'
+// is required locally. Production builds never eval, so it is dropped there.
+const dev = process.env.NODE_ENV !== "production";
+const scriptSrc = dev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self' 'unsafe-inline'";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
