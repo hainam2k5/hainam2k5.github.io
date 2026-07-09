@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Hệ thống Cảnh báo Rủi ro Học tập (VNU-IS)</title>
+<style>
+  :root{
+    --ink:#333; --mut:#888; --faint:#aaa; --line:#c9c9c9; --fill:#ececec;
+    --fill2:#f5f5f5; --dark:#555; --paper:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#e9eaec;color:var(--ink);
+    font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13px;line-height:1.5}
+  .page{max-width:1000px;margin:0 auto;padding:32px 20px 80px}
+  header.doc{text-align:center;margin-bottom:8px}
+  header.doc h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
+  header.doc .sub{color:var(--mut);font-size:13px}
+  header.doc .meta{color:var(--faint);font-size:12px;margin-top:6px}
+  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0 28px;
+    font-size:12px;color:var(--mut)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:26px;height:12px;border:1px solid var(--line);border-radius:2px}
+  .sw.fill{background:var(--fill)} .sw.btn{background:var(--dark);border-color:var(--dark)}
+  .sw.txt{background:repeating-linear-gradient(90deg,var(--faint) 0 60%,transparent 60% 100%);border:none;height:4px}
+
+  .screen{background:var(--paper);border:1px solid #d3d3d3;border-radius:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06);margin:0 0 26px;overflow:hidden}
+  .cap{background:#2f3237;color:#fff;padding:8px 14px;font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:10px}
+  .cap .n{background:#fff;color:#2f3237;width:22px;height:22px;border-radius:50%;
+    display:grid;place-items:center;font-size:12px;font-weight:700}
+  .cap .note{margin-left:auto;font-weight:400;color:#c7c7c7;font-size:11.5px}
+  .frame{padding:16px}
+
+  /* wireframe atoms */
+  .row{display:flex;gap:12px}
+  .col{display:flex;flex-direction:column;gap:12px}
+  .box{border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+  .fill{background:var(--fill)} .fill2{background:var(--fill2)}
+  .pad{padding:12px}
+  .center{display:grid;place-items:center;text-align:center;color:var(--mut)}
+  .imgx{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),
+        linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);
+        background-blend-mode:normal;color:var(--faint)}
+  .lbl{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+  .txt{height:8px;border-radius:3px;background:var(--fill);}
+  .txt.w40{width:40%}.txt.w60{width:60%}.txt.w80{width:80%}.txt.dark{background:#dcdcdc}
+  .h{font-weight:700;font-size:15px}
+  .muted{color:var(--mut)}
+  .field{border:1px solid var(--line);border-radius:5px;height:30px;background:var(--paper);
+    display:flex;align-items:center;padding:0 9px;color:var(--faint);font-size:12px}
+  .field.sel::after{content:"▾";margin-left:auto;color:var(--mut)}
+  .flabel{font-size:11px;color:var(--mut);margin:0 0 4px}
+  .btn{border:1px solid var(--dark);border-radius:5px;height:30px;display:inline-flex;
+    align-items:center;justify-content:center;padding:0 12px;font-size:12px;color:var(--dark);background:var(--paper)}
+  .btn.pri{background:var(--dark);color:#fff}
+  .btn.blk{display:flex;width:100%}
+  .chip{border:1px solid var(--line);border-radius:999px;height:24px;display:inline-flex;
+    align-items:center;padding:0 11px;font-size:11.5px;color:var(--mut);background:var(--paper)}
+  .chip.on{background:var(--fill);color:var(--ink);border-color:#bbb}
+  .tabs{display:flex;background:var(--fill2);border:1px solid var(--line);border-radius:6px;padding:3px}
+  .tabs>div{flex:1;text-align:center;padding:6px;font-size:12px;border-radius:4px;color:var(--mut)}
+  .tabs>div.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
+  .toggle{display:flex;gap:6px}
+  .toggle>div{flex:1;text-align:center;border:1px solid var(--line);border-radius:5px;padding:7px;font-size:12px;color:var(--mut)}
+  .toggle>div.on{background:var(--dark);color:#fff;border-color:var(--dark);font-weight:600}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:11px;color:var(--dark);background:var(--fill2)}
+  .bar{height:7px;border-radius:4px;background:var(--fill);overflow:hidden;display:flex}
+  .bar i{display:block;height:100%;background:#9a9a9a}
+  table.wf{width:100%;border-collapse:collapse;font-size:12px}
+  table.wf th{text-align:left;color:var(--faint);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.04em;padding:7px 8px;border-bottom:1px solid var(--line);font-weight:700}
+  table.wf td{padding:9px 8px;border-bottom:1px solid #eee;color:var(--dark);vertical-align:middle}
+  .otp{display:flex;gap:6px}
+  .otp span{flex:1;height:36px;border:1px solid var(--line);border-radius:5px;background:var(--fill2)}
+  .top{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:6px;
+    padding:8px 12px;background:var(--fill2)}
+  .logo{display:flex;align-items:center;gap:8px}
+  .logo .shield{width:26px;height:30px;border:1px solid var(--dark);border-radius:4px 4px 8px 8px;background:#fff;
+    display:grid;place-items:center;font-size:9px;color:var(--dark);font-weight:700}
+  .side{width:150px;border:1px solid var(--line);border-radius:6px;background:var(--fill2);padding:10px}
+  .side .nav{display:flex;flex-direction:column;gap:4px}
+  .side .nav div{padding:7px 9px;border-radius:5px;color:var(--mut);font-size:12px}
+  .side .nav div.on{background:#fff;color:var(--ink);font-weight:600;border:1px solid var(--line)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .kpi{border:1px solid var(--line);border-radius:6px;padding:10px}
+  .kpi .k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+  .kpi .v{font-size:20px;font-weight:800;color:var(--dark);margin-top:6px}
+  .flex1{flex:1}.g8{gap:8px}.mt8{margin-top:8px}.mt12{margin-top:12px}
+  .small{font-size:11px}
+  .anno{font-size:11.5px;color:#a05a00;background:#fff7e6;border:1px dashed #e0b25a;border-radius:5px;
+    padding:6px 9px;margin-top:10px}
+  .anno b{color:#7a4300}
+  footer.doc{text-align:center;color:var(--faint);font-size:11.5px;margin-top:10px}
+  @media print{body{background:#fff}.screen{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="doc">
+    <h1>Wireframe — Hệ thống Cảnh báo Rủi ro Học tập</h1>
+    <div class="sub">Academic Decision Support System · Trường Quốc tế — ĐHQG Hà Nội (VNU-IS)</div>
+    <div class="meta">Bản phác thảo bố cục (low-fidelity) · INS3282 Capstone Project II</div>
+  </header>
+
+  <div class="legend">
+    <span><i class="sw txt"></i> Văn bản / nhãn</span>
+    <span><i class="sw fill"></i> Vùng nội dung</span>
+    <span><i class="sw"></i> Ô nhập</span>
+    <span><i class="sw btn"></i> Nút chính</span>
+  </div>
+
+  <!-- 1. LOGIN -->
+  <section class="screen">
+    <div class="cap"><span class="n">1</span> Đăng nhập <span class="note">màn hình chia đôi · góc phải trên: chuyển VI | EN</span></div>
+    <div class="frame">
+      <div class="row">
+        <div class="box flex1 imgx center" style="min-height:230px;flex-basis:52%">
+          <div class="logo" style="position:absolute;margin:-190px 0 0 -180px">
+            <div class="shield">VNU<br>iS</div><div class="txt w80" style="width:130px"></div>
+          </div>
+          Ảnh trường (carousel tự đổi)<br><span class="small">● ● ● ●</span>
+        </div>
+        <div class="box pad col flex1" style="flex-basis:48%">
+          <div class="row" style="justify-content:flex-end"><span class="chip on">VI</span><span class="chip">EN</span></div>
+          <div class="h">Chào mừng trở lại</div>
+          <div class="muted small">Đăng nhập để tiếp tục vào hệ thống.</div>
+          <div class="tabs mt8"><div class="on">Đăng nhập</div><div>Đăng ký</div></div>
+          <div><div class="flabel">Email</div><div class="field">ban@gmail.com</div></div>
+          <div><div class="flabel">Mật khẩu</div><div class="field">••••••••</div></div>
+          <div class="row" style="justify-content:flex-end"><span class="small muted">Quên mật khẩu?</span></div>
+          <div class="btn pri blk">Đăng nhập</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. REGISTER -->
+  <section class="screen">
+    <div class="cap"><span class="n">2</span> Đăng ký tài khoản <span class="note">chọn Sinh viên / Cố vấn — trường thay đổi theo vai trò</span></div>
+    <div class="frame">
+      <div class="row">
+        <div class="box pad col flex1">
+          <div class="tabs"><div>Đăng nhập</div><div class="on">Đăng ký</div></div>
+          <div class="toggle"><div class="on">Sinh viên</div><div>Cố vấn</div></div>
+          <div class="small muted">Vui lòng điền đầy đủ tất cả các trường bên dưới.</div>
+          <div><div class="flabel">Họ và tên</div><div class="field">Nguyễn Văn A</div></div>
+          <div><div class="flabel">Email</div><div class="field">ban@gmail.com</div>
+            <div class="small muted" style="margin-top:3px">Dùng email thật để nhận thông báo & mã đặt lại MK.</div></div>
+          <div class="row"><div class="flex1"><div class="flabel">Mã sinh viên</div><div class="field">SV001</div></div>
+            <div class="flex1"><div class="flabel">Khóa</div><div class="field">K68</div></div></div>
+          <div><div class="flabel">Ngành</div><div class="field sel">— Chọn ngành —</div></div>
+          <div><div class="flabel">Mật khẩu (≥ 6 ký tự)</div><div class="field">••••••••</div></div>
+          <div class="btn pri blk">Tạo tài khoản</div>
+        </div>
+        <div class="box pad col flex1" style="max-width:300px">
+          <div class="lbl">Biến thể: tab “Cố vấn”</div>
+          <div class="toggle"><div>Sinh viên</div><div class="on">Cố vấn</div></div>
+          <div class="small muted">Đăng ký cố vấn cần nhập Mã cố vấn do trường cấp.</div>
+          <div><div class="flabel">Họ và tên</div><div class="field">TS. Trần Thị B</div></div>
+          <div><div class="flabel">Email</div><div class="field">cvhttt@gmail.com</div></div>
+          <div><div class="flabel">Ngành</div><div class="field sel">— Chọn ngành —</div></div>
+          <div><div class="flabel">Mã cố vấn</div><div class="field">••••••••</div></div>
+          <div><div class="flabel">Mật khẩu</div><div class="field">••••••••</div></div>
+          <div class="btn pri blk">Tạo tài khoản</div>
+          <div class="anno"><b>Bảo mật:</b> vai trò cố vấn chỉ được cấp khi Mã cố vấn khớp (kiểm tra ở database). Sai mã → tạo tài khoản sinh viên.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. FORGOT PASSWORD -->
+  <section class="screen">
+    <div class="cap"><span class="n">3</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước</span></div>
+    <div class="frame row">
+      <div class="box pad col flex1">
+        <div class="lbl">Bước 1 — nhập email</div>
+        <div class="h" style="font-size:14px">Đặt lại mật khẩu</div>
+        <div class="small muted">Nhập email của bạn, hệ thống sẽ gửi mã xác nhận 6 số.</div>
+        <div><div class="flabel">Email</div><div class="field">ban@gmail.com</div></div>
+        <div class="btn pri blk">Gửi mã xác nhận</div>
+        <div class="small muted" style="text-align:center">← Quay lại đăng nhập</div>
+      </div>
+      <div class="box pad col flex1">
+        <div class="lbl">Bước 2 — nhập mã & mật khẩu mới</div>
+        <div class="h" style="font-size:14px">Đặt mật khẩu mới</div>
+        <div class="small muted">Nhập mã 6 số đã gửi tới email, sau đó đặt mật khẩu mới.</div>
+        <div><div class="flabel">Mã xác nhận (6 số)</div>
+          <div class="otp"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div><div class="flabel">Mật khẩu mới</div><div class="field">••••••••</div></div>
+        <div><div class="flabel">Xác nhận mật khẩu mới</div><div class="field">••••••••</div></div>
+        <div class="btn pri blk">Cập nhật mật khẩu</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. STUDENT PORTAL -->
+  <section class="screen">
+    <div class="cap"><span class="n">4</span> Cổng Sinh viên <span class="note">logo góc trái bấm được → cuộn lên đầu</span></div>
+    <div class="frame col">
+      <div class="top">
+        <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
+        <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span>
+        <span class="pill">🔔</span><span class="pill">Avatar</span><span class="btn small">Đăng xuất</span>
+      </div>
+      <div class="box fill2 pad small" style="border-style:dashed">⚠ Băng cảnh báo (hiện khi CPA thấp / có môn F): “Kết quả học tập đang ở mức báo động…”</div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">CPA (hệ 4)</div><div class="v">2.35</div></div>
+        <div class="kpi"><div class="k">GPA kỳ gần nhất</div><div class="v">2.6</div></div>
+        <div class="kpi"><div class="k">Tín chỉ tích lũy</div><div class="v">42</div></div>
+        <div class="kpi"><div class="k">Môn chưa đạt (F)</div><div class="v">1</div></div>
+      </div>
+      <div class="row">
+        <div class="box pad flex1" style="flex-basis:60%">
+          <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Bảng điểm theo học kỳ</div><span class="btn small">In bảng điểm</span></div>
+          <table class="wf mt8">
+            <tr><th>Môn học</th><th>TC</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Điểm chữ</th></tr>
+            <tr><td>Cơ sở dữ liệu</td><td>3</td><td>8.0</td><td>8.5</td><td>9.0</td><td>8.6</td><td><span class="pill">A</span></td></tr>
+            <tr><td>Giải tích 1</td><td>4</td><td>6.0</td><td>5.5</td><td>6.0</td><td>5.9</td><td><span class="pill">C</span></td></tr>
+            <tr><td>Đại số tuyến tính</td><td>3</td><td>4.0</td><td>3.5</td><td>3.0</td><td>3.4</td><td><span class="pill">F</span></td></tr>
+          </table>
+          <div class="small muted mt8">GPA kỳ: 2.6 · 10 tín chỉ</div>
+        </div>
+        <div class="box pad col flex1" style="flex-basis:40%">
+          <div class="h" style="font-size:14px">Thông báo</div>
+          <div class="box fill2 pad small">• Cố vấn đã cập nhật điểm môn …</div>
+          <div class="box fill2 pad small">• Cảnh báo kết quả học tập …</div>
+          <div class="h mt8" style="font-size:14px">Hỏi đáp với cố vấn</div>
+          <div class="box pad small" style="min-height:52px">💬 …tin nhắn…</div>
+          <div class="row g8"><div class="field flex1">Nhập câu hỏi…</div><div class="btn pri">Gửi</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ADVISOR DASHBOARD -->
+  <section class="screen">
+    <div class="cap"><span class="n">5</span> Bảng cố vấn — Tổng quan <span class="note">logo bấm được → về Tổng quan</span></div>
+    <div class="frame col">
+      <div class="top">
+        <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
+        <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span><span class="pill">TS. …Cố Vấn</span><span class="btn small">Đăng xuất</span>
+      </div>
+      <div class="row">
+        <div class="side">
+          <div class="lbl">Điều hướng</div>
+          <div class="nav">
+            <div class="on">▦ Tổng quan</div><div>◔ Sinh viên</div><div>⚑ Cảnh báo ①</div><div>▤ Can thiệp</div><div>💬 Tin nhắn ①</div>
+          </div>
+        </div>
+        <div class="flex1 col">
+          <div class="kpis">
+            <div class="kpi"><div class="k">Tổng sinh viên</div><div class="v">24</div></div>
+            <div class="kpi"><div class="k">Cảnh báo đang mở</div><div class="v">3</div></div>
+            <div class="kpi"><div class="k">Rủi ro cao / N.trọng</div><div class="v">5</div></div>
+            <div class="kpi"><div class="k">CPA trung bình</div><div class="v">2.7</div></div>
+          </div>
+          <div class="row">
+            <div class="box pad flex1 col" style="flex-basis:55%">
+              <div class="h" style="font-size:14px">Xu hướng rủi ro (14 ngày)</div>
+              <div class="box imgx center" style="min-height:90px">Biểu đồ đường</div>
+            </div>
+            <div class="box pad flex1" style="flex-basis:45%">
+              <div class="h" style="font-size:14px">Sinh viên rủi ro cao nhất</div>
+              <table class="wf mt8">
+                <tr><th>Sinh viên</th><th>Điểm</th><th>Mức</th></tr>
+                <tr><td>Hoàng Văn Em</td><td>70.3</td><td><span class="pill">Cao</span></td></tr>
+                <tr><td>Lê Văn Cường</td><td>36.1</td><td><span class="pill">TB</span></td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="box pad">
+            <div class="h" style="font-size:14px">Cảnh báo gần đây</div>
+            <table class="wf mt8">
+              <tr><th>Sinh viên</th><th>Mức</th><th>Trạng thái</th><th>Thời gian</th></tr>
+              <tr><td>Hoàng Văn Em</td><td><span class="pill">Cao</span></td><td><span class="pill">Mở</span></td><td>hôm nay</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. STUDENT LIST -->
+  <section class="screen">
+    <div class="cap"><span class="n">6</span> Bảng cố vấn — Danh sách sinh viên <span class="note">tìm kiếm · lọc theo mức · nhập CSV</span></div>
+    <div class="frame col">
+      <div class="row">
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div class="on">◔ Sinh viên</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div></div></div>
+        <div class="flex1 col">
+          <div class="row" style="justify-content:space-between">
+            <div class="h">Sinh viên <span class="muted small">· 24 sinh viên</span></div>
+            <div class="row g8"><span class="btn small">Nhập CSV</span><span class="btn small">Tải mẫu</span><span class="btn pri small">+ Thêm sinh viên</span></div>
+          </div>
+          <div class="row g8"><div class="field flex1">🔍 Tìm theo tên hoặc mã SV…</div></div>
+          <div class="row g8"><span class="chip on">Tất cả</span><span class="chip">Nghiêm trọng</span><span class="chip">Cao</span><span class="chip">Trung bình</span><span class="chip">Thấp</span></div>
+          <div class="box pad">
+            <table class="wf">
+              <tr><th>Sinh viên</th><th>Mã SV</th><th>CPA</th><th>Điểm rủi ro</th><th>Mức</th><th>Dự đoán</th><th>Cảnh báo</th></tr>
+              <tr><td>Hoàng Văn Em</td><td>SV004</td><td>0.23</td><td><div class="bar"><i style="width:70%"></i></div> 70.3</td><td><span class="pill">Cao</span></td><td><span class="pill">Đang báo động</span></td><td><span class="pill">Mở</span></td></tr>
+              <tr><td>Lê Văn Cường</td><td>SV002</td><td>1.13</td><td><div class="bar"><i style="width:36%"></i></div> 36.1</td><td><span class="pill">Thấp</span></td><td><span class="pill">Nguy cơ cao</span></td><td>—</td></tr>
+              <tr><td>Phạm Thị Dung</td><td>SV003</td><td>2.30</td><td><div class="bar"><i style="width:6%"></i></div> 3.2</td><td><span class="pill">Thấp</span></td><td><span class="pill">An toàn</span></td><td>—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. STUDENT DETAIL -->
+  <section class="screen">
+    <div class="cap"><span class="n">7</span> Bảng cố vấn — Chi tiết sinh viên <span class="note">nhập điểm · rủi ro · cảnh báo · can thiệp · chat</span></div>
+    <div class="frame col">
+      <div class="small muted">← Danh sách sinh viên</div>
+      <div class="row">
+        <div class="box pad flex1" style="flex-basis:33%"><div class="lbl">Thông tin sinh viên</div>
+          <div class="h" style="font-size:14px">Hoàng Văn Em</div><div class="small muted">SV004 · K69 · Hệ thống thông tin</div>
+          <div class="small mt8">Điểm rủi ro: <b>70.3</b> <span class="pill">Cao</span></div>
+          <div class="small muted">📧 email liên hệ (mailto)</div>
+        </div>
+        <div class="box pad flex1" style="flex-basis:34%"><div class="lbl">Yếu tố rủi ro</div>
+          <div class="small">GPA thấp <div class="bar"><i style="width:80%"></i></div></div>
+          <div class="small mt8">Điểm danh <div class="bar"><i style="width:45%"></i></div></div>
+          <div class="small mt8">Hoạt động LMS <div class="bar"><i style="width:30%"></i></div></div>
+          <div class="small mt8">Môn trượt <div class="bar"><i style="width:60%"></i></div></div>
+        </div>
+        <div class="box pad flex1" style="flex-basis:33%"><div class="lbl">Chỉ số theo dõi</div>
+          <div><div class="flabel">Tỷ lệ đi học (%)</div><div class="field">54</div></div>
+          <div class="mt8"><div class="flabel">Hoạt động LMS (0–100)</div><div class="field">28</div></div>
+          <div class="btn blk mt8">Lưu & tính lại rủi ro</div>
+        </div>
+      </div>
+      <div class="box pad"><div class="h" style="font-size:14px">Nhập / sửa điểm</div>
+        <table class="wf mt8">
+          <tr><th>Môn</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Chữ</th><th></th></tr>
+          <tr><td>Nhập môn lập trình</td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td><div class="field" style="width:52px;height:26px">2.5</div></td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td><td><span class="btn small">Lưu</span></td></tr>
+        </table>
+      </div>
+      <div class="row">
+        <div class="box pad flex1"><div class="h" style="font-size:14px">Cảnh báo & Can thiệp</div>
+          <div class="small muted">Cảnh báo mở · mức Cao — <span class="pill">Nhận</span> <span class="pill">Đang xử lý ▾</span></div>
+          <div class="mt8"><div class="flabel">Hình thức</div><div class="field sel">Buổi tư vấn</div></div>
+          <div class="mt8"><div class="field" style="height:44px">Ghi chú buổi can thiệp…</div></div>
+          <div class="btn blk mt8">Ghi nhận can thiệp</div>
+        </div>
+        <div class="box pad flex1 col"><div class="h" style="font-size:14px">Gửi thông báo / Trao đổi</div>
+          <div class="field">Tiêu đề</div>
+          <div class="field" style="height:44px">Nội dung thông báo…</div>
+          <div class="btn blk">Gửi thông báo cho sinh viên</div>
+          <div class="box pad small" style="min-height:40px">💬 khung chat trực tiếp với sinh viên</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="doc">Wireframe low-fidelity · dùng để phác thảo bố cục & luồng, không phải bản màu cuối cùng ·
+  Mở bằng trình duyệt, có thể In → Lưu thành PDF.</footer>
+</div>
+</body>
+</html>
