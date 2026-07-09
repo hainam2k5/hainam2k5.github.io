@@ -33,6 +33,12 @@ export default function LoginPage() {
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  // Forgot-password (6-digit OTP) flow. null = normal login/register view.
+  const [forgotStep, setForgotStep] = useState<null | "email" | "code">(null);
+  const [fpEmail, setFpEmail] = useState("");
+  const [fpCode, setFpCode] = useState("");
+  const [fpPass, setFpPass] = useState("");
+  const [fpPass2, setFpPass2] = useState("");
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regCode, setRegCode] = useState("");
@@ -54,6 +60,43 @@ export default function LoginPage() {
     if (error) return toast(error.message, "error");
     const p = await getMyProfile();
     router.replace(homeFor(p ? p.role : "student"));
+  }
+
+  // Step 1 — email → send a 6-digit recovery code to the mailbox.
+  async function onSendCode(e: FormEvent) {
+    e.preventDefault();
+    if (!configured || !supabase) return toast(t("toast.notConfigured"), "error");
+    const email = fpEmail.trim();
+    if (!email) return toast(t("toast.enterEmail"), "error");
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    setBusy(false);
+    if (error) return toast(error.message, "error");
+    toast(t("toast.resetSent"), "success");
+    setForgotStep("code");
+  }
+
+  // Step 2 — verify the 6-digit code, then set the new password.
+  async function onVerifyReset(e: FormEvent) {
+    e.preventDefault();
+    if (!configured || !supabase) return toast(t("toast.notConfigured"), "error");
+    if (fpPass !== fpPass2) return toast(t("reset.mismatch"), "error");
+    setBusy(true);
+    const { error: vErr } = await supabase.auth.verifyOtp({
+      email: fpEmail.trim(), token: fpCode.trim(), type: "recovery",
+    });
+    if (vErr) { setBusy(false); return toast(t("reset.invalid"), "error"); }
+    const { error: uErr } = await supabase.auth.updateUser({ password: fpPass });
+    if (uErr) { setBusy(false); return toast(uErr.message, "error"); }
+    // Drop the temporary recovery session so the user signs in fresh.
+    await supabase.auth.signOut();
+    setBusy(false);
+    toast(t("reset.done"), "success");
+    setLoginEmail(fpEmail.trim());
+    setLoginPassword("");
+    setFpCode(""); setFpPass(""); setFpPass2("");
+    setForgotStep(null);
+    setTab("login");
   }
 
   async function onRegister(e: FormEvent) {
@@ -127,54 +170,97 @@ export default function LoginPage() {
       <main className="auth-formpane">
         <div className="auth-card">
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}><LangSwitch /></div>
-          <div className="auth-title">{t("login.welcome")}</div>
-          <div className="auth-sub">{t("login.welcomeSub")}</div>
 
-          {!configured && (
-            <div className="config-warn">
-              <Icon name="alert" size={18} />
-              <div>{t("login.configWarn")}</div>
-            </div>
-          )}
+          {forgotStep === null && (<>
+            <div className="auth-title">{t("login.welcome")}</div>
+            <div className="auth-sub">{t("login.welcomeSub")}</div>
 
-          <div className="auth-tabs">
-            <button type="button" className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>{t("login.tabLogin")}</button>
-            <button type="button" className={tab === "register" ? "active" : ""} onClick={() => setTab("register")}>{t("login.tabRegister")}</button>
-          </div>
-
-          {tab === "login" ? (
-            <form onSubmit={onLogin}>
-              <div className="field"><label>{t("form.email")}</label>
-                <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" /></div>
-              <div className="field"><label>{t("form.password")}</label>
-                <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="••••••••" required autoComplete="current-password" /></div>
-              <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnLogin")}</button>
-            </form>
-          ) : (
-            <form onSubmit={onRegister}>
-              <div className="muted-note" style={{ marginBottom: 12 }}>{t("login.registerNote")}</div>
-              <div className="field"><label>{t("form.fullName")}</label>
-                <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Nguyễn Văn A" required /></div>
-              <div className="field"><label>{t("form.email")}</label>
-                <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" /></div>
-              <div className="field-grid-2">
-                <div className="field"><label>{t("form.studentCode")}</label>
-                  <input type="text" value={regCode} onChange={(e) => setRegCode(e.target.value)} placeholder="SV001" /></div>
-                <div className="field"><label>{t("form.cohort")}</label>
-                  <input type="text" value={regCohort} onChange={(e) => setRegCohort(e.target.value)} placeholder="K68" /></div>
+            {!configured && (
+              <div className="config-warn">
+                <Icon name="alert" size={18} />
+                <div>{t("login.configWarn")}</div>
               </div>
-              <div className="field"><label>{t("form.program")}</label>
-                <select value={regProgram} onChange={(e) => setRegProgram(e.target.value)}>
-                  <option value="">{t("form.selectProgram")}</option>
-                  {PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}
-                </select></div>
-              <div className="field"><label>{t("form.passwordMin")}</label>
-                <input type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="new-password" /></div>
-              <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnRegister")}</button>
+            )}
+
+            <div className="auth-tabs">
+              <button type="button" className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>{t("login.tabLogin")}</button>
+              <button type="button" className={tab === "register" ? "active" : ""} onClick={() => setTab("register")}>{t("login.tabRegister")}</button>
+            </div>
+
+            {tab === "login" ? (
+              <form onSubmit={onLogin}>
+                <div className="field"><label>{t("form.email")}</label>
+                  <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" /></div>
+                <div className="field"><label>{t("form.password")}</label>
+                  <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="••••••••" required autoComplete="current-password" /></div>
+                <div className="auth-forgot">
+                  <button type="button" className="link-btn" onClick={() => { setForgotStep("email"); if (loginEmail) setFpEmail(loginEmail); }}>{t("login.forgotLink")}</button>
+                </div>
+                <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnLogin")}</button>
+              </form>
+            ) : (
+              <form onSubmit={onRegister}>
+                <div className="muted-note" style={{ marginBottom: 12 }}>{t("login.registerNote")}</div>
+                <div className="field"><label>{t("form.fullName")}</label>
+                  <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Nguyễn Văn A" required /></div>
+                <div className="field"><label>{t("form.email")}</label>
+                  <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" /></div>
+                <div className="field-grid-2">
+                  <div className="field"><label>{t("form.studentCode")}</label>
+                    <input type="text" value={regCode} onChange={(e) => setRegCode(e.target.value)} placeholder="SV001" /></div>
+                  <div className="field"><label>{t("form.cohort")}</label>
+                    <input type="text" value={regCohort} onChange={(e) => setRegCohort(e.target.value)} placeholder="K68" /></div>
+                </div>
+                <div className="field"><label>{t("form.program")}</label>
+                  <select value={regProgram} onChange={(e) => setRegProgram(e.target.value)}>
+                    <option value="">{t("form.selectProgram")}</option>
+                    {PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select></div>
+                <div className="field"><label>{t("form.passwordMin")}</label>
+                  <input type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="new-password" /></div>
+                <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnRegister")}</button>
+              </form>
+            )}
+
+            <div className="auth-hint" dangerouslySetInnerHTML={{ __html: t("login.demoHint") }} />
+          </>)}
+
+          {forgotStep === "email" && (
+            <form onSubmit={onSendCode}>
+              <div className="auth-title">{t("login.forgotTitle")}</div>
+              <div className="auth-sub">{t("login.forgotDesc")}</div>
+              {!configured && (
+                <div className="config-warn"><Icon name="alert" size={18} /><div>{t("login.configWarn")}</div></div>
+              )}
+              <div className="field"><label>{t("form.email")}</label>
+                <input type="email" value={fpEmail} onChange={(e) => setFpEmail(e.target.value)} placeholder="email@truong.edu.vn" required autoComplete="email" autoFocus /></div>
+              <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnSendReset")}</button>
+              <div className="auth-back">
+                <button type="button" className="link-btn" onClick={() => setForgotStep(null)}>{t("login.backToLogin")}</button>
+              </div>
             </form>
           )}
 
-          <div className="auth-hint" dangerouslySetInnerHTML={{ __html: t("login.demoHint") }} />
+          {forgotStep === "code" && (
+            <form onSubmit={onVerifyReset}>
+              <div className="auth-title">{t("reset.title")}</div>
+              <div className="auth-sub">{t("reset.sentTo", { email: fpEmail.trim() })}</div>
+              <div className="field"><label>{t("reset.code")}</label>
+                <input className="otp-input" inputMode="numeric" pattern="[0-9]*" maxLength={6}
+                  value={fpCode} onChange={(e) => setFpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="••••••" required autoFocus autoComplete="one-time-code" /></div>
+              <div className="field"><label>{t("reset.newPassword")}</label>
+                <input type="password" value={fpPass} onChange={(e) => setFpPass(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="new-password" /></div>
+              <div className="field"><label>{t("reset.confirmPassword")}</label>
+                <input type="password" value={fpPass2} onChange={(e) => setFpPass2(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="new-password" /></div>
+              <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("reset.btnUpdate")}</button>
+              <div className="auth-back">
+                <button type="button" className="link-btn" onClick={() => onSendCode({ preventDefault() {} } as FormEvent)} disabled={busy}>{t("login.btnSendReset")}</button>
+                <span className="auth-back-sep">·</span>
+                <button type="button" className="link-btn" onClick={() => setForgotStep(null)}>{t("login.backToLogin")}</button>
+              </div>
+            </form>
+          )}
         </div>
       </main>
     </div>

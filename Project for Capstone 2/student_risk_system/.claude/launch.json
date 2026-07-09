@@ -10,6 +10,15 @@
         "student_risk_system/webapp"
       ],
       "port": 5173
+    },
+    {
+      "name": "webapp-next",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix", "../../webapp-next",
+        "run", "dev"
+      ],
+      "port": 3000
     }
   ]
 }
