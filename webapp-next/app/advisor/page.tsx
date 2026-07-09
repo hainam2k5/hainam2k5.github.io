@@ -411,6 +411,66 @@ export default function AdvisorPage() {
     const a = document.createElement("a"); a.href = url; a.download = "students_template.csv"; a.click();
     URL.revokeObjectURL(url);
   }
+
+  // Import grades from a CSV keyed on MSSV (student_code). Each row is a course;
+  // the student is matched by MSSV, so it works regardless of how the student was
+  // added. Rows whose MSSV isn't among this advisor's students are reported.
+  const scoreOrNull = (v: unknown) => (v === "" || v === null || v === undefined ? null : Number(v));
+  async function importGrades(file: File) {
+    if (!sb || !me) return;
+    const rows = parseCsv(await file.text());
+    if (!rows.length) return toast(t("adv.importFail", { n: 0 }), "error");
+    const byCode = new Map<string, string>();
+    for (const s of students) if (s.student_code) byCode.set(s.student_code.trim().toLowerCase(), s.id);
+
+    let ok = 0, notFound = 0, bad = 0;
+    const touched = new Set<string>();
+    for (const row of rows) {
+      const code = (row.student_code || row.mssv || row.code || "").trim();
+      const name = (row.course_name || row.name || "").trim();
+      if (!code || !name) { bad++; continue; }
+      const sid = byCode.get(code.toLowerCase());
+      if (!sid) { notFound++; continue; }
+      const wr = numOr(row.weight_regular, 0.2), wm = numOr(row.weight_midterm, 0.3), wf = numOr(row.weight_final, 0.5);
+      const g = computeCourse({ score_regular: row.score_regular, score_midterm: row.score_midterm, score_final: row.score_final, weight_regular: wr, weight_midterm: wm, weight_final: wf });
+      const courseCode = (row.course_code || "").trim();
+      const semester = (row.semester || "").trim() || "—";
+      const payload: Record<string, unknown> = {
+        student_id: sid, code: courseCode, name, credits: parseInt(row.credits) || 3,
+        semester, academic_year: (row.academic_year || row.year || "").trim(),
+        weight_regular: wr, weight_midterm: wm, weight_final: wf,
+        score_regular: scoreOrNull(row.score_regular), score_midterm: scoreOrNull(row.score_midterm), score_final: scoreOrNull(row.score_final),
+        total_score: g.total, letter_grade: g.letter, grade_point: g.point, updated_at: new Date().toISOString(),
+      };
+      // Upsert by (student, course code, semester) so re-importing updates in place.
+      let existingId: string | null = null;
+      if (courseCode) {
+        const { data } = await sb.from("courses").select("id").eq("student_id", sid).eq("code", courseCode).eq("semester", semester).limit(1);
+        existingId = data && data[0] ? (data[0] as any).id : null;
+      }
+      const res = existingId
+        ? await sb.from("courses").update(payload).eq("id", existingId)
+        : await sb.from("courses").insert(payload);
+      if (res.error) bad++; else { ok++; touched.add(sid); }
+    }
+    // Recompute risk for every student whose grades changed.
+    const core = await fetchCore();
+    for (const sid of touched) { const st = core.students.find((x) => x.id === sid); if (st) await recomputeStudent(st, core); }
+    await loadCore();
+    let msg = t("adv.importGradesDone", { n: ok });
+    if (notFound) msg += " · " + t("adv.gradeNotFound", { n: notFound });
+    if (bad) msg += " · " + t("adv.importFail", { n: bad });
+    toast(msg, notFound || bad ? "error" : "success");
+  }
+  function downloadGradeTemplate() {
+    const csv =
+      "student_code,course_code,course_name,credits,semester,academic_year,weight_regular,weight_midterm,weight_final,score_regular,score_midterm,score_final\n" +
+      "SV001,INT1004,Nhap mon lap trinh,3,2024-2,2024-2025,0.2,0.3,0.5,8.0,8.5,9.0\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "grades_template.csv"; a.click();
+    URL.revokeObjectURL(url);
+  }
   async function sendReply(e: FormEvent) {
     e.preventDefault();
     if (!sb || !selectedThread) return;
@@ -560,6 +620,10 @@ export default function AdvisorPage() {
               <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) importCsv(f); e.target.value = ""; }} />
             </label>
             <button className="btn" onClick={downloadTemplate}>{t("adv.importTemplate")}</button>
+            <label className="btn"><Icon name="chart" size={16} /> {t("adv.importGrades")}
+              <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) importGrades(f); e.target.value = ""; }} />
+            </label>
+            <button className="btn" onClick={downloadGradeTemplate}>{t("adv.gradeTemplate")}</button>
             <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
           </div>
         </div>
