@@ -290,16 +290,36 @@ export default function AdvisorPage() {
     await loadCore();
   }
 
+  // Provision real login accounts (email + password) via the server-side admin
+  // endpoint, which uses the service_role key. Keyed on MSSV (student_code).
+  async function provisionStudents(students: any[], password: string): Promise<any> {
+    const { data: sess } = await sb!.auth.getSession();
+    const token = sess.session?.access_token;
+    if (!token) return { ok: false, error: "unauthorized" };
+    const res = await fetch("/api/admin/import-students", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ students, password }),
+    });
+    return res.json().catch(() => ({ ok: false, error: "bad response" }));
+  }
+  function adminErr(r: any): string {
+    if (r?.error === "admin_not_configured") return t("toast.adminNotConfigured");
+    if (r?.error === "forbidden" || r?.error === "unauthorized") return t("toast.notConfigured");
+    return String(r?.error || "error");
+  }
+
   async function addStudent(s: NewStudent) {
     if (!sb || !me) return;
-    if (!s.name.trim()) return toast(t("toast.enterName"), "error");
-    const { error } = await sb.from("profiles").insert({
-      role: "student", full_name: s.name.trim(),
-      student_code: s.code.trim() || null, email: s.email.trim() || null,
-      program: s.program.trim(), cohort: s.cohort.trim(), advisor_id: me.id,
-      attendance_rate: numOr(s.att, 100), lms_activity_score: numOr(s.lms, 100),
-    });
-    if (error) return toast(error.message, "error");
+    if (!s.name.trim() || !s.code.trim() || !s.email.trim()) return toast(t("toast.enterNameEmailCode"), "error");
+    if ((s.pw || "").trim().length < 6) return toast(t("toast.pwMin"), "error");
+    const r = await provisionStudents([{
+      student_code: s.code.trim(), full_name: s.name.trim(), email: s.email.trim(),
+      program: s.program.trim(), cohort: s.cohort.trim(),
+      attendance_rate: s.att, lms_activity_score: s.lms, password: s.pw.trim(),
+    }], s.pw.trim());
+    if (!r.ok) return toast(adminErr(r), "error");
+    if (r.failed) return toast(r.results?.[0]?.error || t("adv.importFail", { n: r.failed }), "error");
     toast(t("toast.studentAdded"), "success");
     setShowAdd(false);
     await loadCore();
@@ -364,23 +384,28 @@ export default function AdvisorPage() {
   async function importCsv(file: File) {
     if (!sb || !me) return;
     const rows = parseCsv(await file.text());
-    let ok = 0, fail = 0;
-    for (const row of rows) {
-      const code = (row.student_code || row.code || "").trim();
-      const name = (row.full_name || row.name || "").trim();
-      if (!name && !code) continue;
-      const { error } = await sb.from("profiles").insert({
-        role: "student", full_name: name || code, student_code: code || null,
-        email: (row.email || "").trim() || null, program: (row.program || "").trim(), cohort: (row.cohort || "").trim(),
-        advisor_id: me.id, attendance_rate: numOr(row.attendance_rate, 100), lms_activity_score: numOr(row.lms_activity_score, 100),
-      });
-      if (error) fail++; else ok++;
-    }
-    toast(t("adv.importDone", { n: ok }) + (fail ? " · " + t("adv.importFail", { n: fail }) : ""), fail ? "error" : "success");
+    const students = rows
+      .map((row) => ({
+        student_code: (row.student_code || row.code || "").trim(),
+        full_name: (row.full_name || row.name || "").trim(),
+        email: (row.email || "").trim(),
+        program: (row.program || "").trim(),
+        cohort: (row.cohort || "").trim(),
+        attendance_rate: row.attendance_rate,
+        lms_activity_score: row.lms_activity_score,
+        password: (row.password || "").trim(),
+      }))
+      .filter((s) => s.student_code || s.email);
+    if (!students.length) return toast(t("adv.importFail", { n: 0 }), "error");
+    // A shared initial password for any row that didn't include its own.
+    const batch = (window.prompt(t("adv.batchPasswordPrompt"), "") || "").trim();
+    const r = await provisionStudents(students, batch);
+    if (!r.ok) return toast(adminErr(r), "error");
+    toast(t("adv.importDone", { n: r.created }) + (r.failed ? " · " + t("adv.importFail", { n: r.failed }) : ""), r.failed ? "error" : "success");
     await loadCore();
   }
   function downloadTemplate() {
-    const csv = "student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score\nSV010,Nguyen Van A,sv010@gmail.com,He thong thong tin,K69,90,80\n";
+    const csv = "student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score,password\nSV010,Nguyen Van A,sv010@gmail.com,He thong thong tin,K69,90,80,Sv@123456\n";
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "students_template.csv"; a.click();
