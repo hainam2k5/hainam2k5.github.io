@@ -63,10 +63,10 @@ export function AddCourseForm({ onAdd }: { onAdd: (c: NewCourse) => void }) {
 }
 
 // -------------------------------------------------------------- add student
-export interface NewStudent { name: string; code: string; email: string; program: string; cohort: string; att: string; lms: string; }
+export interface NewStudent { name: string; code: string; email: string; program: string; cohort: string; att: string; lms: string; pw: string; }
 export function AddStudentForm({ onAdd }: { onAdd: (s: NewStudent) => void }) {
   const { t } = useI18n();
-  const [v, setV] = useState<NewStudent>({ name: "", code: "", email: "", program: "", cohort: "", att: "100", lms: "100" });
+  const [v, setV] = useState<NewStudent>({ name: "", code: "", email: "", program: "", cohort: "", att: "100", lms: "100", pw: "" });
   const up = (k: keyof NewStudent) => (e: ChangeEvent<HTMLInputElement>) => setV({ ...v, [k]: e.target.value });
   return (
     <div className="card">
@@ -81,8 +81,9 @@ export function AddStudentForm({ onAdd }: { onAdd: (s: NewStudent) => void }) {
         <div className="field"><label>{t("form.cohort")}</label><input type="text" value={v.cohort} onChange={up("cohort")} placeholder="K69" /></div>
         <div className="field"><label>{t("label.attendance")}</label><input type="number" value={v.att} onChange={up("att")} min="0" max="100" /></div>
       </div>
-      <div className="field-grid-2">
+      <div className="field-grid">
         <div className="field"><label>{t("label.lms")}</label><input type="number" value={v.lms} onChange={up("lms")} min="0" max="100" /></div>
+        <div className="field"><label>{t("form.initPassword")}</label><input type="text" value={v.pw} onChange={up("pw")} placeholder="≥ 6 ký tự" autoComplete="off" /></div>
         <div className="field" style={{ display: "flex", alignItems: "flex-end" }}><button className="btn btn-primary btn-block" onClick={() => onAdd(v)}>{t("btn.save")}</button></div>
       </div>
       <div className="muted-note">{t("adv.addStudentHint")}</div>

@@ -6,7 +6,6 @@ import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClien
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { LangSwitch } from "@/components/common";
-import { PROGRAMS } from "@/lib/programs";
 
 // Ảnh giới thiệu Trường Quốc tế (tự động đổi). Người dùng đặt ảnh thật vào
 // webapp-next/public/school/slide1.jpg ... slide4.jpg. Nếu thiếu ảnh, nền
@@ -21,7 +20,6 @@ const SLIDES = [
 export default function LoginPage() {
   const { t } = useI18n();
   const router = useRouter();
-  const [tab, setTab] = useState<"login" | "register">("login");
   const [busy, setBusy] = useState(false);
   const [slide, setSlide] = useState(0);
   const [logoOk, setLogoOk] = useState(true);
@@ -33,22 +31,12 @@ export default function LoginPage() {
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  // Forgot-password (6-digit OTP) flow. null = normal login/register view.
+  // Forgot-password (6-digit OTP) flow. null = normal login view.
   const [forgotStep, setForgotStep] = useState<null | "email" | "code">(null);
   const [fpEmail, setFpEmail] = useState("");
   const [fpCode, setFpCode] = useState("");
   const [fpPass, setFpPass] = useState("");
   const [fpPass2, setFpPass2] = useState("");
-  // Registration: pick the account type first. Students self-register freely;
-  // advisors must supply the secret advisor code (verified by the DB trigger).
-  const [regRole, setRegRole] = useState<"student" | "advisor">("student");
-  const [regName, setRegName] = useState("");
-  const [regEmail, setRegEmail] = useState("");
-  const [regCode, setRegCode] = useState("");
-  const [regCohort, setRegCohort] = useState("");
-  const [regProgram, setRegProgram] = useState("");
-  const [regPassword, setRegPassword] = useState("");
-  const [regAdvisorCode, setRegAdvisorCode] = useState("");
 
   useEffect(() => {
     if (!configured) return;
@@ -100,42 +88,6 @@ export default function LoginPage() {
     setLoginPassword("");
     setFpCode(""); setFpPass(""); setFpPass2("");
     setForgotStep(null);
-    setTab("login");
-  }
-
-  async function onRegister(e: FormEvent) {
-    e.preventDefault();
-    if (!configured || !supabase) return toast(t("toast.notConfigured"), "error");
-
-    // Every field is mandatory so no half-filled profile can be created.
-    const base = regName.trim() && regEmail.trim() && regProgram.trim() && regPassword;
-    const ok = regRole === "advisor"
-      ? base && regAdvisorCode.trim()
-      : base && regCode.trim() && regCohort.trim();
-    if (!ok) return toast(t("toast.fillAll"), "error");
-
-    // The role here is only a REQUEST. The DB trigger promotes to 'advisor' only
-    // when advisor_code matches the school's secret; otherwise it stays a student.
-    const meta =
-      regRole === "advisor"
-        ? { full_name: regName.trim(), role: "advisor", program: regProgram.trim(), advisor_code: regAdvisorCode.trim() }
-        : { full_name: regName.trim(), role: "student", student_code: regCode.trim(), program: regProgram.trim(), cohort: regCohort.trim() };
-
-    setBusy(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: regEmail.trim(),
-      password: regPassword,
-      options: { data: meta },
-    });
-    setBusy(false);
-    if (error) return toast(error.message, "error");
-    if (data.session) {
-      const p = await getMyProfile();
-      router.replace(homeFor(p ? p.role : "student"));
-    } else {
-      toast(t("toast.signupDone"), "success");
-      setTab("login");
-    }
   }
 
   return (
@@ -195,62 +147,17 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="auth-tabs">
-              <button type="button" className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>{t("login.tabLogin")}</button>
-              <button type="button" className={tab === "register" ? "active" : ""} onClick={() => setTab("register")}>{t("login.tabRegister")}</button>
-            </div>
-
-            {tab === "login" ? (
-              <form onSubmit={onLogin}>
-                <div className="field"><label>{t("form.email")}</label>
-                  <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="ban@gmail.com" required autoComplete="email" /></div>
-                <div className="field"><label>{t("form.password")}</label>
-                  <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="••••••••" required autoComplete="current-password" /></div>
-                <div className="auth-forgot">
-                  <button type="button" className="link-btn" onClick={() => { setForgotStep("email"); if (loginEmail) setFpEmail(loginEmail); }}>{t("login.forgotLink")}</button>
-                </div>
-                <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnLogin")}</button>
-              </form>
-            ) : (
-              <form onSubmit={onRegister}>
-                {/* Account type: student (open) vs advisor (needs the secret code) */}
-                <div className="role-toggle">
-                  <button type="button" className={regRole === "student" ? "active" : ""} onClick={() => setRegRole("student")}>{t("role.student")}</button>
-                  <button type="button" className={regRole === "advisor" ? "active" : ""} onClick={() => setRegRole("advisor")}>{t("role.advisor")}</button>
-                </div>
-                <div className="muted-note" style={{ marginBottom: 12 }}>{regRole === "advisor" ? t("reg.advisorNote") : t("reg.studentNote")}</div>
-
-                <div className="field"><label>{t("form.fullName")}</label>
-                  <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Nguyễn Văn A" required /></div>
-                <div className="field"><label>{t("form.email")}</label>
-                  <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="ban@gmail.com" required autoComplete="email" />
-                  <div className="muted-note" style={{ marginTop: 6 }}>{t("form.emailHint")}</div></div>
-
-                {regRole === "student" ? (
-                  <div className="field-grid-2">
-                    <div className="field"><label>{t("form.studentCode")}</label>
-                      <input type="text" value={regCode} onChange={(e) => setRegCode(e.target.value)} placeholder="SV001" required /></div>
-                    <div className="field"><label>{t("form.cohort")}</label>
-                      <input type="text" value={regCohort} onChange={(e) => setRegCohort(e.target.value)} placeholder="K68" required /></div>
-                  </div>
-                ) : null}
-
-                <div className="field"><label>{t("form.program")}</label>
-                  <select value={regProgram} onChange={(e) => setRegProgram(e.target.value)} required>
-                    <option value="">{t("form.selectProgram")}</option>
-                    {PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}
-                  </select></div>
-
-                {regRole === "advisor" ? (
-                  <div className="field"><label>{t("form.advisorCode")}</label>
-                    <input type="password" value={regAdvisorCode} onChange={(e) => setRegAdvisorCode(e.target.value)} placeholder="••••••••" required autoComplete="off" /></div>
-                ) : null}
-
-                <div className="field"><label>{t("form.passwordMin")}</label>
-                  <input type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="new-password" /></div>
-                <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnRegister")}</button>
-              </form>
-            )}
+            <form onSubmit={onLogin}>
+              <div className="field"><label>{t("form.email")}</label>
+                <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="ban@gmail.com" required autoComplete="email" /></div>
+              <div className="field"><label>{t("form.password")}</label>
+                <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="••••••••" required autoComplete="current-password" /></div>
+              <div className="auth-forgot">
+                <button type="button" className="link-btn" onClick={() => { setForgotStep("email"); if (loginEmail) setFpEmail(loginEmail); }}>{t("login.forgotLink")}</button>
+              </div>
+              <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("login.btnLogin")}</button>
+            </form>
+            <div className="muted-note" style={{ marginTop: 14, textAlign: "center" }}>{t("login.provisionNote")}</div>
           </>)}
 
           {forgotStep === "email" && (

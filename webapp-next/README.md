@@ -32,8 +32,13 @@ Mở http://localhost:3000
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...    # anon public key
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...        # service_role secret (SERVER ONLY)
 ```
-> Chỉ dùng key **anon/public** (an toàn nhờ RLS). Không đưa `service_role` vào đây.
+> `NEXT_PUBLIC_*` là key **anon/public** (an toàn nhờ RLS). `SUPABASE_SERVICE_ROLE_KEY`
+> là key **toàn quyền** — chỉ đặt phía server (không có `NEXT_PUBLIC_`), dùng cho
+> `/api/admin/import-students` để **tạo tài khoản đăng nhập cho sinh viên**. Trên
+> Vercel: **Settings → Environment Variables**. Thiếu key này thì đăng nhập/xem dữ
+> liệu vẫn chạy, chỉ **không tạo được tài khoản mới** (báo lỗi rõ).
 
 ### Gửi điểm qua email (Gmail SMTP — tùy chọn)
 Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm thành phần). Dùng một
