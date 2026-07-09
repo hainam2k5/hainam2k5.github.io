@@ -131,6 +131,19 @@ create table if not exists public.messages (
 );
 create index if not exists idx_msg_student on public.messages(student_id, created_at);
 
+-- app_secrets: server-only key/value (e.g. the advisor sign-up code). RLS is ON
+-- with NO policies, so neither anon nor authenticated clients can read it — only
+-- SECURITY DEFINER functions (like the signup trigger) can. -------------------
+create table if not exists public.app_secrets (
+  key   text primary key,
+  value text not null default ''
+);
+alter table public.app_secrets enable row level security;
+-- Seed a placeholder advisor code. CHANGE THIS before going live:
+--   update public.app_secrets set value = 'your-secret' where key = 'advisor_signup_code';
+insert into public.app_secrets (key, value) values ('advisor_signup_code', 'DOI-MA-NAY')
+  on conflict (key) do nothing;
+
 -- =============================================================== FUNCTIONS ===
 -- SECURITY DEFINER helpers read `profiles` while bypassing RLS, so policies can
 -- reference the caller's role/profile without causing infinite recursion.
@@ -149,7 +162,11 @@ $$;
 -- otherwise create a fresh profile from the signup metadata.
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
-declare existing uuid;
+declare
+  existing    uuid;
+  want_role   text := coalesce(new.raw_user_meta_data->>'role', 'student');
+  code_in     text := coalesce(new.raw_user_meta_data->>'advisor_code', '');
+  final_role  text := 'student';
 begin
   select id into existing
     from public.profiles
@@ -158,22 +175,31 @@ begin
 
   if existing is not null then
     update public.profiles set user_id = new.id where id = existing;
-  else
-    -- SECURITY: public self-signups are ALWAYS students. The client-provided
-    -- role is ignored on purpose — an advisor/manager can only be created by
-    -- pre-provisioning a profile row (user_id null) with that email, which the
-    -- branch above then links to. This prevents privilege escalation via signup.
-    insert into public.profiles (user_id, role, full_name, email, student_code, program, cohort)
-    values (
-      new.id,
-      'student',
-      coalesce(new.raw_user_meta_data->>'full_name', ''),
-      new.email,
-      nullif(new.raw_user_meta_data->>'student_code', ''),
-      coalesce(new.raw_user_meta_data->>'program', ''),
-      coalesce(new.raw_user_meta_data->>'cohort', '')
-    );
+    return new;
   end if;
+
+  -- SECURITY: a fresh self-signup is a STUDENT by default. It is only promoted
+  -- to 'advisor' when the client asked for that role AND supplied the correct
+  -- secret advisor code (compared here, server-side, against app_secrets which
+  -- the client can never read). No valid code → stays a student. This is the
+  -- only path to a public advisor account and cannot be bypassed from the app.
+  if want_role = 'advisor'
+     and code_in <> ''
+     and exists (select 1 from public.app_secrets
+                  where key = 'advisor_signup_code' and value = code_in) then
+    final_role := 'advisor';
+  end if;
+
+  insert into public.profiles (user_id, role, full_name, email, student_code, program, cohort)
+  values (
+    new.id,
+    final_role,
+    coalesce(new.raw_user_meta_data->>'full_name', ''),
+    new.email,
+    nullif(new.raw_user_meta_data->>'student_code', ''),
+    coalesce(new.raw_user_meta_data->>'program', ''),
+    coalesce(new.raw_user_meta_data->>'cohort', '')
+  );
   return new;
 end; $$;
 

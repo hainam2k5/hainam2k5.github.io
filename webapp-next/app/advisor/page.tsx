@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClient";
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
-import { LangSwitch, RiskBadge, RiskBar } from "@/components/common";
+import { BrandLogo, LangSwitch, RiskBadge, RiskBar } from "@/components/common";
 import { gpaOf, bySemester, failedCount, computeCourse, numOr } from "@/lib/gpa";
 import { compute as computeRisk, alertWorthy } from "@/lib/risk";
 import { fmtDate, initials, riskLabel } from "@/lib/format";
@@ -837,10 +837,7 @@ export default function AdvisorPage() {
   return (
     <>
       <div className="topbar">
-        <div className="brand">
-          <div className="brand-logo">SR</div>
-          <div><div className="brand-name">{t("brand.name")}</div><div className="brand-sub">{t("brand.advisorSub")}</div></div>
-        </div>
+        <BrandLogo onClick={() => setView("dashboard")} title={t("brand.home")} />
         <div className="topbar-spacer" />
         <LangSwitch />
         <div className="topbar-user">
