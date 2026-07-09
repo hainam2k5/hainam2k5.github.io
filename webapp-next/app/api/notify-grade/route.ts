@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
 
-// Sends a grade-update email via Resend. Server-side only: RESEND_API_KEY never
-// reaches the browser.
+// nodemailer needs the Node.js runtime (net/tls), not the Edge runtime.
+export const runtime = "nodejs";
+
+// Sends a grade-update email via a Gmail account (SMTP). Server-side only:
+// GMAIL_USER / GMAIL_APP_PASSWORD never reach the browser.
+//
+// Why Gmail SMTP: it needs no verified domain (unlike Resend), delivers well,
+// and ~500 emails/day is plenty for this system. Create an App Password on a
+// Google account with 2-Step Verification enabled and set:
+//   GMAIL_USER=vnuis.risk.alert@gmail.com
+//   GMAIL_APP_PASSWORD=xxxxxxxxxxxxxxxx     (16-char app password, no spaces)
+//   NOTIFY_FROM_NAME=Hệ thống Cảnh báo Rủi ro Học tập — VNU-IS   (optional)
 //
 // Security model:
 // - Caller must present a valid Supabase JWT of an advisor/manager (403 otherwise).
@@ -14,7 +25,8 @@ import { createClient } from "@supabase/supabase-js";
 export async function POST(req: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-  const resendKey = process.env.RESEND_API_KEY;
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
   let body: any;
   try {
@@ -37,7 +49,7 @@ export async function POST(req: Request) {
   }
 
   // --- graceful no-ops (app must still work without email configured) ----------
-  if (!resendKey) return NextResponse.json({ ok: true, skipped: "no RESEND_API_KEY" });
+  if (!gmailUser || !gmailPass) return NextResponse.json({ ok: true, skipped: "no GMAIL_USER/GMAIL_APP_PASSWORD" });
   if (!body?.studentId) return NextResponse.json({ ok: true, skipped: "no student" });
 
   // Recipient resolved server-side, through the caller's own RLS view.
@@ -73,13 +85,24 @@ export async function POST(req: Request) {
       <p style="color:#5c6678;font-size:12px;margin-top:16px">${L.foot}</p>
     </div>`;
 
-  const from = process.env.NOTIFY_FROM || "Academic Risk Alert <onboarding@resend.dev>";
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from, to: [student.email], subject: L.subject, html }),
+  // Gmail requires the From address to be the authenticated account; only the
+  // display name is customisable.
+  const fromName = process.env.NOTIFY_FROM_NAME || "Academic Risk Alert";
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: { user: gmailUser, pass: gmailPass },
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) return NextResponse.json({ ok: false, error: data }, { status: 502 });
-  return NextResponse.json({ ok: true, id: (data as any)?.id });
+  try {
+    const info = await transporter.sendMail({
+      from: `"${fromName}" <${gmailUser}>`,
+      to: student.email,
+      subject: L.subject,
+      html,
+    });
+    return NextResponse.json({ ok: true, id: info.messageId });
+  } catch (e: any) {
+    return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 502 });
+  }
 }
