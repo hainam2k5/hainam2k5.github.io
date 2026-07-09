@@ -8,11 +8,28 @@ import { Icon } from "@/lib/icons";
 import { LangSwitch } from "@/components/common";
 import { PROGRAMS } from "@/lib/programs";
 
+// Ảnh giới thiệu Trường Quốc tế (tự động đổi). Người dùng đặt ảnh thật vào
+// webapp-next/public/school/slide1.jpg ... slide4.jpg. Nếu thiếu ảnh, nền
+// gradient bên dưới vẫn hiển thị (không bị vỡ ảnh).
+const SLIDES = [
+  { src: "/school/slide1.jpg", grad: "linear-gradient(150deg,#0c2647,#1c53a6)" },
+  { src: "/school/slide2.jpg", grad: "linear-gradient(150deg,#123a68,#2a7de1)" },
+  { src: "/school/slide3.jpg", grad: "linear-gradient(150deg,#0f2f3d,#1c7a4d)" },
+  { src: "/school/slide4.jpg", grad: "linear-gradient(150deg,#241a4d,#5b3fa6)" },
+];
+
 export default function LoginPage() {
   const { t } = useI18n();
   const router = useRouter();
   const [tab, setTab] = useState<"login" | "register">("login");
   const [busy, setBusy] = useState(false);
+  const [slide, setSlide] = useState(0);
+  const [logoOk, setLogoOk] = useState(true);
+
+  useEffect(() => {
+    const id = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 5000);
+    return () => clearInterval(id);
+  }, []);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -70,13 +87,37 @@ export default function LoginPage() {
   return (
     <div className="auth-split">
       <aside className="auth-brandpane">
-        <div className="abp-brand">
-          <div className="brand-logo">SR</div>
-          <div>
-            <div className="brand-name">{t("brand.name")}</div>
-            <div className="brand-sub">{t("brand.dss")}</div>
-          </div>
+        {/* Ảnh Trường Quốc tế – tự động đổi */}
+        <div className="abp-carousel" aria-hidden="true">
+          {SLIDES.map((s, i) => (
+            <div key={i} className={"abp-slide" + (i === slide ? " active" : "")} style={{ backgroundImage: s.grad }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={s.src} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+            </div>
+          ))}
+          <div className="abp-scrim" />
         </div>
+
+        {/* Logo + tên trường (góc trên bên trái). Khi có /school-logo.png
+            (ảnh 2: khiên + tên trường) thì hiển thị đúng ảnh đó; nếu thiếu
+            thì dùng huy hiệu chữ + tên trường thay thế. */}
+        <div className="abp-topbar">
+          {logoOk ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="abp-logo-full" src="/school-logo.png" alt="Trường Quốc tế - Đại học Quốc gia Hà Nội" onError={() => setLogoOk(false)} />
+          ) : (
+            <>
+              <div className="abp-logo abp-logo-fallback">VNU<span>iS</span></div>
+              <div className="abp-school">
+                <div className="abp-school-1">Đại học Quốc gia Hà Nội</div>
+                <div className="abp-school-2">Trường Quốc tế</div>
+                <div className="abp-school-3">VNU International School</div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Thông điệp giới thiệu (overlay dưới) */}
         <div className="abp-hero">
           <h1>{t("login.heroTitle")}</h1>
           <p>{t("login.heroDesc")}</p>
@@ -86,7 +127,14 @@ export default function LoginPage() {
             ))}
           </ul>
         </div>
-        <div className="abp-foot">{t("login.footer")}</div>
+
+        {/* Chấm chuyển ảnh */}
+        <div className="abp-dots" role="tablist" aria-label="Ảnh giới thiệu">
+          {SLIDES.map((_, i) => (
+            <button key={i} type="button" className={"abp-dot" + (i === slide ? " active" : "")}
+              aria-label={"Ảnh " + (i + 1)} aria-selected={i === slide} role="tab" onClick={() => setSlide(i)} />
+          ))}
+        </div>
       </aside>
 
       <main className="auth-formpane">
