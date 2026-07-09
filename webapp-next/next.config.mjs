@@ -38,6 +38,8 @@ const nextConfig = {
   reactStrictMode: true,
   // Do not fail the Vercel build on lint warnings; TypeScript type-checking still runs.
   eslint: { ignoreDuringBuilds: true },
+  // Keep nodemailer external — it uses dynamic requires that shouldn't be bundled.
+  experimental: { serverComponentsExternalPackages: ["nodemailer"] },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

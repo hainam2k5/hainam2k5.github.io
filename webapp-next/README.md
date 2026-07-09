@@ -35,18 +35,24 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...    # anon public key
 ```
 > Chỉ dùng key **anon/public** (an toàn nhờ RLS). Không đưa `service_role` vào đây.
 
-### Gửi điểm qua email (Resend — tùy chọn)
-Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm thành phần):
-1. Tạo tài khoản https://resend.com → **API Keys** → tạo key `re_...`.
-2. Thêm biến môi trường **server** (KHÔNG có `NEXT_PUBLIC_`) — trong `.env.local`
-   khi chạy local, và trong **Vercel → Settings → Environment Variables** khi deploy:
-   - `RESEND_API_KEY=re_...`
-   - `NOTIFY_FROM=Academic Risk Alert <onboarding@resend.dev>` (test) hoặc địa chỉ
-     thuộc **tên miền đã xác thực** trên Resend.
-> Địa chỉ test `onboarding@resend.dev` chỉ gửi tới đúng email tài khoản Resend của
-> bạn. Muốn gửi tới email SV bất kỳ → xác thực tên miền trong Resend.
-> Nếu **không** đặt `RESEND_API_KEY`, app vẫn chạy bình thường và **bỏ qua email**
-> (thông báo trong hệ thống vẫn hiển thị đầy đủ điểm thành phần).
+### Gửi điểm qua email (Gmail SMTP — tùy chọn)
+Muốn hệ thống **gửi email** báo điểm cho sinh viên (kèm điểm thành phần). Dùng một
+tài khoản Gmail làm SMTP — **không cần tên miền riêng**, gửi tới Gmail sinh viên tốt
+(~500 email/ngày):
+1. Trên một tài khoản Google (nên tạo riêng, ví dụ `vnuis.risk.alert@gmail.com`):
+   bật **Xác minh 2 bước**, rồi **Google Account → Security → App passwords** để tạo
+   **mật khẩu ứng dụng 16 ký tự**.
+2. Thêm biến môi trường **server** (KHÔNG có `NEXT_PUBLIC_`) — trong `.env.local` khi
+   chạy local, và trong **Vercel → Settings → Environment Variables** khi deploy:
+   - `GMAIL_USER=vnuis.risk.alert@gmail.com`
+   - `GMAIL_APP_PASSWORD=` (16 ký tự, bỏ dấu cách)
+   - `NOTIFY_FROM_NAME=Hệ thống Cảnh báo Rủi ro Học tập — VNU-IS` (tùy chọn — chỉ đổi
+     tên hiển thị; địa chỉ gửi luôn là `GMAIL_USER`).
+> Nếu **không** đặt `GMAIL_USER`/`GMAIL_APP_PASSWORD`, app vẫn chạy bình thường và
+> **bỏ qua email** (thông báo trong hệ thống vẫn hiển thị đầy đủ điểm thành phần).
+> Cách này chỉ dành cho **email báo điểm**. Email **quên mật khẩu / xác nhận** đi qua
+> Supabase Auth — muốn ổn định, đặt cùng Gmail này làm **Custom SMTP** trong
+> Supabase → Authentication → SMTP Settings.
 
 ### Bảo mật dữ liệu sinh viên
 - **RLS** bảo vệ mọi bảng: SV chỉ đọc dữ liệu của mình, không sửa được điểm; khách
