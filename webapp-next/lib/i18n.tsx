@@ -10,9 +10,6 @@ type Dict = Record<string, string>;
 
 const DICT: Record<Lang, Dict> = {
   vi: {
-    "brand.name": "Cảnh báo Rủi ro Học tập", "brand.dss": "Academic Decision Support System",
-    "brand.studentPortal": "Cổng sinh viên", "brand.studentSub": "Kết quả học tập & cảnh báo",
-    "brand.advisorSub": "Bảng điều khiển cố vấn",
     "nav.section": "Điều hướng", "nav.dashboard": "Tổng quan", "nav.students": "Sinh viên",
     "nav.alerts": "Cảnh báo", "nav.interventions": "Can thiệp", "nav.messages": "Tin nhắn",
     "btn.logout": "Đăng xuất", "bell.title": "Thông báo", "loading": "Đang tải…",
@@ -32,7 +29,6 @@ const DICT: Record<Lang, Dict> = {
     "login.welcome": "Chào mừng trở lại", "login.welcomeSub": "Đăng nhập để tiếp tục vào hệ thống.",
     "login.configWarn": "Chưa cấu hình Supabase. Đặt biến môi trường NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_ANON_KEY (xem README).",
     "login.tabLogin": "Đăng nhập", "login.tabRegister": "Đăng ký",
-    "login.registerNote": "Đăng ký dành cho sinh viên. Tài khoản cố vấn do nhà trường cấp.",
     "reg.studentNote": "Vui lòng điền đầy đủ tất cả các trường bên dưới.",
     "reg.advisorNote": "Đăng ký cố vấn cần nhập Mã cố vấn do nhà trường cấp.",
     "brand.home": "Về trang Tổng quan",
@@ -50,7 +46,6 @@ const DICT: Record<Lang, Dict> = {
     "reset.done": "Đã cập nhật mật khẩu thành công.", "reset.checking": "Đang xác thực liên kết…",
     "reset.invalid": "Mã xác nhận không đúng hoặc đã hết hạn. Hãy yêu cầu gửi lại mã.",
     "reset.code": "Mã xác nhận (6 số)", "reset.sentTo": "Nhập mã 6 số đã gửi tới {email}, sau đó đặt mật khẩu mới.",
-    "login.demoHint": "<b>Tài khoản demo</b> (đăng ký bằng đúng email để nhận dữ liệu mẫu):<br>Cố vấn HTTT quản lý: <b>advisor@demo.edu.vn</b> · Cố vấn Tự động hóa &amp; Tin học: <b>advisor2@demo.edu.vn</b><br>Sinh viên: <b>sv002@demo.edu.vn</b> / <b>sv004@demo.edu.vn</b> · Mật khẩu: <b>Demo@12345</b>",
     "toast.notConfigured": "Chưa cấu hình Supabase", "toast.signupDone": "Đã tạo tài khoản. Nếu bật xác nhận email, hãy kiểm tra hộp thư rồi đăng nhập.",
     "toast.fillAll": "Vui lòng điền đầy đủ tất cả các trường.",
     "student.hello": "Xin chào, {name}", "student.helloDefault": "bạn",
@@ -124,9 +119,6 @@ const DICT: Record<Lang, Dict> = {
     "notif.advReplyTitle": "Cố vấn trả lời", "adv.toastNewMsg": "Sinh viên vừa nhắn tin",
   },
   en: {
-    "brand.name": "Academic Risk Alert", "brand.dss": "Academic Decision Support System",
-    "brand.studentPortal": "Student Portal", "brand.studentSub": "Grades & alerts",
-    "brand.advisorSub": "Advisor console",
     "nav.section": "Navigation", "nav.dashboard": "Overview", "nav.students": "Students",
     "nav.alerts": "Alerts", "nav.interventions": "Interventions", "nav.messages": "Messages",
     "btn.logout": "Sign out", "bell.title": "Notifications", "loading": "Loading…",
@@ -146,7 +138,6 @@ const DICT: Record<Lang, Dict> = {
     "login.welcome": "Welcome back", "login.welcomeSub": "Sign in to continue.",
     "login.configWarn": "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (see README).",
     "login.tabLogin": "Sign in", "login.tabRegister": "Register",
-    "login.registerNote": "Registration is for students. Advisor accounts are provisioned by the school.",
     "reg.studentNote": "Please fill in every field below.",
     "reg.advisorNote": "Advisor registration requires the Advisor code issued by the school.",
     "brand.home": "Back to Overview",
@@ -164,7 +155,6 @@ const DICT: Record<Lang, Dict> = {
     "reset.done": "Password updated successfully.", "reset.checking": "Verifying link…",
     "reset.invalid": "The verification code is incorrect or has expired. Request a new code.",
     "reset.code": "Verification code (6 digits)", "reset.sentTo": "Enter the 6-digit code sent to {email}, then set a new password.",
-    "login.demoHint": "<b>Demo accounts</b> (register with the exact email to inherit sample data):<br>Advisor (MIS): <b>advisor@demo.edu.vn</b> · Advisor (Automation): <b>advisor2@demo.edu.vn</b><br>Students: <b>sv002@demo.edu.vn</b> / <b>sv004@demo.edu.vn</b> · Password: <b>Demo@12345</b>",
     "toast.notConfigured": "Supabase is not configured", "toast.signupDone": "Account created. If email confirmation is on, check your inbox then sign in.",
     "toast.fillAll": "Please fill in all fields.",
     "student.hello": "Hello, {name}", "student.helloDefault": "there",
