@@ -250,7 +250,7 @@ textarea { resize: vertical; min-height: 72px; }
 .abp-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.1s ease; background-size: cover; background-position: center; }
 .abp-slide.active { opacity: 1; }
 .abp-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.abp-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 22, 40, 0.62) 0%, rgba(8, 22, 40, 0.30) 34%, rgba(8, 22, 40, 0.32) 56%, rgba(8, 22, 40, 0.9) 100%); }
+.abp-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 22, 40, 0.55) 0%, rgba(8, 22, 40, 0.14) 28%, rgba(8, 22, 40, 0.14) 68%, rgba(8, 22, 40, 0.5) 100%); }
 /* Logo + tên trường (góc trên trái) */
 .abp-topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; align-items: center; gap: 13px; padding: 26px 40px; }
 .abp-logo { height: 48px; width: auto; display: block; background: #fff; border-radius: 8px; padding: 5px 8px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28); }

@@ -82,8 +82,6 @@ export default function LoginPage() {
     }
   }
 
-  const features: [string, string][] = [["chart", "login.feat1"], ["notes", "login.feat2"], ["message", "login.feat3"]];
-
   return (
     <div className="auth-split">
       <aside className="auth-brandpane">
@@ -115,17 +113,6 @@ export default function LoginPage() {
               </div>
             </>
           )}
-        </div>
-
-        {/* Thông điệp giới thiệu (overlay dưới) */}
-        <div className="abp-hero">
-          <h1>{t("login.heroTitle")}</h1>
-          <p>{t("login.heroDesc")}</p>
-          <ul className="abp-features">
-            {features.map(([ic, k]) => (
-              <li key={k}><Icon name={ic} size={18} /><span>{t(k)}</span></li>
-            ))}
-          </ul>
         </div>
 
         {/* Chấm chuyển ảnh */}
