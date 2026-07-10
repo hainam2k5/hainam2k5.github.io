@@ -7,7 +7,7 @@ import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { BrandLogo, LangSwitch, RiskBadge, RiskBar } from "@/components/common";
 import { gpaOf, bySemester, failedCount, computeCourse, numOr } from "@/lib/gpa";
-import { compute as computeRisk, alertWorthy } from "@/lib/risk";
+import { compute as computeRisk, alertWorthy, DEFAULT_CONFIG, type RiskConfig } from "@/lib/risk";
 import { fmtDate, initials, riskLabel } from "@/lib/format";
 import {
   CourseRow, AddCourseForm, AddStudentForm, IndicatorsBox, SendNotifBox, InterventionForm, FactorList,
@@ -49,6 +49,9 @@ export default function AdvisorPage() {
   const [gbCourse, setGbCourse] = useState<string | null>(null);
   const [gbEdits, setGbEdits] = useState<Record<string, { sr?: string; sm?: string; sf?: string }>>({});
   const [gbSaving, setGbSaving] = useState(false);
+  // Configurable risk weights/thresholds (loaded from risk_config; default fallback).
+  const [riskCfg, setRiskCfg] = useState<RiskConfig>(DEFAULT_CONFIG);
+  const [cfgSaving, setCfgSaving] = useState(false);
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
@@ -99,12 +102,12 @@ export default function AdvisorPage() {
   }
   async function loadCore(): Promise<Core> { const c = await fetchCore(); applyCore(c); return c; }
 
-  async function recomputeStudent(student: Profile, core: Core): Promise<boolean> {
+  async function recomputeStudent(student: Profile, core: Core, cfg: RiskConfig = riskCfg): Promise<boolean> {
     const cs = core.courses.filter((c) => c.student_id === student.id);
     const g = gpaOf(cs);
     const failed = failedCount(cs);
     if (g.gpa === null && failed === 0) return false;
-    const result = computeRisk({ cpa: g.gpa, attendance_rate: student.attendance_rate, lms_activity_score: student.lms_activity_score, failed_count: failed });
+    const result = computeRisk({ cpa: g.gpa, attendance_rate: student.attendance_rate, lms_activity_score: student.lms_activity_score, failed_count: failed }, cfg);
     await sb!.from("risk_scores").insert({
       student_id: student.id, score: result.score, risk_level: result.level,
       factor_gpa: result.factor_gpa, factor_attendance: result.factor_attendance,
@@ -120,6 +123,21 @@ export default function AdvisorPage() {
         student_id: student.id, sender_id: me!.id, type: "alert",
         title: t("alert.autoTitle"), body: t("alert.autoBody", { level: riskLabel(t, result.level) }),
       });
+      // Best-effort awareness email to the student (no-op if email unconfigured
+      // or no address). Only fires for a NEW alert, so no repeated spam.
+      if (student.email) {
+        try {
+          const { data: sess } = await sb!.auth.getSession();
+          const token = sess.session?.access_token;
+          if (token) {
+            void fetch("/api/notify-alert", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ studentId: student.id, level: result.level, lang }),
+            }).catch(() => {});
+          }
+        } catch { /* ignore email errors */ }
+      }
     }
     return true;
   }
@@ -145,13 +163,19 @@ export default function AdvisorPage() {
     if (!me || !sb) return;
     let active = true;
     (async () => {
+      // Load custom risk config if the table exists (else keep defaults).
+      const { data: cfg } = await sb.from("risk_config").select("w_gpa,w_att,w_lms,w_fail,th_medium,th_high,th_critical").eq("id", 1).maybeSingle();
+      const effCfg: RiskConfig = cfg
+        ? { w_gpa: +cfg.w_gpa, w_att: +cfg.w_att, w_lms: +cfg.w_lms, w_fail: +cfg.w_fail, th_medium: +cfg.th_medium, th_high: +cfg.th_high, th_critical: +cfg.th_critical }
+        : DEFAULT_CONFIG;
+      if (active && cfg) setRiskCfg(effCfg);
       const core = await fetchCore();
       if (!active) return;
       applyCore(core);
       let scored = false;
       for (const s of core.students) {
         if (!core.risks.some((r) => r.student_id === s.id)) {
-          const did = await recomputeStudent(s, core);
+          const did = await recomputeStudent(s, core, effCfg);
           if (did) scored = true;
         }
       }
@@ -242,6 +266,7 @@ export default function AdvisorPage() {
     if (!sb || !selectedId) return;
     const course = (coursesBy[selectedId] || []).find((c) => c.id === courseId);
     if (!course) return;
+    if (course.locked) return toast(t("toast.courseLocked"), "error");
     if (![r, m, f].every((v) => parseScore(v).ok)) return toast(t("gimp.errScore"), "error");
     const g = computeCourse({ score_regular: r, score_midterm: m, score_final: f, weight_regular: course.weight_regular, weight_midterm: course.weight_midterm, weight_final: course.weight_final });
     const { error } = await sb.from("courses").update({
@@ -479,21 +504,23 @@ export default function AdvisorPage() {
     if (!rows.length) { setGradePreview(null); return; }
     setImporting(true);
     const sids = [...new Set(rows.map((r) => r.sid))];
-    const { data: existing } = await sb.from("courses").select("id, student_id, code, semester").in("student_id", sids);
+    const { data: existing } = await sb.from("courses").select("id, student_id, code, semester, locked").in("student_id", sids);
     const key = (sid: string, code: string, sem: string) => sid + "|" + code + "|" + sem;
-    const existMap = new Map<string, string>();
-    for (const c of (existing || []) as any[]) if (c.code) existMap.set(key(c.student_id, c.code, c.semester), c.id);
+    const existMap = new Map<string, { id: string; locked: boolean }>();
+    for (const c of (existing || []) as any[]) if (c.code) existMap.set(key(c.student_id, c.code, c.semester), { id: c.id, locked: !!c.locked });
     const now = new Date().toISOString();
     const toInsert: any[] = [];
     const toUpdate: { id: string; payload: any }[] = [];
+    let lockedSkipped = 0;
     for (const r of rows) {
       const payload = {
         student_id: r.sid, code: r.code, name: r.name, credits: r.credits, semester: r.semester, academic_year: r.academic_year,
         weight_regular: r.wr, weight_midterm: r.wm, weight_final: r.wf, score_regular: r.sr, score_midterm: r.sm, score_final: r.sf,
         total_score: r.total, letter_grade: r.letter, grade_point: r.point, updated_at: now,
       };
-      const eid = r.code ? existMap.get(key(r.sid, r.code, r.semester)) : undefined;
-      if (eid) toUpdate.push({ id: eid, payload }); else toInsert.push(payload);
+      const ex = r.code ? existMap.get(key(r.sid, r.code, r.semester)) : undefined;
+      if (ex?.locked) { lockedSkipped++; continue; } // never overwrite a locked course
+      if (ex) toUpdate.push({ id: ex.id, payload }); else toInsert.push(payload);
     }
     let failed = 0;
     if (toInsert.length) { const { error } = await sb.from("courses").insert(toInsert); if (error) failed += toInsert.length; }
@@ -504,8 +531,8 @@ export default function AdvisorPage() {
     await loadCore();
     setImporting(false);
     setGradePreview(null);
-    const done = rows.length - failed;
-    toast(t("adv.importGradesDone", { n: done }) + (failed ? " · " + t("adv.importFail", { n: failed }) : ""), failed ? "error" : "success");
+    const done = rows.length - failed - lockedSkipped;
+    toast(t("adv.importGradesDone", { n: done }) + (lockedSkipped ? " · " + t("gb.lockedSkip", { n: lockedSkipped }) : "") + (failed ? " · " + t("adv.importFail", { n: failed }) : ""), failed || lockedSkipped ? "error" : "success");
   }
   function downloadGradeErrors() {
     if (!gradePreview) return;
@@ -597,6 +624,17 @@ export default function AdvisorPage() {
     toast(failed ? t("adv.importFail", { n: failed }) : t("gb.saved"), failed ? "error" : "success");
   }
 
+  // Lock/unlock all rows of the selected course (finalize grades).
+  async function toggleLock(rows: Course[], lock: boolean) {
+    if (!sb || !rows.length) return;
+    setGbSaving(true);
+    const { error } = await sb.from("courses").update({ locked: lock }).in("id", rows.map((c) => c.id));
+    setGbSaving(false);
+    if (error) return toast(t("gb.lockErr"), "error");
+    await loadCore();
+    toast(lock ? t("gb.locked") : t("gb.unlocked"), "success");
+  }
+
   // Export a course's grade sheet to CSV (same columns as the grade importer, so
   // it round-trips: download → edit in Excel → re-import via "Nhập điểm").
   function exportGradebook(rows: Course[]) {
@@ -623,6 +661,7 @@ export default function AdvisorPage() {
     const rows = gbCourse ? courses.filter((c) => c.code === code && c.semester === sem) : [];
     const list = rows.map((c) => ({ c, s: studentById(c.student_id) })).filter((r): r is { c: Course; s: Profile } => !!r.s);
     list.sort((a, b) => (a.s.full_name || "").localeCompare(b.s.full_name || ""));
+    const locked = list.length > 0 && list.every(({ c }) => c.locked);
     return (
       <>
         <div className="page-head"><div><div className="page-title">{t("gb.title")}</div><div className="page-sub">{t("gb.sub")}</div></div></div>
@@ -647,9 +686,9 @@ export default function AdvisorPage() {
                       return (
                         <tr key={c.id}>
                           <td>{s.full_name}</td><td className="mono">{s.student_code || "—"}</td>
-                          <td><input className="cell-in" inputMode="decimal" value={sr} onChange={(e) => gbSet(c.id, "sr", e.target.value)} /></td>
-                          <td><input className="cell-in" inputMode="decimal" value={sm} onChange={(e) => gbSet(c.id, "sm", e.target.value)} /></td>
-                          <td><input className="cell-in" inputMode="decimal" value={sf} onChange={(e) => gbSet(c.id, "sf", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sr} disabled={locked} onChange={(e) => gbSet(c.id, "sr", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sm} disabled={locked} onChange={(e) => gbSet(c.id, "sm", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sf} disabled={locked} onChange={(e) => gbSet(c.id, "sf", e.target.value)} /></td>
                           <td className="mono">{g.total === null ? "—" : g.total}</td>
                           <td><span className={"grade-chip grade-" + (g.letter || "").replace("+", "p")}>{g.letter || "—"}</span></td>
                         </tr>
@@ -658,14 +697,61 @@ export default function AdvisorPage() {
                   </tbody>
                 </table>
               </div>
-              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button className="btn btn-primary" disabled={gbSaving} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
+              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                {locked && <span className="pill Resolved">{t("gb.lockedBadge")}</span>}
+                <button className="btn btn-primary" disabled={gbSaving || locked} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
                 <button className="btn" onClick={() => exportGradebook(rows)}><Icon name="inbox" size={16} /> {t("gb.export")}</button>
+                <button className="btn" disabled={gbSaving} onClick={() => toggleLock(rows, !locked)}>{locked ? t("gb.unlock") : t("gb.lock")}</button>
               </div>
             </>
           ) : <div className="empty">{t("gb.noStudents")}</div>)}
         </div>
       </>
+    );
+  };
+
+  // Risk config: managers edit weights + thresholds; persisted to risk_config.
+  const setCfg = (k: keyof RiskConfig, v: number) => setRiskCfg((p) => ({ ...p, [k]: v }));
+  async function saveConfig() {
+    if (!sb || me?.role !== "manager") return;
+    setCfgSaving(true);
+    const { error } = await sb.from("risk_config").update({
+      w_gpa: riskCfg.w_gpa, w_att: riskCfg.w_att, w_lms: riskCfg.w_lms, w_fail: riskCfg.w_fail,
+      th_medium: riskCfg.th_medium, th_high: riskCfg.th_high, th_critical: riskCfg.th_critical, updated_at: new Date().toISOString(),
+    }).eq("id", 1);
+    setCfgSaving(false);
+    if (error) return toast(t("cfg.err"), "error");
+    toast(t("cfg.saved"), "success");
+  }
+
+  const renderConfigCard = () => {
+    const isMgr = me?.role === "manager";
+    const wSum = riskCfg.w_gpa + riskCfg.w_att + riskCfg.w_lms + riskCfg.w_fail;
+    const numField = (label: string, k: keyof RiskConfig, step: string) => (
+      <div className="field"><label>{label}</label>
+        <input type="number" step={step} min="0" value={riskCfg[k]} disabled={!isMgr} onChange={(e) => setCfg(k, numOr(e.target.value, 0))} /></div>
+    );
+    return (
+      <div className="card">
+        <div className="card-head"><div className="card-title"><Icon name="edit" /> {t("cfg.title")}</div>
+          <div className="card-sub">{isMgr ? t("cfg.subManager") : t("cfg.subRead")}</div></div>
+        <div className="card-sub" style={{ marginBottom: 6 }}>{t("cfg.weights")}</div>
+        <div className="field-grid">
+          {numField(t("factor.gpa"), "w_gpa", "0.05")}{numField(t("factor.att"), "w_att", "0.05")}
+          {numField(t("factor.lms"), "w_lms", "0.05")}{numField(t("factor.fail"), "w_fail", "0.05")}
+        </div>
+        <div className="muted-note" style={{ marginTop: -4, marginBottom: 10 }}>{t("cfg.weightSum", { sum: wSum.toFixed(2) })}</div>
+        <div className="card-sub" style={{ marginBottom: 6 }}>{t("cfg.thresholds")}</div>
+        <div className="field-grid">
+          {numField(t("risk.Medium"), "th_medium", "1")}{numField(t("risk.High"), "th_high", "1")}{numField(t("risk.Critical"), "th_critical", "1")}
+        </div>
+        {isMgr && (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
+            <button className="btn btn-primary" disabled={cfgSaving} onClick={saveConfig}>{cfgSaving ? t("loading") : t("cfg.save")}</button>
+            <span className="muted-note">{t("cfg.applyNote")}</span>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -677,8 +763,8 @@ export default function AdvisorPage() {
     const scored = students.map((s) => ({ s, a: agg(s) })).filter((r) => r.a.risk && r.a.cpa !== null);
     let tp = 0, fp = 0, fn = 0, tn = 0;
     for (const { a } of scored) {
-      const flagged = a.risk!.score >= 40;         // alert = Medium+
-      const weak = (a.cpa as number) < WEAK_CPA;   // ground truth = poor standing
+      const flagged = a.risk!.score >= riskCfg.th_medium; // alert = Medium+
+      const weak = (a.cpa as number) < WEAK_CPA;          // ground truth = poor standing
       if (flagged && weak) tp++; else if (flagged && !weak) fp++;
       else if (!flagged && weak) fn++; else tn++;
     }
@@ -711,6 +797,8 @@ export default function AdvisorPage() {
           <div><div className="page-title">{t("eval.title")}</div><div className="page-sub">{t("eval.sub")}</div></div>
           <button className="btn btn-primary" onClick={recomputeAll}><Icon name="refresh" size={16} /> {t("btn.recalc")}</button>
         </div>
+
+        {renderConfigCard()}
 
         <div className="card">
           <div className="card-head">

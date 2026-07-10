@@ -1,6 +1,15 @@
 // Explainable, rule-based risk engine. Ported from the static app (risk.js).
 export const WEIGHTS = { gpa: 0.4, attendance: 0.3, lms: 0.15, failed: 0.15 };
-const THRESHOLDS: [number, string][] = [[85, "Critical"], [65, "High"], [40, "Medium"], [0, "Low"]];
+
+// Weights + level thresholds are configurable (per institution / major) so the
+// model isn't locked to one policy — a limitation highlighted in the literature.
+export interface RiskConfig {
+  w_gpa: number; w_att: number; w_lms: number; w_fail: number;
+  th_medium: number; th_high: number; th_critical: number;
+}
+export const DEFAULT_CONFIG: RiskConfig = {
+  w_gpa: 0.4, w_att: 0.3, w_lms: 0.15, w_fail: 0.15, th_medium: 40, th_high: 65, th_critical: 85,
+};
 
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 const r1 = (x: number) => Math.round(x * 10) / 10;
@@ -37,18 +46,19 @@ export interface RiskResult {
   factor_failed_credits: number;
 }
 
-export function compute(input: RiskInput): RiskResult {
+export function compute(input: RiskInput, cfg: RiskConfig = DEFAULT_CONFIG): RiskResult {
   const gr = gpaRisk(input.cpa);
   const ar = attendanceRisk(input.attendance_rate);
   const lr = lmsRisk(input.lms_activity_score);
   const fr = failedRisk(input.failed_count);
 
-  const fg = gr * WEIGHTS.gpa, fa = ar * WEIGHTS.attendance, fl = lr * WEIGHTS.lms, ff = fr * WEIGHTS.failed;
+  const fg = gr * cfg.w_gpa, fa = ar * cfg.w_att, fl = lr * cfg.w_lms, ff = fr * cfg.w_fail;
   let score = clamp(fg + fa + fl + ff, 0, 100);
   score = Math.round(score * 10) / 10;
 
+  const thresholds: [number, string][] = [[cfg.th_critical, "Critical"], [cfg.th_high, "High"], [cfg.th_medium, "Medium"], [0, "Low"]];
   let level = "Low";
-  for (const [th, l] of THRESHOLDS) { if (score >= th) { level = l; break; } }
+  for (const [th, l] of thresholds) { if (score >= th) { level = l; break; } }
 
   return {
     score, level,
