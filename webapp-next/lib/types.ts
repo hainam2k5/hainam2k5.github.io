@@ -32,6 +32,7 @@ export interface Course {
   total_score: number | null;
   letter_grade: string | null;
   grade_point: number | null;
+  locked?: boolean;
   created_at?: string;
   updated_at?: string;
 }

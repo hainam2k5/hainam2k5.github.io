@@ -266,6 +266,7 @@ export default function AdvisorPage() {
     if (!sb || !selectedId) return;
     const course = (coursesBy[selectedId] || []).find((c) => c.id === courseId);
     if (!course) return;
+    if (course.locked) return toast(t("toast.courseLocked"), "error");
     if (![r, m, f].every((v) => parseScore(v).ok)) return toast(t("gimp.errScore"), "error");
     const g = computeCourse({ score_regular: r, score_midterm: m, score_final: f, weight_regular: course.weight_regular, weight_midterm: course.weight_midterm, weight_final: course.weight_final });
     const { error } = await sb.from("courses").update({
@@ -503,21 +504,23 @@ export default function AdvisorPage() {
     if (!rows.length) { setGradePreview(null); return; }
     setImporting(true);
     const sids = [...new Set(rows.map((r) => r.sid))];
-    const { data: existing } = await sb.from("courses").select("id, student_id, code, semester").in("student_id", sids);
+    const { data: existing } = await sb.from("courses").select("id, student_id, code, semester, locked").in("student_id", sids);
     const key = (sid: string, code: string, sem: string) => sid + "|" + code + "|" + sem;
-    const existMap = new Map<string, string>();
-    for (const c of (existing || []) as any[]) if (c.code) existMap.set(key(c.student_id, c.code, c.semester), c.id);
+    const existMap = new Map<string, { id: string; locked: boolean }>();
+    for (const c of (existing || []) as any[]) if (c.code) existMap.set(key(c.student_id, c.code, c.semester), { id: c.id, locked: !!c.locked });
     const now = new Date().toISOString();
     const toInsert: any[] = [];
     const toUpdate: { id: string; payload: any }[] = [];
+    let lockedSkipped = 0;
     for (const r of rows) {
       const payload = {
         student_id: r.sid, code: r.code, name: r.name, credits: r.credits, semester: r.semester, academic_year: r.academic_year,
         weight_regular: r.wr, weight_midterm: r.wm, weight_final: r.wf, score_regular: r.sr, score_midterm: r.sm, score_final: r.sf,
         total_score: r.total, letter_grade: r.letter, grade_point: r.point, updated_at: now,
       };
-      const eid = r.code ? existMap.get(key(r.sid, r.code, r.semester)) : undefined;
-      if (eid) toUpdate.push({ id: eid, payload }); else toInsert.push(payload);
+      const ex = r.code ? existMap.get(key(r.sid, r.code, r.semester)) : undefined;
+      if (ex?.locked) { lockedSkipped++; continue; } // never overwrite a locked course
+      if (ex) toUpdate.push({ id: ex.id, payload }); else toInsert.push(payload);
     }
     let failed = 0;
     if (toInsert.length) { const { error } = await sb.from("courses").insert(toInsert); if (error) failed += toInsert.length; }
@@ -528,8 +531,8 @@ export default function AdvisorPage() {
     await loadCore();
     setImporting(false);
     setGradePreview(null);
-    const done = rows.length - failed;
-    toast(t("adv.importGradesDone", { n: done }) + (failed ? " · " + t("adv.importFail", { n: failed }) : ""), failed ? "error" : "success");
+    const done = rows.length - failed - lockedSkipped;
+    toast(t("adv.importGradesDone", { n: done }) + (lockedSkipped ? " · " + t("gb.lockedSkip", { n: lockedSkipped }) : "") + (failed ? " · " + t("adv.importFail", { n: failed }) : ""), failed || lockedSkipped ? "error" : "success");
   }
   function downloadGradeErrors() {
     if (!gradePreview) return;
@@ -621,6 +624,17 @@ export default function AdvisorPage() {
     toast(failed ? t("adv.importFail", { n: failed }) : t("gb.saved"), failed ? "error" : "success");
   }
 
+  // Lock/unlock all rows of the selected course (finalize grades).
+  async function toggleLock(rows: Course[], lock: boolean) {
+    if (!sb || !rows.length) return;
+    setGbSaving(true);
+    const { error } = await sb.from("courses").update({ locked: lock }).in("id", rows.map((c) => c.id));
+    setGbSaving(false);
+    if (error) return toast(t("gb.lockErr"), "error");
+    await loadCore();
+    toast(lock ? t("gb.locked") : t("gb.unlocked"), "success");
+  }
+
   // Export a course's grade sheet to CSV (same columns as the grade importer, so
   // it round-trips: download → edit in Excel → re-import via "Nhập điểm").
   function exportGradebook(rows: Course[]) {
@@ -647,6 +661,7 @@ export default function AdvisorPage() {
     const rows = gbCourse ? courses.filter((c) => c.code === code && c.semester === sem) : [];
     const list = rows.map((c) => ({ c, s: studentById(c.student_id) })).filter((r): r is { c: Course; s: Profile } => !!r.s);
     list.sort((a, b) => (a.s.full_name || "").localeCompare(b.s.full_name || ""));
+    const locked = list.length > 0 && list.every(({ c }) => c.locked);
     return (
       <>
         <div className="page-head"><div><div className="page-title">{t("gb.title")}</div><div className="page-sub">{t("gb.sub")}</div></div></div>
@@ -671,9 +686,9 @@ export default function AdvisorPage() {
                       return (
                         <tr key={c.id}>
                           <td>{s.full_name}</td><td className="mono">{s.student_code || "—"}</td>
-                          <td><input className="cell-in" inputMode="decimal" value={sr} onChange={(e) => gbSet(c.id, "sr", e.target.value)} /></td>
-                          <td><input className="cell-in" inputMode="decimal" value={sm} onChange={(e) => gbSet(c.id, "sm", e.target.value)} /></td>
-                          <td><input className="cell-in" inputMode="decimal" value={sf} onChange={(e) => gbSet(c.id, "sf", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sr} disabled={locked} onChange={(e) => gbSet(c.id, "sr", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sm} disabled={locked} onChange={(e) => gbSet(c.id, "sm", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sf} disabled={locked} onChange={(e) => gbSet(c.id, "sf", e.target.value)} /></td>
                           <td className="mono">{g.total === null ? "—" : g.total}</td>
                           <td><span className={"grade-chip grade-" + (g.letter || "").replace("+", "p")}>{g.letter || "—"}</span></td>
                         </tr>
@@ -682,9 +697,11 @@ export default function AdvisorPage() {
                   </tbody>
                 </table>
               </div>
-              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button className="btn btn-primary" disabled={gbSaving} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
+              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                {locked && <span className="pill Resolved">{t("gb.lockedBadge")}</span>}
+                <button className="btn btn-primary" disabled={gbSaving || locked} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
                 <button className="btn" onClick={() => exportGradebook(rows)}><Icon name="inbox" size={16} /> {t("gb.export")}</button>
+                <button className="btn" disabled={gbSaving} onClick={() => toggleLock(rows, !locked)}>{locked ? t("gb.unlock") : t("gb.lock")}</button>
               </div>
             </>
           ) : <div className="empty">{t("gb.noStudents")}</div>)}
