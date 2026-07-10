@@ -7,7 +7,7 @@ import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { BrandLogo, LangSwitch, RiskBadge, RiskBar } from "@/components/common";
 import { gpaOf, bySemester, failedCount, computeCourse, numOr } from "@/lib/gpa";
-import { compute as computeRisk, alertWorthy } from "@/lib/risk";
+import { compute as computeRisk, alertWorthy, DEFAULT_CONFIG, type RiskConfig } from "@/lib/risk";
 import { fmtDate, initials, riskLabel } from "@/lib/format";
 import {
   CourseRow, AddCourseForm, AddStudentForm, IndicatorsBox, SendNotifBox, InterventionForm, FactorList,
@@ -49,6 +49,9 @@ export default function AdvisorPage() {
   const [gbCourse, setGbCourse] = useState<string | null>(null);
   const [gbEdits, setGbEdits] = useState<Record<string, { sr?: string; sm?: string; sf?: string }>>({});
   const [gbSaving, setGbSaving] = useState(false);
+  // Configurable risk weights/thresholds (loaded from risk_config; default fallback).
+  const [riskCfg, setRiskCfg] = useState<RiskConfig>(DEFAULT_CONFIG);
+  const [cfgSaving, setCfgSaving] = useState(false);
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
@@ -99,12 +102,12 @@ export default function AdvisorPage() {
   }
   async function loadCore(): Promise<Core> { const c = await fetchCore(); applyCore(c); return c; }
 
-  async function recomputeStudent(student: Profile, core: Core): Promise<boolean> {
+  async function recomputeStudent(student: Profile, core: Core, cfg: RiskConfig = riskCfg): Promise<boolean> {
     const cs = core.courses.filter((c) => c.student_id === student.id);
     const g = gpaOf(cs);
     const failed = failedCount(cs);
     if (g.gpa === null && failed === 0) return false;
-    const result = computeRisk({ cpa: g.gpa, attendance_rate: student.attendance_rate, lms_activity_score: student.lms_activity_score, failed_count: failed });
+    const result = computeRisk({ cpa: g.gpa, attendance_rate: student.attendance_rate, lms_activity_score: student.lms_activity_score, failed_count: failed }, cfg);
     await sb!.from("risk_scores").insert({
       student_id: student.id, score: result.score, risk_level: result.level,
       factor_gpa: result.factor_gpa, factor_attendance: result.factor_attendance,
@@ -160,13 +163,19 @@ export default function AdvisorPage() {
     if (!me || !sb) return;
     let active = true;
     (async () => {
+      // Load custom risk config if the table exists (else keep defaults).
+      const { data: cfg } = await sb.from("risk_config").select("w_gpa,w_att,w_lms,w_fail,th_medium,th_high,th_critical").eq("id", 1).maybeSingle();
+      const effCfg: RiskConfig = cfg
+        ? { w_gpa: +cfg.w_gpa, w_att: +cfg.w_att, w_lms: +cfg.w_lms, w_fail: +cfg.w_fail, th_medium: +cfg.th_medium, th_high: +cfg.th_high, th_critical: +cfg.th_critical }
+        : DEFAULT_CONFIG;
+      if (active && cfg) setRiskCfg(effCfg);
       const core = await fetchCore();
       if (!active) return;
       applyCore(core);
       let scored = false;
       for (const s of core.students) {
         if (!core.risks.some((r) => r.student_id === s.id)) {
-          const did = await recomputeStudent(s, core);
+          const did = await recomputeStudent(s, core, effCfg);
           if (did) scored = true;
         }
       }
@@ -684,6 +693,51 @@ export default function AdvisorPage() {
     );
   };
 
+  // Risk config: managers edit weights + thresholds; persisted to risk_config.
+  const setCfg = (k: keyof RiskConfig, v: number) => setRiskCfg((p) => ({ ...p, [k]: v }));
+  async function saveConfig() {
+    if (!sb || me?.role !== "manager") return;
+    setCfgSaving(true);
+    const { error } = await sb.from("risk_config").update({
+      w_gpa: riskCfg.w_gpa, w_att: riskCfg.w_att, w_lms: riskCfg.w_lms, w_fail: riskCfg.w_fail,
+      th_medium: riskCfg.th_medium, th_high: riskCfg.th_high, th_critical: riskCfg.th_critical, updated_at: new Date().toISOString(),
+    }).eq("id", 1);
+    setCfgSaving(false);
+    if (error) return toast(t("cfg.err"), "error");
+    toast(t("cfg.saved"), "success");
+  }
+
+  const renderConfigCard = () => {
+    const isMgr = me?.role === "manager";
+    const wSum = riskCfg.w_gpa + riskCfg.w_att + riskCfg.w_lms + riskCfg.w_fail;
+    const numField = (label: string, k: keyof RiskConfig, step: string) => (
+      <div className="field"><label>{label}</label>
+        <input type="number" step={step} min="0" value={riskCfg[k]} disabled={!isMgr} onChange={(e) => setCfg(k, numOr(e.target.value, 0))} /></div>
+    );
+    return (
+      <div className="card">
+        <div className="card-head"><div className="card-title"><Icon name="edit" /> {t("cfg.title")}</div>
+          <div className="card-sub">{isMgr ? t("cfg.subManager") : t("cfg.subRead")}</div></div>
+        <div className="card-sub" style={{ marginBottom: 6 }}>{t("cfg.weights")}</div>
+        <div className="field-grid">
+          {numField(t("factor.gpa"), "w_gpa", "0.05")}{numField(t("factor.att"), "w_att", "0.05")}
+          {numField(t("factor.lms"), "w_lms", "0.05")}{numField(t("factor.fail"), "w_fail", "0.05")}
+        </div>
+        <div className="muted-note" style={{ marginTop: -4, marginBottom: 10 }}>{t("cfg.weightSum", { sum: wSum.toFixed(2) })}</div>
+        <div className="card-sub" style={{ marginBottom: 6 }}>{t("cfg.thresholds")}</div>
+        <div className="field-grid">
+          {numField(t("risk.Medium"), "th_medium", "1")}{numField(t("risk.High"), "th_high", "1")}{numField(t("risk.Critical"), "th_critical", "1")}
+        </div>
+        {isMgr && (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
+            <button className="btn btn-primary" disabled={cfgSaving} onClick={saveConfig}>{cfgSaving ? t("loading") : t("cfg.save")}</button>
+            <span className="muted-note">{t("cfg.applyNote")}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Evaluation: (1) accuracy of the risk alert vs a ground-truth "weak standing"
   // label (CPA < 2.0), reported as precision/recall/F1; (2) whether logged
   // interventions actually lowered risk (before vs after). Both from loaded data.
@@ -692,8 +746,8 @@ export default function AdvisorPage() {
     const scored = students.map((s) => ({ s, a: agg(s) })).filter((r) => r.a.risk && r.a.cpa !== null);
     let tp = 0, fp = 0, fn = 0, tn = 0;
     for (const { a } of scored) {
-      const flagged = a.risk!.score >= 40;         // alert = Medium+
-      const weak = (a.cpa as number) < WEAK_CPA;   // ground truth = poor standing
+      const flagged = a.risk!.score >= riskCfg.th_medium; // alert = Medium+
+      const weak = (a.cpa as number) < WEAK_CPA;          // ground truth = poor standing
       if (flagged && weak) tp++; else if (flagged && !weak) fp++;
       else if (!flagged && weak) fn++; else tn++;
     }
@@ -726,6 +780,8 @@ export default function AdvisorPage() {
           <div><div className="page-title">{t("eval.title")}</div><div className="page-sub">{t("eval.sub")}</div></div>
           <button className="btn btn-primary" onClick={recomputeAll}><Icon name="refresh" size={16} /> {t("btn.recalc")}</button>
         </div>
+
+        {renderConfigCard()}
 
         <div className="card">
           <div className="card-head">
