@@ -17,6 +17,8 @@ import { predictAlarm, type Prediction } from "@/lib/predict";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
 
 type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation";
+// A validated grade row ready to write (used by the grade-import preview).
+type PGrade = { sid: string; code: string; name: string; credits: number; semester: string; academic_year: string; wr: number; wm: number; wf: number; sr: number | null; sm: number | null; sf: number | null; total: number | null; letter: string | null; point: number | null };
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
 interface Core { students: Profile[]; courses: Course[]; risks: RiskScore[]; alerts: Alert[]; interventions: Intervention[]; msgUnread: number; }
 
@@ -40,6 +42,9 @@ export default function AdvisorPage() {
   const [level, setLevel] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [alertStatusFilter, setAlertStatusFilter] = useState("Open");
+  // Grade-import preview: parsed + validated rows awaiting confirmation.
+  const [gradePreview, setGradePreview] = useState<null | { rows: PGrade[]; errors: { line: number; reason: string }[]; fileName: string }>(null);
+  const [importing, setImporting] = useState(false);
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
@@ -222,6 +227,7 @@ export default function AdvisorPage() {
     if (!sb || !selectedId) return;
     const course = (coursesBy[selectedId] || []).find((c) => c.id === courseId);
     if (!course) return;
+    if (![r, m, f].every((v) => parseScore(v).ok)) return toast(t("gimp.errScore"), "error");
     const g = computeCourse({ score_regular: r, score_midterm: m, score_final: f, weight_regular: course.weight_regular, weight_midterm: course.weight_midterm, weight_final: course.weight_final });
     const { error } = await sb.from("courses").update({
       score_regular: r === "" ? null : Number(r),
@@ -259,6 +265,7 @@ export default function AdvisorPage() {
   async function addCourse(c: NewCourse) {
     if (!sb || !selectedId) return;
     if (!c.name.trim()) return toast(t("toast.enterCourse"), "error");
+    if (![c.sr, c.sm, c.sf].every((v) => parseScore(v).ok)) return toast(t("gimp.errScore"), "error");
     const wr = numOr(c.wr, 0.2), wm = numOr(c.wm, 0.3), wf = numOr(c.wf, 0.5);
     const g = computeCourse({ score_regular: c.sr, score_midterm: c.sm, score_final: c.sf, weight_regular: wr, weight_midterm: wm, weight_final: wf });
     const { error } = await sb.from("courses").insert({
@@ -412,55 +419,86 @@ export default function AdvisorPage() {
     URL.revokeObjectURL(url);
   }
 
-  // Import grades from a CSV keyed on MSSV (student_code). Each row is a course;
-  // the student is matched by MSSV, so it works regardless of how the student was
-  // added. Rows whose MSSV isn't among this advisor's students are reported.
-  const scoreOrNull = (v: unknown) => (v === "" || v === null || v === undefined ? null : Number(v));
-  async function importGrades(file: File) {
+  // A score cell: empty is allowed (null); otherwise must be a number in 0..10.
+  const parseScore = (v: unknown): { ok: boolean; val: number | null } => {
+    if (v === "" || v === null || v === undefined) return { ok: true, val: null };
+    const n = Number(v);
+    return isNaN(n) || n < 0 || n > 10 ? { ok: false, val: null } : { ok: true, val: n };
+  };
+
+  // Step 1 — parse + VALIDATE a grade CSV (keyed on MSSV) into a preview. Nothing
+  // is written yet; the advisor confirms after seeing valid/error counts.
+  async function prepareGrades(file: File) {
     if (!sb || !me) return;
     const rows = parseCsv(await file.text());
-    if (!rows.length) return toast(t("adv.importFail", { n: 0 }), "error");
     const byCode = new Map<string, string>();
     for (const s of students) if (s.student_code) byCode.set(s.student_code.trim().toLowerCase(), s.id);
-
-    let ok = 0, notFound = 0, bad = 0;
-    const touched = new Set<string>();
-    for (const row of rows) {
+    const valid: PGrade[] = [];
+    const errors: { line: number; reason: string }[] = [];
+    rows.forEach((row, i) => {
+      const line = i + 2; // +1 for header, +1 for 1-based
       const code = (row.student_code || row.mssv || row.code || "").trim();
       const name = (row.course_name || row.name || "").trim();
-      if (!code || !name) { bad++; continue; }
+      if (!code) return errors.push({ line, reason: t("gimp.errNoMssv") });
       const sid = byCode.get(code.toLowerCase());
-      if (!sid) { notFound++; continue; }
+      if (!sid) return errors.push({ line, reason: t("gimp.errMssvNotFound", { code }) });
+      if (!name) return errors.push({ line, reason: t("gimp.errNoCourse") });
+      const sr = parseScore(row.score_regular), sm = parseScore(row.score_midterm), sf = parseScore(row.score_final);
+      if (!sr.ok || !sm.ok || !sf.ok) return errors.push({ line, reason: t("gimp.errScore") });
       const wr = numOr(row.weight_regular, 0.2), wm = numOr(row.weight_midterm, 0.3), wf = numOr(row.weight_final, 0.5);
       const g = computeCourse({ score_regular: row.score_regular, score_midterm: row.score_midterm, score_final: row.score_final, weight_regular: wr, weight_midterm: wm, weight_final: wf });
-      const courseCode = (row.course_code || "").trim();
-      const semester = (row.semester || "").trim() || "—";
-      const payload: Record<string, unknown> = {
-        student_id: sid, code: courseCode, name, credits: parseInt(row.credits) || 3,
-        semester, academic_year: (row.academic_year || row.year || "").trim(),
-        weight_regular: wr, weight_midterm: wm, weight_final: wf,
-        score_regular: scoreOrNull(row.score_regular), score_midterm: scoreOrNull(row.score_midterm), score_final: scoreOrNull(row.score_final),
-        total_score: g.total, letter_grade: g.letter, grade_point: g.point, updated_at: new Date().toISOString(),
+      valid.push({
+        sid, code: (row.course_code || "").trim(), name, credits: parseInt(row.credits) || 3,
+        semester: (row.semester || "").trim() || "—", academic_year: (row.academic_year || row.year || "").trim(),
+        wr, wm, wf, sr: sr.val, sm: sm.val, sf: sf.val, total: g.total, letter: g.letter, point: g.point,
+      });
+    });
+    setGradePreview({ rows: valid, errors, fileName: file.name });
+  }
+
+  // Step 2 — write the previewed rows FAST: one query to load existing courses,
+  // then a single bulk insert for new rows + parallel updates for existing ones.
+  async function commitGrades() {
+    if (!sb || !me || !gradePreview) return;
+    const rows = gradePreview.rows;
+    if (!rows.length) { setGradePreview(null); return; }
+    setImporting(true);
+    const sids = [...new Set(rows.map((r) => r.sid))];
+    const { data: existing } = await sb.from("courses").select("id, student_id, code, semester").in("student_id", sids);
+    const key = (sid: string, code: string, sem: string) => sid + "|" + code + "|" + sem;
+    const existMap = new Map<string, string>();
+    for (const c of (existing || []) as any[]) if (c.code) existMap.set(key(c.student_id, c.code, c.semester), c.id);
+    const now = new Date().toISOString();
+    const toInsert: any[] = [];
+    const toUpdate: { id: string; payload: any }[] = [];
+    for (const r of rows) {
+      const payload = {
+        student_id: r.sid, code: r.code, name: r.name, credits: r.credits, semester: r.semester, academic_year: r.academic_year,
+        weight_regular: r.wr, weight_midterm: r.wm, weight_final: r.wf, score_regular: r.sr, score_midterm: r.sm, score_final: r.sf,
+        total_score: r.total, letter_grade: r.letter, grade_point: r.point, updated_at: now,
       };
-      // Upsert by (student, course code, semester) so re-importing updates in place.
-      let existingId: string | null = null;
-      if (courseCode) {
-        const { data } = await sb.from("courses").select("id").eq("student_id", sid).eq("code", courseCode).eq("semester", semester).limit(1);
-        existingId = data && data[0] ? (data[0] as any).id : null;
-      }
-      const res = existingId
-        ? await sb.from("courses").update(payload).eq("id", existingId)
-        : await sb.from("courses").insert(payload);
-      if (res.error) bad++; else { ok++; touched.add(sid); }
+      const eid = r.code ? existMap.get(key(r.sid, r.code, r.semester)) : undefined;
+      if (eid) toUpdate.push({ id: eid, payload }); else toInsert.push(payload);
     }
-    // Recompute risk for every student whose grades changed.
+    let failed = 0;
+    if (toInsert.length) { const { error } = await sb.from("courses").insert(toInsert); if (error) failed += toInsert.length; }
+    const upRes = await Promise.all(toUpdate.map((u) => sb!.from("courses").update(u.payload).eq("id", u.id)));
+    failed += upRes.filter((r) => r.error).length;
     const core = await fetchCore();
-    for (const sid of touched) { const st = core.students.find((x) => x.id === sid); if (st) await recomputeStudent(st, core); }
+    for (const sid of sids) { const st = core.students.find((x) => x.id === sid); if (st) await recomputeStudent(st, core); }
     await loadCore();
-    let msg = t("adv.importGradesDone", { n: ok });
-    if (notFound) msg += " · " + t("adv.gradeNotFound", { n: notFound });
-    if (bad) msg += " · " + t("adv.importFail", { n: bad });
-    toast(msg, notFound || bad ? "error" : "success");
+    setImporting(false);
+    setGradePreview(null);
+    const done = rows.length - failed;
+    toast(t("adv.importGradesDone", { n: done }) + (failed ? " · " + t("adv.importFail", { n: failed }) : ""), failed ? "error" : "success");
+  }
+  function downloadGradeErrors() {
+    if (!gradePreview) return;
+    const csv = "line,reason\n" + gradePreview.errors.map((e) => e.line + ',"' + e.reason.replace(/"/g, '""') + '"').join("\n") + "\n";
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "grade_import_errors.csv"; a.click();
+    URL.revokeObjectURL(url);
   }
   function downloadGradeTemplate() {
     const csv =
@@ -703,13 +741,38 @@ export default function AdvisorPage() {
             </label>
             <button className="btn" onClick={downloadTemplate}>{t("adv.importTemplate")}</button>
             <label className="btn"><Icon name="chart" size={16} /> {t("adv.importGrades")}
-              <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) importGrades(f); e.target.value = ""; }} />
+              <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) prepareGrades(f); e.target.value = ""; }} />
             </label>
             <button className="btn" onClick={downloadGradeTemplate}>{t("adv.gradeTemplate")}</button>
             <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
           </div>
         </div>
         {showAdd && <AddStudentForm onAdd={addStudent} />}
+        {gradePreview && (
+          <div className="card">
+            <div className="card-head">
+              <div className="card-title"><Icon name="chart" /> {t("gimp.title")}</div>
+              <div className="card-sub">{gradePreview.fileName}</div>
+            </div>
+            <div className="toolbar" style={{ marginBottom: 4 }}>
+              <span className="pill Resolved">{t("gimp.valid", { n: gradePreview.rows.length })}</span>
+              {gradePreview.errors.length > 0 && <span className="pill Open">{t("gimp.errors", { n: gradePreview.errors.length })}</span>}
+            </div>
+            {gradePreview.errors.length > 0 && (
+              <div className="muted-note" style={{ maxHeight: 150, overflowY: "auto", background: "var(--surface-2)", borderRadius: 8, padding: "8px 10px", margin: "6px 0 10px" }}>
+                {gradePreview.errors.slice(0, 25).map((e, i) => <div key={i}>{t("gimp.line")} {e.line}: {e.reason}</div>)}
+                {gradePreview.errors.length > 25 && <div>… +{gradePreview.errors.length - 25}</div>}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="btn btn-primary" disabled={importing || gradePreview.rows.length === 0} onClick={commitGrades}>
+                {importing ? t("loading") : t("gimp.confirm", { n: gradePreview.rows.length })}
+              </button>
+              <button className="btn" disabled={importing} onClick={() => setGradePreview(null)}>{t("gimp.cancel")}</button>
+              {gradePreview.errors.length > 0 && <button className="btn" onClick={downloadGradeErrors}>{t("gimp.downloadErrors")}</button>}
+            </div>
+          </div>
+        )}
         <div className="toolbar">
           <div className="search"><Icon name="search" size={16} /><input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("ph.search")} /></div>
           <div className="chips">
