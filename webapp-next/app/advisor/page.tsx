@@ -597,6 +597,27 @@ export default function AdvisorPage() {
     toast(failed ? t("adv.importFail", { n: failed }) : t("gb.saved"), failed ? "error" : "success");
   }
 
+  // Export a course's grade sheet to CSV (same columns as the grade importer, so
+  // it round-trips: download → edit in Excel → re-import via "Nhập điểm").
+  function exportGradebook(rows: Course[]) {
+    if (!rows.length) return;
+    const esc = (v: unknown) => { const s = String(v ?? ""); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    const header = "student_code,student_name,course_code,course_name,credits,semester,academic_year,weight_regular,weight_midterm,weight_final,score_regular,score_midterm,score_final";
+    const lines = rows
+      .map((c) => ({ c, s: studentById(c.student_id) }))
+      .sort((a, b) => (a.s?.full_name || "").localeCompare(b.s?.full_name || ""))
+      .map(({ c, s }) => [
+        s?.student_code || "", s?.full_name || "", c.code || "", c.name || "", c.credits, c.semester, c.academic_year || "",
+        c.weight_regular, c.weight_midterm, c.weight_final, c.score_regular ?? "", c.score_midterm ?? "", c.score_final ?? "",
+      ].map(esc).join(","));
+    const csv = "﻿" + [header, ...lines].join("\r\n") + "\r\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const [xc, xs] = (gbCourse || "|").split("|");
+    const a = document.createElement("a"); a.href = url; a.download = "diem_" + xc + "_" + xs + ".csv"; a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const renderGradebook = () => {
     const [code, sem] = gbCourse ? gbCourse.split("|") : ["", ""];
     const rows = gbCourse ? courses.filter((c) => c.code === code && c.semester === sem) : [];
@@ -637,8 +658,9 @@ export default function AdvisorPage() {
                   </tbody>
                 </table>
               </div>
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button className="btn btn-primary" disabled={gbSaving} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
+                <button className="btn" onClick={() => exportGradebook(rows)}><Icon name="inbox" size={16} /> {t("gb.export")}</button>
               </div>
             </>
           ) : <div className="empty">{t("gb.noStudents")}</div>)}
