@@ -16,7 +16,7 @@ import {
 import { predictAlarm, type Prediction } from "@/lib/predict";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
 
-type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages";
+type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation";
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
 interface Core { students: Profile[]; courses: Course[]; risks: RiskScore[]; alerts: Alert[]; interventions: Intervention[]; msgUnread: number; }
 
@@ -507,6 +507,88 @@ export default function AdvisorPage() {
     );
   };
 
+  // Evaluation: (1) accuracy of the risk alert vs a ground-truth "weak standing"
+  // label (CPA < 2.0), reported as precision/recall/F1; (2) whether logged
+  // interventions actually lowered risk (before vs after). Both from loaded data.
+  const renderEvaluation = () => {
+    const WEAK_CPA = 2.0;
+    const scored = students.map((s) => ({ s, a: agg(s) })).filter((r) => r.a.risk && r.a.cpa !== null);
+    let tp = 0, fp = 0, fn = 0, tn = 0;
+    for (const { a } of scored) {
+      const flagged = a.risk!.score >= 40;         // alert = Medium+
+      const weak = (a.cpa as number) < WEAK_CPA;   // ground truth = poor standing
+      if (flagged && weak) tp++; else if (flagged && !weak) fp++;
+      else if (!flagged && weak) fn++; else tn++;
+    }
+    const div = (n: number, d: number) => (d === 0 ? null : n / d);
+    const precision = div(tp, tp + fp), recall = div(tp, tp + fn);
+    const f1 = precision !== null && recall !== null && precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : null;
+    const accuracy = div(tp + tn, scored.length);
+    const pc = (v: number | null) => (v === null ? "—" : (v * 100).toFixed(1) + "%");
+    const f3 = (v: number | null) => (v === null ? "—" : v.toFixed(3));
+
+    // Intervention effectiveness: risk score before vs after each intervention.
+    const alertStudent = (aid: string) => alerts.find((a) => a.id === aid)?.student_id;
+    const histOf = (sid: string) => risks.filter((r) => r.student_id === sid).slice().sort((a, b) => new Date(a.computed_at).getTime() - new Date(b.computed_at).getTime());
+    let measured = 0, improved = 0, sumDelta = 0;
+    for (const iv of interventions) {
+      const sid = alertStudent(iv.alert_id); if (!sid) continue;
+      const tms = new Date(iv.created_at).getTime();
+      const hist = histOf(sid);
+      const before = [...hist].reverse().find((r) => new Date(r.computed_at).getTime() <= tms);
+      const after = hist.find((r) => new Date(r.computed_at).getTime() > tms);
+      if (!before || !after) continue;
+      measured++; const d = after.score - before.score; sumDelta += d; if (d < 0) improved++;
+    }
+    const improvedRate = measured ? (improved / measured) * 100 : null;
+    const avgDelta = measured ? sumDelta / measured : null;
+
+    return (
+      <>
+        <div className="page-head">
+          <div><div className="page-title">{t("eval.title")}</div><div className="page-sub">{t("eval.sub")}</div></div>
+          <button className="btn btn-primary" onClick={recomputeAll}><Icon name="refresh" size={16} /> {t("btn.recalc")}</button>
+        </div>
+
+        <div className="card">
+          <div className="card-head">
+            <div className="card-title"><Icon name="target" /> {t("eval.accuracyTitle")}</div>
+            <div className="card-sub">{t("eval.groundTruth")} · {t("eval.scoredN", { n: scored.length })}</div>
+          </div>
+          <div className="kpi-grid">
+            <div className="kpi accent"><div className="kpi-label">{t("eval.f1")}</div><div className="kpi-value">{f3(f1)}</div></div>
+            <div className="kpi"><div className="kpi-label">{t("eval.precision")}</div><div className="kpi-value">{pc(precision)}</div></div>
+            <div className="kpi"><div className="kpi-label">{t("eval.recall")}</div><div className="kpi-value">{pc(recall)}</div></div>
+            <div className="kpi"><div className="kpi-label">{t("eval.accuracy")}</div><div className="kpi-value">{pc(accuracy)}</div></div>
+          </div>
+          <div className="divider" />
+          <div className="card-sub" style={{ marginBottom: 8 }}>{t("eval.confusion")}</div>
+          <table>
+            <thead><tr><th></th><th className="text-right">{t("eval.actualWeak")}</th><th className="text-right">{t("eval.actualOk")}</th></tr></thead>
+            <tbody>
+              <tr><td><b>{t("eval.predAtRisk")}</b></td><td className="text-right mono"><span className="badge badge-Low">TP {tp}</span></td><td className="text-right mono"><span className="badge badge-Medium">FP {fp}</span></td></tr>
+              <tr><td><b>{t("eval.predSafe")}</b></td><td className="text-right mono"><span className="badge badge-Critical">FN {fn}</span></td><td className="text-right mono"><span className="badge badge-Low">TN {tn}</span></td></tr>
+            </tbody>
+          </table>
+          <div className="muted-note" style={{ marginTop: 10 }}>{t("eval.accNote")}</div>
+        </div>
+
+        <div className="card">
+          <div className="card-head"><div className="card-title"><Icon name="activity" /> {t("eval.ivTitle")}</div></div>
+          {measured ? (
+            <div className="kpi-grid">
+              <div className="kpi"><div className="kpi-label">{t("eval.ivMeasured")}</div><div className="kpi-value">{measured}</div></div>
+              <div className="kpi"><div className="kpi-label">{t("eval.ivImproved")}</div><div className="kpi-value tone-Low">{improvedRate === null ? "—" : improvedRate.toFixed(0) + "%"}</div></div>
+              <div className="kpi"><div className="kpi-label">{t("eval.ivAvgDelta")}</div><div className="kpi-value">{avgDelta === null ? "—" : (avgDelta > 0 ? "+" : "") + avgDelta.toFixed(1)}</div></div>
+            </div>
+          ) : (
+            <div className="empty"><Icon name="activity" size={26} /><div>{t("eval.ivNoData")}</div></div>
+          )}
+        </div>
+      </>
+    );
+  };
+
   const renderDashboard = () => {
     const rows = students.map((s) => ({ s, a: agg(s) }));
     const counts: Record<string, number> = { Low: 0, Medium: 0, High: 0, Critical: 0, Unscored: 0 };
@@ -920,6 +1002,7 @@ export default function AdvisorPage() {
     ["alerts", "alert", "nav.alerts"],
     ["interventions", "notes", "nav.interventions"],
     ["messages", "message", "nav.messages"],
+    ["evaluation", "target", "nav.evaluation"],
   ];
   const activeNav = view === "student" ? "students" : view;
 
@@ -956,6 +1039,7 @@ export default function AdvisorPage() {
           {view === "alerts" && renderAlerts()}
           {view === "interventions" && renderInterventions()}
           {view === "messages" && renderMessages()}
+          {view === "evaluation" && renderEvaluation()}
         </main>
       </div>
     </>
