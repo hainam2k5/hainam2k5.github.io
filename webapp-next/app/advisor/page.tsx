@@ -120,6 +120,21 @@ export default function AdvisorPage() {
         student_id: student.id, sender_id: me!.id, type: "alert",
         title: t("alert.autoTitle"), body: t("alert.autoBody", { level: riskLabel(t, result.level) }),
       });
+      // Best-effort awareness email to the student (no-op if email unconfigured
+      // or no address). Only fires for a NEW alert, so no repeated spam.
+      if (student.email) {
+        try {
+          const { data: sess } = await sb!.auth.getSession();
+          const token = sess.session?.access_token;
+          if (token) {
+            void fetch("/api/notify-alert", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ studentId: student.id, level: result.level, lang }),
+            }).catch(() => {});
+          }
+        } catch { /* ignore email errors */ }
+      }
     }
     return true;
   }
