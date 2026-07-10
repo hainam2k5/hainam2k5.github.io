@@ -16,7 +16,7 @@ import {
 import { predictAlarm, type Prediction } from "@/lib/predict";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
 
-type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation";
+type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation" | "gradebook";
 // A validated grade row ready to write (used by the grade-import preview).
 type PGrade = { sid: string; code: string; name: string; credits: number; semester: string; academic_year: string; wr: number; wm: number; wf: number; sr: number | null; sm: number | null; sf: number | null; total: number | null; letter: string | null; point: number | null };
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
@@ -45,6 +45,10 @@ export default function AdvisorPage() {
   // Grade-import preview: parsed + validated rows awaiting confirmation.
   const [gradePreview, setGradePreview] = useState<null | { rows: PGrade[]; errors: { line: number; reason: string }[]; fileName: string }>(null);
   const [importing, setImporting] = useState(false);
+  // Gradebook grid: pick a course (code|semester) and edit the whole class inline.
+  const [gbCourse, setGbCourse] = useState<string | null>(null);
+  const [gbEdits, setGbEdits] = useState<Record<string, { sr?: string; sm?: string; sf?: string }>>({});
+  const [gbSaving, setGbSaving] = useState(false);
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
@@ -205,6 +209,17 @@ export default function AdvisorPage() {
     for (const r of risks) if (!m[r.student_id]) m[r.student_id] = r; // risks are desc → first is latest
     return m;
   }, [risks]);
+  // Distinct courses (code + semester) for the gradebook selector.
+  const courseOptions = useMemo(() => {
+    const m = new Map<string, { k: string; code: string; name: string; semester: string; count: number }>();
+    for (const c of courses) {
+      if (!c.code) continue;
+      const k = c.code + "|" + c.semester;
+      const e = m.get(k);
+      if (e) e.count++; else m.set(k, { k, code: c.code, name: c.name, semester: c.semester, count: 1 });
+    }
+    return [...m.values()].sort((a, b) => (b.semester + a.code).localeCompare(a.semester + b.code));
+  }, [courses]);
 
   const studentById = (id: string) => students.find((s) => s.id === id);
   const openAlertFor = (id: string) => alerts.find((a) => a.student_id === id && a.status === "Open") || null;
@@ -542,6 +557,93 @@ export default function AdvisorPage() {
           ))}
         </tbody>
       </table>
+    );
+  };
+
+  // ---- Gradebook grid: grade a whole class (one course) at once ----
+  const gbVal = (c: Course, field: "sr" | "sm" | "sf") => {
+    const e = gbEdits[c.id];
+    if (e && e[field] !== undefined) return e[field] as string;
+    const src = field === "sr" ? c.score_regular : field === "sm" ? c.score_midterm : c.score_final;
+    return src === null || src === undefined ? "" : String(src);
+  };
+  const gbSet = (id: string, field: "sr" | "sm" | "sf", v: string) =>
+    setGbEdits((p) => ({ ...p, [id]: { ...p[id], [field]: v } }));
+
+  async function saveGradebook(rows: Course[]) {
+    if (!sb) return;
+    for (const c of rows) {
+      if (![gbVal(c, "sr"), gbVal(c, "sm"), gbVal(c, "sf")].every((v) => parseScore(v).ok)) return toast(t("gimp.errScore"), "error");
+    }
+    setGbSaving(true);
+    const now = new Date().toISOString();
+    const affected = new Set<string>();
+    const ups = rows.map((c) => {
+      const sr = gbVal(c, "sr"), sm = gbVal(c, "sm"), sf = gbVal(c, "sf");
+      const g = computeCourse({ score_regular: sr, score_midterm: sm, score_final: sf, weight_regular: c.weight_regular, weight_midterm: c.weight_midterm, weight_final: c.weight_final });
+      affected.add(c.student_id);
+      return sb!.from("courses").update({
+        score_regular: parseScore(sr).val, score_midterm: parseScore(sm).val, score_final: parseScore(sf).val,
+        total_score: g.total, letter_grade: g.letter, grade_point: g.point, updated_at: now,
+      }).eq("id", c.id);
+    });
+    const res = await Promise.all(ups);
+    const failed = res.filter((r) => r.error).length;
+    const core = await fetchCore();
+    for (const sid of affected) { const st = core.students.find((x) => x.id === sid); if (st) await recomputeStudent(st, core); }
+    await loadCore();
+    setGbSaving(false);
+    setGbEdits({});
+    toast(failed ? t("adv.importFail", { n: failed }) : t("gb.saved"), failed ? "error" : "success");
+  }
+
+  const renderGradebook = () => {
+    const [code, sem] = gbCourse ? gbCourse.split("|") : ["", ""];
+    const rows = gbCourse ? courses.filter((c) => c.code === code && c.semester === sem) : [];
+    const list = rows.map((c) => ({ c, s: studentById(c.student_id) })).filter((r): r is { c: Course; s: Profile } => !!r.s);
+    list.sort((a, b) => (a.s.full_name || "").localeCompare(b.s.full_name || ""));
+    return (
+      <>
+        <div className="page-head"><div><div className="page-title">{t("gb.title")}</div><div className="page-sub">{t("gb.sub")}</div></div></div>
+        <div className="card">
+          <div className="field" style={{ maxWidth: 480 }}>
+            <label>{t("gb.pickCourse")}</label>
+            <select value={gbCourse || ""} onChange={(e) => { setGbCourse(e.target.value || null); setGbEdits({}); }}>
+              <option value="">{t("gb.selectCourse")}</option>
+              {courseOptions.map((o) => <option key={o.k} value={o.k}>{o.code} — {o.name} · {o.semester} ({o.count})</option>)}
+            </select>
+          </div>
+          {!gbCourse && <div className="muted-note">{t("gb.hint")}</div>}
+          {gbCourse && (list.length ? (
+            <>
+              <div style={{ overflowX: "auto" }}>
+                <table>
+                  <thead><tr><th>{t("th.student")}</th><th>{t("th.studentId")}</th><th>{t("th.reg")}</th><th>{t("th.mid")}</th><th>{t("th.final")}</th><th>{t("th.total")}</th><th>{t("th.grade")}</th></tr></thead>
+                  <tbody>
+                    {list.map(({ c, s }) => {
+                      const sr = gbVal(c, "sr"), sm = gbVal(c, "sm"), sf = gbVal(c, "sf");
+                      const g = computeCourse({ score_regular: sr, score_midterm: sm, score_final: sf, weight_regular: c.weight_regular, weight_midterm: c.weight_midterm, weight_final: c.weight_final });
+                      return (
+                        <tr key={c.id}>
+                          <td>{s.full_name}</td><td className="mono">{s.student_code || "—"}</td>
+                          <td><input className="cell-in" inputMode="decimal" value={sr} onChange={(e) => gbSet(c.id, "sr", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sm} onChange={(e) => gbSet(c.id, "sm", e.target.value)} /></td>
+                          <td><input className="cell-in" inputMode="decimal" value={sf} onChange={(e) => gbSet(c.id, "sf", e.target.value)} /></td>
+                          <td className="mono">{g.total === null ? "—" : g.total}</td>
+                          <td><span className={"grade-chip grade-" + (g.letter || "").replace("+", "p")}>{g.letter || "—"}</span></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <button className="btn btn-primary" disabled={gbSaving} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
+              </div>
+            </>
+          ) : <div className="empty">{t("gb.noStudents")}</div>)}
+        </div>
+      </>
     );
   };
 
@@ -1062,6 +1164,7 @@ export default function AdvisorPage() {
   const navItems: [View, string, string][] = [
     ["dashboard", "dashboard", "nav.dashboard"],
     ["students", "students", "nav.students"],
+    ["gradebook", "edit", "nav.gradebook"],
     ["alerts", "alert", "nav.alerts"],
     ["interventions", "notes", "nav.interventions"],
     ["messages", "message", "nav.messages"],
@@ -1098,6 +1201,7 @@ export default function AdvisorPage() {
         <main className="main">
           {view === "dashboard" && renderDashboard()}
           {view === "students" && renderStudents()}
+          {view === "gradebook" && renderGradebook()}
           {view === "student" && renderStudentDetail()}
           {view === "alerts" && renderAlerts()}
           {view === "interventions" && renderInterventions()}
