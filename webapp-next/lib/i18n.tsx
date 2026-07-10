@@ -11,7 +11,7 @@ type Dict = Record<string, string>;
 const DICT: Record<Lang, Dict> = {
   vi: {
     "nav.section": "Điều hướng", "nav.dashboard": "Tổng quan", "nav.students": "Sinh viên",
-    "nav.alerts": "Cảnh báo", "nav.interventions": "Can thiệp", "nav.messages": "Tin nhắn", "nav.evaluation": "Đánh giá",
+    "nav.alerts": "Cảnh báo", "nav.interventions": "Can thiệp", "nav.messages": "Tin nhắn", "nav.evaluation": "Đánh giá", "nav.gradebook": "Bảng điểm",
     "btn.logout": "Đăng xuất", "bell.title": "Thông báo", "loading": "Đang tải…",
     "role.student": "Sinh viên", "role.advisor": "Cố vấn", "role.manager": "Quản lý chương trình",
     "meta.advisor": "Cố vấn học tập", "you": "Bạn", "advisor": "Cố vấn",
@@ -85,6 +85,9 @@ const DICT: Record<Lang, Dict> = {
     "gimp.title": "Xem trước nhập điểm", "gimp.valid": "{n} dòng hợp lệ", "gimp.errors": "{n} dòng lỗi", "gimp.line": "Dòng",
     "gimp.confirm": "Xác nhận nhập {n} dòng", "gimp.cancel": "Hủy", "gimp.downloadErrors": "Tải báo cáo lỗi",
     "gimp.errNoMssv": "Thiếu MSSV", "gimp.errMssvNotFound": "MSSV {code} không có trong danh sách", "gimp.errNoCourse": "Thiếu tên môn", "gimp.errScore": "Điểm phải là số trong khoảng 0–10",
+    "gb.title": "Nhập điểm theo môn", "gb.sub": "Chọn môn học → nhập điểm cả lớp một lần",
+    "gb.pickCourse": "Chọn môn học (mã · học kỳ)", "gb.selectCourse": "— Chọn môn —", "gb.saveAll": "Lưu tất cả ({n} sinh viên)",
+    "gb.noStudents": "Chưa có sinh viên nào học môn này.", "gb.hint": "Chọn một môn để nhập điểm cho toàn bộ sinh viên đang học môn đó.", "gb.saved": "Đã lưu bảng điểm",
     "form.initPassword": "Mật khẩu khởi tạo",
     "toast.pwMin": "Mật khẩu khởi tạo tối thiểu 6 ký tự.",
     "toast.enterNameEmailCode": "Nhập họ tên, mã sinh viên và email.",
@@ -139,7 +142,7 @@ const DICT: Record<Lang, Dict> = {
   },
   en: {
     "nav.section": "Navigation", "nav.dashboard": "Overview", "nav.students": "Students",
-    "nav.alerts": "Alerts", "nav.interventions": "Interventions", "nav.messages": "Messages", "nav.evaluation": "Evaluation",
+    "nav.alerts": "Alerts", "nav.interventions": "Interventions", "nav.messages": "Messages", "nav.evaluation": "Evaluation", "nav.gradebook": "Gradebook",
     "btn.logout": "Sign out", "bell.title": "Notifications", "loading": "Loading…",
     "role.student": "Student", "role.advisor": "Advisor", "role.manager": "Programme manager",
     "meta.advisor": "Academic advisor", "you": "You", "advisor": "Advisor",
@@ -213,6 +216,9 @@ const DICT: Record<Lang, Dict> = {
     "gimp.title": "Grade import preview", "gimp.valid": "{n} valid rows", "gimp.errors": "{n} error rows", "gimp.line": "Line",
     "gimp.confirm": "Confirm import ({n} rows)", "gimp.cancel": "Cancel", "gimp.downloadErrors": "Download error report",
     "gimp.errNoMssv": "Missing student ID", "gimp.errMssvNotFound": "Student ID {code} not in your list", "gimp.errNoCourse": "Missing course name", "gimp.errScore": "Score must be a number in 0–10",
+    "gb.title": "Enter grades by course", "gb.sub": "Pick a course → grade the whole class at once",
+    "gb.pickCourse": "Pick a course (code · semester)", "gb.selectCourse": "— Select course —", "gb.saveAll": "Save all ({n} students)",
+    "gb.noStudents": "No students in this course yet.", "gb.hint": "Pick a course to grade every student enrolled in it.", "gb.saved": "Gradebook saved",
     "form.initPassword": "Initial password",
     "toast.pwMin": "Initial password must be at least 6 characters.",
     "toast.enterNameEmailCode": "Enter name, student ID and email.",
