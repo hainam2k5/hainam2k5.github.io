@@ -4,10 +4,8 @@
 // state and re-renders instantly; the choice is persisted in localStorage.
 // =============================================================================
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-
 export type Lang = "vi" | "en";
 type Dict = Record<string, string>;
-
 const DICT: Record<Lang, Dict> = {
   vi: {
     "nav.section": "Điều hướng", "nav.dashboard": "Tổng quan", "nav.students": "Sinh viên",
@@ -19,37 +17,24 @@ const DICT: Record<Lang, Dict> = {
     "status.Open": "Mở", "status.Acknowledged": "Đang xử lý", "status.Resolved": "Đã xử lý", "status.Dismissed": "Bỏ qua", "status.All": "Tất cả",
     "iv.Planned": "Dự kiến", "iv.Completed": "Hoàn thành", "iv.Follow-up needed": "Cần theo dõi",
     "ivtype.advising": "Buổi tư vấn", "ivtype.callEmail": "Gọi điện / Email", "ivtype.studyPlan": "Kế hoạch học tập", "ivtype.referral": "Giới thiệu hỗ trợ", "ivtype.followup": "Theo dõi",
-    "login.pageTitle": "Đăng nhập — Hệ thống Cảnh báo Rủi ro Học tập",
-    "login.heroTitle": "Phát hiện sớm sinh viên gặp rủi ro học tập",
-    "login.heroDesc": "Theo dõi kết quả học tập, chấm điểm rủi ro minh bạch và phối hợp can thiệp giữa cố vấn và sinh viên — theo thời gian thực.",
-    "login.feat1": "Chấm điểm rủi ro minh bạch, giải thích theo từng yếu tố",
-    "login.feat2": "Nhập điểm thành phần → tự tính GPA học kỳ & CPA",
-    "login.feat3": "Thông báo và hỏi đáp cố vấn theo thời gian thực",
-    "login.footer": "INS3282 · Capstone Project II — Academic DSS",
     "login.welcome": "Chào mừng trở lại", "login.welcomeSub": "Đăng nhập để tiếp tục vào hệ thống.",
     "login.provisionNote": "Tài khoản do nhà trường cấp. Nếu chưa có, hãy liên hệ cố vấn học tập.",
     "login.configWarn": "Chưa cấu hình Supabase. Đặt biến môi trường NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_ANON_KEY (xem README).",
-    "login.tabLogin": "Đăng nhập", "login.tabRegister": "Đăng ký",
-    "reg.studentNote": "Vui lòng điền đầy đủ tất cả các trường bên dưới.",
-    "reg.advisorNote": "Đăng ký cố vấn cần nhập Mã cố vấn do nhà trường cấp.",
     "brand.home": "Về trang Tổng quan",
-    "form.email": "Email", "form.password": "Mật khẩu", "form.passwordMin": "Mật khẩu (tối thiểu 6 ký tự)",
+    "form.email": "Email", "form.password": "Mật khẩu",
     "form.fullName": "Họ và tên", "form.studentCode": "Mã sinh viên", "form.cohort": "Khóa", "form.program": "Ngành", "form.selectProgram": "— Chọn ngành —",
-    "form.advisorCode": "Mã cố vấn",
-    "form.emailHint": "Dùng email thật bạn hay dùng (Gmail, Outlook…) — không bắt buộc email trường. Đây là nơi nhận thông báo và mã đặt lại mật khẩu.",
-    "login.btnLogin": "Đăng nhập", "login.btnRegister": "Tạo tài khoản",
+    "login.btnLogin": "Đăng nhập",
     "login.forgotLink": "Quên mật khẩu?", "login.forgotTitle": "Đặt lại mật khẩu",
     "login.forgotDesc": "Nhập email của bạn, hệ thống sẽ gửi mã xác nhận 6 số qua email.",
     "login.btnSendReset": "Gửi mã xác nhận", "login.backToLogin": "← Quay lại đăng nhập",
     "toast.enterEmail": "Nhập email của bạn", "toast.resetSent": "Đã gửi mã xác nhận qua email. Hãy kiểm tra hộp thư (kể cả mục Spam).",
-    "reset.title": "Đặt mật khẩu mới", "reset.desc": "Nhập mật khẩu mới cho tài khoản của bạn.",
+    "reset.title": "Đặt mật khẩu mới",
     "reset.newPassword": "Mật khẩu mới (tối thiểu 6 ký tự)", "reset.confirmPassword": "Xác nhận mật khẩu mới",
     "reset.btnUpdate": "Cập nhật mật khẩu", "reset.mismatch": "Mật khẩu xác nhận không khớp.",
-    "reset.done": "Đã cập nhật mật khẩu thành công.", "reset.checking": "Đang xác thực liên kết…",
+    "reset.done": "Đã cập nhật mật khẩu thành công.",
     "reset.invalid": "Mã xác nhận không đúng hoặc đã hết hạn. Hãy yêu cầu gửi lại mã.",
     "reset.code": "Mã xác nhận (6 số)", "reset.sentTo": "Nhập mã 6 số đã gửi tới {email}, sau đó đặt mật khẩu mới.",
-    "toast.notConfigured": "Chưa cấu hình Supabase", "toast.signupDone": "Đã tạo tài khoản. Nếu bật xác nhận email, hãy kiểm tra hộp thư rồi đăng nhập.",
-    "toast.fillAll": "Vui lòng điền đầy đủ tất cả các trường.",
+    "toast.notConfigured": "Chưa cấu hình Supabase",
     "student.hello": "Xin chào, {name}", "student.helloDefault": "bạn",
     "kpi.cpa": "CPA (hệ 4)", "kpi.gpaLatest": "GPA học kỳ gần nhất", "kpi.creditsAccum": "Tín chỉ tích lũy", "kpi.failedF": "Môn chưa đạt (F)",
     "card.transcript": "Bảng điểm theo học kỳ", "card.transcriptSub": "Chỉ xem — điểm do cố vấn nhập",
@@ -66,7 +51,7 @@ const DICT: Record<Lang, Dict> = {
     "empty.noChat": "Chưa có trao đổi nào.", "student.notAssigned": "Bạn chưa được phân công cố vấn.",
     "student.chatNote": "Cố vấn sẽ nhận sinh viên phụ trách trước khi có thể trao đổi.",
     "toast.gradesUpdated": "Bảng điểm vừa được cập nhật", "toast.newNotif": "Thông báo mới: {title}", "toast.advisorReplied": "Cố vấn vừa trả lời",
-    "btn.print": "In bảng điểm", "card.gpaSummary": "Tóm tắt GPA theo kỳ", "print.title": "BẢNG ĐIỂM", "print.printedAt": "Ngày in: {date}",
+    "btn.print": "In bảng điểm", "print.title": "BẢNG ĐIỂM", "print.printedAt": "Ngày in: {date}",
     "notif.gradeBodyDetailed": "Cố vấn đã cập nhật điểm môn {course}: TX {r} · GK {m} · CK {f} → Tổng {total} ({letter}).",
     "adv.evaluation": "Đánh giá hệ thống", "kpi.avgHandle": "TG xử lý cảnh báo TB (ngày)", "kpi.ivComplete": "Hoàn thành can thiệp", "kpi.followup": "Theo dõi ca rủi ro cao", "kpi.resolvedRate": "Cảnh báo đã xử lý",
     "eval.title": "Đánh giá mô hình & can thiệp", "eval.sub": "Độ chính xác cảnh báo và hiệu quả can thiệp — tính từ dữ liệu hiện có",
@@ -85,7 +70,7 @@ const DICT: Record<Lang, Dict> = {
     "adv.import": "Nhập CSV", "adv.importTemplate": "Tải mẫu", "adv.importDone": "Đã tạo {n} tài khoản sinh viên", "adv.importFail": "{n} dòng lỗi",
     "adv.batchPasswordPrompt": "Nhập mật khẩu khởi tạo chung cho các sinh viên chưa có cột 'password' (tối thiểu 6 ký tự):",
     "adv.importGrades": "Nhập điểm", "adv.gradeTemplate": "Tải mẫu điểm",
-    "adv.importGradesDone": "Đã nhập điểm {n} dòng", "adv.gradeNotFound": "{n} MSSV không có trong danh sách của bạn",
+    "adv.importGradesDone": "Đã nhập điểm {n} dòng",
     "gimp.title": "Xem trước nhập điểm", "gimp.valid": "{n} dòng hợp lệ", "gimp.errors": "{n} dòng lỗi", "gimp.line": "Dòng",
     "gimp.confirm": "Xác nhận nhập {n} dòng", "gimp.cancel": "Hủy", "gimp.downloadErrors": "Tải báo cáo lỗi",
     "gimp.errNoMssv": "Thiếu MSSV", "gimp.errMssvNotFound": "MSSV {code} không có trong danh sách", "gimp.errNoCourse": "Thiếu tên môn", "gimp.errScore": "Điểm phải là số trong khoảng 0–10",
@@ -156,37 +141,24 @@ const DICT: Record<Lang, Dict> = {
     "status.Open": "Open", "status.Acknowledged": "In progress", "status.Resolved": "Resolved", "status.Dismissed": "Dismissed", "status.All": "All",
     "iv.Planned": "Planned", "iv.Completed": "Completed", "iv.Follow-up needed": "Follow-up needed",
     "ivtype.advising": "Advising meeting", "ivtype.callEmail": "Call / Email", "ivtype.studyPlan": "Study plan", "ivtype.referral": "Support referral", "ivtype.followup": "Follow-up",
-    "login.pageTitle": "Sign in — Academic Risk Alert System",
-    "login.heroTitle": "Spot at-risk students early",
-    "login.heroDesc": "Track academic performance, score risk transparently, and coordinate interventions between advisors and students — in real time.",
-    "login.feat1": "Transparent risk scoring, explained factor by factor",
-    "login.feat2": "Enter component scores → auto semester GPA & CPA",
-    "login.feat3": "Real-time notifications and advisor Q&A",
-    "login.footer": "INS3282 · Capstone Project II — Academic DSS",
     "login.welcome": "Welcome back", "login.welcomeSub": "Sign in to continue.",
     "login.provisionNote": "Accounts are issued by the school. If you don't have one yet, contact your academic advisor.",
     "login.configWarn": "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (see README).",
-    "login.tabLogin": "Sign in", "login.tabRegister": "Register",
-    "reg.studentNote": "Please fill in every field below.",
-    "reg.advisorNote": "Advisor registration requires the Advisor code issued by the school.",
     "brand.home": "Back to Overview",
-    "form.email": "Email", "form.password": "Password", "form.passwordMin": "Password (at least 6 characters)",
+    "form.email": "Email", "form.password": "Password",
     "form.fullName": "Full name", "form.studentCode": "Student ID", "form.cohort": "Cohort", "form.program": "Programme", "form.selectProgram": "— Select major —",
-    "form.advisorCode": "Advisor code",
-    "form.emailHint": "Use a real email you can access (Gmail, Outlook…) — a school email is not required. This is where notifications and password-reset codes are sent.",
-    "login.btnLogin": "Sign in", "login.btnRegister": "Create account",
+    "login.btnLogin": "Sign in",
     "login.forgotLink": "Forgot password?", "login.forgotTitle": "Reset password",
     "login.forgotDesc": "Enter your email and we'll send you a 6-digit verification code.",
     "login.btnSendReset": "Send verification code", "login.backToLogin": "← Back to sign in",
     "toast.enterEmail": "Enter your email", "toast.resetSent": "Verification code sent by email. Check your inbox (including Spam).",
-    "reset.title": "Set a new password", "reset.desc": "Enter a new password for your account.",
+    "reset.title": "Set a new password",
     "reset.newPassword": "New password (at least 6 characters)", "reset.confirmPassword": "Confirm new password",
     "reset.btnUpdate": "Update password", "reset.mismatch": "Passwords do not match.",
-    "reset.done": "Password updated successfully.", "reset.checking": "Verifying link…",
+    "reset.done": "Password updated successfully.",
     "reset.invalid": "The verification code is incorrect or has expired. Request a new code.",
     "reset.code": "Verification code (6 digits)", "reset.sentTo": "Enter the 6-digit code sent to {email}, then set a new password.",
-    "toast.notConfigured": "Supabase is not configured", "toast.signupDone": "Account created. If email confirmation is on, check your inbox then sign in.",
-    "toast.fillAll": "Please fill in all fields.",
+    "toast.notConfigured": "Supabase is not configured",
     "student.hello": "Hello, {name}", "student.helloDefault": "there",
     "kpi.cpa": "CPA (4.0)", "kpi.gpaLatest": "Latest semester GPA", "kpi.creditsAccum": "Cumulative credits", "kpi.failedF": "Failed courses (F)",
     "card.transcript": "Transcript by semester", "card.transcriptSub": "View only — entered by advisor",
@@ -203,7 +175,7 @@ const DICT: Record<Lang, Dict> = {
     "empty.noChat": "No conversation yet.", "student.notAssigned": "You have no advisor assigned yet.",
     "student.chatNote": "An advisor must take you on before you can chat.",
     "toast.gradesUpdated": "Your grades were updated", "toast.newNotif": "New notification: {title}", "toast.advisorReplied": "Your advisor replied",
-    "btn.print": "Print transcript", "card.gpaSummary": "GPA by semester", "print.title": "TRANSCRIPT", "print.printedAt": "Printed: {date}",
+    "btn.print": "Print transcript", "print.title": "TRANSCRIPT", "print.printedAt": "Printed: {date}",
     "notif.gradeBodyDetailed": "Your advisor updated {course}: Reg {r} · Mid {m} · Final {f} → Total {total} ({letter}).",
     "adv.evaluation": "System evaluation", "kpi.avgHandle": "Avg alert handling (days)", "kpi.ivComplete": "Intervention completion", "kpi.followup": "High-risk follow-up", "kpi.resolvedRate": "Alerts resolved",
     "eval.title": "Model & intervention evaluation", "eval.sub": "Alert accuracy and intervention effectiveness — from current data",
@@ -222,7 +194,7 @@ const DICT: Record<Lang, Dict> = {
     "adv.import": "Import CSV", "adv.importTemplate": "Template", "adv.importDone": "Created {n} student accounts", "adv.importFail": "{n} rows failed",
     "adv.batchPasswordPrompt": "Enter a shared initial password for students without a 'password' column (at least 6 characters):",
     "adv.importGrades": "Import grades", "adv.gradeTemplate": "Grade template",
-    "adv.importGradesDone": "Imported grades: {n} rows", "adv.gradeNotFound": "{n} student IDs not in your list",
+    "adv.importGradesDone": "Imported grades: {n} rows",
     "gimp.title": "Grade import preview", "gimp.valid": "{n} valid rows", "gimp.errors": "{n} error rows", "gimp.line": "Line",
     "gimp.confirm": "Confirm import ({n} rows)", "gimp.cancel": "Cancel", "gimp.downloadErrors": "Download error report",
     "gimp.errNoMssv": "Missing student ID", "gimp.errMssvNotFound": "Student ID {code} not in your list", "gimp.errNoCourse": "Missing course name", "gimp.errScore": "Score must be a number in 0–10",
@@ -284,37 +256,28 @@ const DICT: Record<Lang, Dict> = {
     "notif.advReplyTitle": "Advisor replied", "adv.toastNewMsg": "A student sent a message",
   },
 };
-
 export type TFunc = (key: string, params?: Record<string, string | number>) => string;
 interface I18nCtx { lang: Lang; setLang: (l: Lang) => void; t: TFunc; locale: string; }
 const Ctx = createContext<I18nCtx | null>(null);
-
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("vi");
-
   useEffect(() => {
     const saved = localStorage.getItem("lang");
     if (saved === "vi" || saved === "en") setLangState(saved);
   }, []);
-
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
-
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     try { localStorage.setItem("lang", l); } catch {}
   }, []);
-
   const t = useCallback<TFunc>((key, params) => {
     let s = (DICT[lang] && DICT[lang][key]) || DICT.vi[key] || key;
     if (params) for (const k in params) s = s.replace(new RegExp("\\{" + k + "\\}", "g"), String(params[k]));
     return s;
   }, [lang]);
-
   const locale = lang === "en" ? "en-GB" : "vi-VN";
-
   return <Ctx.Provider value={{ lang, setLang, t, locale }}>{children}</Ctx.Provider>;
 }
-
 export function useI18n(): I18nCtx {
   const c = useContext(Ctx);
   if (!c) throw new Error("useI18n must be used within I18nProvider");
