@@ -10,7 +10,7 @@
 // =============================================================================
 import type { RiskScore } from "./types";
 
-export const ALARM_SCORE = 40; // Medium threshold = the "alarm zone"
+const ALARM_SCORE = 40; // Medium threshold = the "alarm zone"
 
 export interface PredictInput {
   score: number | null; // current composite risk score (null if unscored)
