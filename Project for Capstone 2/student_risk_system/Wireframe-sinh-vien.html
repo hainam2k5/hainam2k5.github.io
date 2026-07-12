@@ -78,9 +78,6 @@
   .kpi.acc{border-left:4px solid var(--dark)}
   .flex1{flex:1}.g8{gap:8px}.mt8{margin-top:8px}.mt12{margin-top:12px}
   .small{font-size:11px}
-  .anno{font-size:11.5px;color:#a05a00;background:#fff7e6;border:1px dashed #e0b25a;border-radius:5px;
-    padding:6px 9px;margin-top:10px}
-  .anno b{color:#7a4300}
   .flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11.5px;color:var(--mut)}
   .flow .st{border:1px solid var(--line);border-radius:5px;background:var(--fill2);padding:4px 9px;color:var(--dark)}
   .notif{display:flex;gap:8px;border-bottom:1px solid #eee;padding:7px 0;font-size:12px}
@@ -100,7 +97,7 @@
   <header class="doc">
     <h1>Wireframe — Luồng Sinh viên</h1>
     <div class="sub">Đăng nhập & toàn bộ tính năng dành cho sinh viên · Hệ thống Cảnh báo Rủi ro Học tập (VNU-IS)</div>
-    <div class="meta">Bổ trợ cho “Wireframe hệ thống” (9 màn tổng) · INS3282 Capstone Project II · 12/07/2026 — khớp bản triển khai</div>
+    <div class="meta">Bổ trợ cho “Wireframe hệ thống” · INS3282 Capstone Project II · 12/07/2026 — khớp bản triển khai</div>
   </header>
 
   <div class="legend">
@@ -123,7 +120,7 @@
           <div><div class="flabel">Mật khẩu</div><div class="field">••••••••</div></div>
           <div class="row" style="justify-content:flex-end"><span class="small muted">Quên mật khẩu?</span></div>
           <div class="btn pri blk">Đăng nhập</div>
-          <div class="small muted" style="text-align:center">Tài khoản do nhà trường cấp. Nếu chưa có, liên hệ cố vấn học tập.</div>
+          <div class="small muted" style="text-align:center">Tài khoản do nhà trường cấp. Nếu chưa có, hãy liên hệ cố vấn học tập.</div>
         </div>
         <div class="col flex1" style="flex-basis:45%">
           <div class="box pad col">
@@ -139,7 +136,6 @@
         </div>
       </div>
       <div class="flow"><span class="st">Nhập email + mật khẩu</span> → <span class="st">Supabase Auth xác thực</span> → <span class="st">Đọc vai trò (profiles.role)</span> → <span class="st">role = student → vào Cổng Sinh viên</span></div>
-      <div class="anno"><b>Phân quyền tự động:</b> cùng một màn đăng nhập cho mọi vai trò — hệ thống tự chuyển sinh viên vào <b>/student</b>, cố vấn/quản lý vào <b>/advisor</b>. Không có đăng ký công khai.</div>
     </div>
   </section>
 
@@ -189,7 +185,6 @@
         <div class="kpi"><div class="k">Tín chỉ tích lũy</div><div class="v">42</div></div>
         <div class="kpi"><div class="k">Môn chưa đạt (F)</div><div class="v">1</div></div>
       </div>
-      <div class="anno"><b>Bố cục dưới KPI:</b> 2 cột — trái: Bảng điểm theo học kỳ (màn 4); phải: Thông báo (màn 6) → Hỏi đáp (màn 7) → Lịch hẹn (màn 8). Logo góc trái bấm → cuộn về đầu trang; chuông 🔔 bấm → cuộn tới Thông báo.</div>
     </div>
   </section>
 
@@ -213,7 +208,6 @@
         <div class="row" style="justify-content:space-between"><b>Học kỳ HK2 2024-2025</b><span class="pill">GPA <b>2.45</b> · 14 tín chỉ</span></div>
         <div class="box fill2 center small" style="min-height:36px;margin-top:8px">… bảng môn học tương tự …</div>
       </div>
-      <div class="anno"><b>Nguồn dữ liệu:</b> điểm do giáo viên/cố vấn nhập hoặc đồng bộ từ hệ thống trường; điểm tổng = TX×20% + GK×30% + CK×50% (trọng số theo môn); GPA/CPA quy thang 4 chuẩn VNU. Sinh viên <b>không sửa được</b> điểm; môn bị “Khóa điểm” 🔒 thì cố vấn cũng không sửa.</div>
     </div>
   </section>
 
@@ -238,7 +232,6 @@
           <div class="field sel">Máy in / Lưu thành PDF</div>
           <div class="row g8"><div class="btn pri flex1">In</div><div class="btn flex1">Hủy</div></div>
         </div>
-        <div class="anno"><b>Kỹ thuật:</b> chỉ vùng bảng điểm được in (ẩn topbar, thông báo, chat bằng CSS @media print) — có phần đầu trang riêng chỉ hiện khi in: tiêu đề + thông tin SV + thời điểm in.</div>
       </div>
     </div>
   </section>
@@ -261,7 +254,6 @@
           <div class="small">💬 Tin nhắn — khi cố vấn nhắn</div>
           <div class="small">⚙ Hệ thống — thông báo chung từ cố vấn</div>
         </div>
-        <div class="anno"><b>Realtime:</b> thông báo mới tự hiện không cần tải lại trang (Supabase Realtime); mục chưa đọc có chấm đậm + đếm trên chuông 🔔.</div>
       </div>
     </div>
   </section>
@@ -285,7 +277,6 @@
           <div class="box fill2 pad small">Cố vấn sẽ nhận sinh viên phụ trách trước khi có thể trao đổi.</div>
           <div class="small muted">Ô nhập vẫn hiển thị nhưng tin không gửi được khi chưa gán cố vấn.</div>
         </div>
-        <div class="anno"><b>Hai phía đồng bộ:</b> tin nhắn hiện ngay bên bảng cố vấn (badge “Tin nhắn ①”); cố vấn trả lời trong Chi tiết SV hoặc mục Tin nhắn.</div>
       </div>
     </div>
   </section>
@@ -315,7 +306,6 @@
         </div>
       </div>
       <div class="flow"><span class="st">SV đặt lịch</span> → <span class="st">Chờ duyệt</span> → <span class="st">Cố vấn “Xác nhận”</span> → <span class="st">Đã xác nhận</span> → <span class="st">Gặp xong → “Đã gặp”</span> <span class="muted">(SV hoặc cố vấn có thể “Hủy” trước buổi gặp)</span></div>
-      <div class="anno"><b>Điều kiện:</b> thẻ chỉ mở khi sinh viên đã có cố vấn phụ trách. Trạng thái đồng bộ realtime hai chiều — cố vấn duyệt trong màn Chi tiết sinh viên.</div>
     </div>
   </section>
 
@@ -342,12 +332,11 @@
           <div class="mh"><b>Supabase Auth</b> · Chủ đề: Đặt lại mật khẩu</div>
           <div class="mb">Mã xác nhận của bạn là: <b style="font-size:16px;letter-spacing:3px">4 8 2 9 1 7</b><br><span class="small muted">Mã có hiệu lực trong ít phút. Không chia sẻ cho ai.</span></div>
         </div>
-        <div class="anno flex1" style="margin-top:0"><b>Kênh gửi:</b> email điểm & cảnh báo gửi qua Gmail SMTP (cấu hình máy chủ trên Vercel, không lộ mật khẩu ra trình duyệt); riêng mã 6 số do Supabase gửi. Email nhận là email trong hồ sơ sinh viên — dùng email thật để nhận đủ thông báo.</div>
       </div>
     </div>
   </section>
 
-  <footer class="doc">Wireframe low-fidelity — luồng sinh viên · dùng kèm “Wireframe hệ thống” (bản 9 màn tổng) ·
+  <footer class="doc">Wireframe low-fidelity — luồng sinh viên · dùng kèm “Wireframe hệ thống” ·
   Mở bằng trình duyệt, có thể In → Lưu thành PDF.</footer>
 </div>
 </body>
