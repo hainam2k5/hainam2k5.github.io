@@ -1,6 +1,4 @@
 // Explainable, rule-based risk engine. Ported from the static app (risk.js).
-export const WEIGHTS = { gpa: 0.4, attendance: 0.3, lms: 0.15, failed: 0.15 };
-
 // Weights + level thresholds are configurable (per institution / major) so the
 // model isn't locked to one policy — a limitation highlighted in the literature.
 export interface RiskConfig {
