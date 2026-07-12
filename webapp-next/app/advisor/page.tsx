@@ -40,6 +40,9 @@ export default function AdvisorPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [level, setLevel] = useState("");
+  const [cohortF, setCohortF] = useState("");
+  const [programF, setProgramF] = useState("");
+  const [courseF, setCourseF] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [alertStatusFilter, setAlertStatusFilter] = useState("Open");
   // Grade-import preview: parsed + validated rows awaiting confirmation.
@@ -1042,9 +1045,15 @@ export default function AdvisorPage() {
 
   const renderStudents = () => {
     const levels = ["", "Critical", "High", "Medium", "Low"];
+    const cohorts = [...new Set(students.map((s) => s.cohort).filter(Boolean))].sort();
+    const programs = [...new Set(students.map((s) => s.program).filter(Boolean))].sort();
+    const courseOpts = [...new Map(courses.filter((c) => c.code).map((c) => [c.code, c.name || c.code])).entries()].sort((a, b) => a[0].localeCompare(b[0]));
     let rows = students.map((s) => ({ s, a: agg(s) }));
     if (q) { const qq = q.toLowerCase(); rows = rows.filter(({ s }) => (s.full_name || "").toLowerCase().includes(qq) || (s.student_code || "").toLowerCase().includes(qq)); }
     if (level) rows = rows.filter(({ a }) => (a.risk ? a.risk.risk_level : "Unscored") === level);
+    if (cohortF) rows = rows.filter(({ s }) => s.cohort === cohortF);
+    if (programF) rows = rows.filter(({ s }) => s.program === programF);
+    if (courseF) rows = rows.filter(({ s }) => courses.some((c) => c.student_id === s.id && c.code === courseF));
     rows.sort((x, y) => (y.a.risk ? y.a.risk.score : -1) - (x.a.risk ? x.a.risk.score : -1));
     return (
       <>
@@ -1091,10 +1100,26 @@ export default function AdvisorPage() {
         )}
         <div className="toolbar">
           <div className="search"><Icon name="search" size={16} /><input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("ph.search")} /></div>
+          <select value={cohortF} onChange={(e) => setCohortF(e.target.value)}>
+            <option value="">{t("adv.allCohorts")}</option>
+            {cohorts.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select value={programF} onChange={(e) => setProgramF(e.target.value)}>
+            <option value="">{t("adv.allPrograms")}</option>
+            {programs.map((pg) => <option key={pg} value={pg}>{pg}</option>)}
+          </select>
+          <select value={courseF} onChange={(e) => setCourseF(e.target.value)}>
+            <option value="">{t("adv.allCourses")}</option>
+            {courseOpts.map(([code, name]) => <option key={code} value={code}>{name && name !== code ? code + " — " + name : code}</option>)}
+          </select>
           <div className="chips">
             {levels.map((lv) => <span key={lv} className={"chip" + (level === lv ? " active" : "")} onClick={() => setLevel(lv)}>{lv === "" ? t("status.All") : t("risk." + lv)}</span>)}
           </div>
+          {(cohortF || programF || courseF || level || q) && (
+            <button className="btn btn-sm" onClick={() => { setQ(""); setLevel(""); setCohortF(""); setProgramF(""); setCourseF(""); }}>{t("adv.clearFilters")}</button>
+          )}
         </div>
+        <div className="muted-note" style={{ marginTop: -8, marginBottom: 10 }}>{t("adv.matchCount", { n: rows.length, total: students.length })}</div>
         <div className="card">{RiskTable(rows)}</div>
       </>
     );
