@@ -59,9 +59,6 @@
   .chip{border:1px solid var(--line);border-radius:999px;height:24px;display:inline-flex;
     align-items:center;padding:0 11px;font-size:11.5px;color:var(--mut);background:var(--paper)}
   .chip.on{background:var(--fill);color:var(--ink);border-color:#bbb}
-  .tabs{display:flex;background:var(--fill2);border:1px solid var(--line);border-radius:6px;padding:3px}
-  .tabs>div{flex:1;text-align:center;padding:6px;font-size:12px;border-radius:4px;color:var(--mut)}
-  .tabs>div.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
   .toggle{display:flex;gap:6px}
   .toggle>div{flex:1;text-align:center;border:1px solid var(--line);border-radius:5px;padding:7px;font-size:12px;color:var(--mut)}
   .toggle>div.on{background:var(--dark);color:#fff;border-color:var(--dark);font-weight:600}
@@ -81,7 +78,7 @@
     display:grid;place-items:center;font-size:9px;color:var(--dark);font-weight:700}
   .side{width:150px;border:1px solid var(--line);border-radius:6px;background:var(--fill2);padding:10px}
   .side .nav{display:flex;flex-direction:column;gap:4px}
-  .side .nav div{padding:7px 9px;border-radius:5px;color:var(--mut);font-size:12px}
+  .side .nav div{padding:6px 9px;border-radius:5px;color:var(--mut);font-size:12px}
   .side .nav div.on{background:#fff;color:var(--ink);font-weight:600;border:1px solid var(--line)}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .kpi{border:1px solid var(--line);border-radius:6px;padding:10px}
@@ -101,7 +98,7 @@
   <header class="doc">
     <h1>Wireframe — Hệ thống Cảnh báo Rủi ro Học tập</h1>
     <div class="sub">Academic Decision Support System · Trường Quốc tế — ĐHQG Hà Nội (VNU-IS)</div>
-    <div class="meta">Bản phác thảo bố cục (low-fidelity) · INS3282 Capstone Project II</div>
+    <div class="meta">Bản phác thảo bố cục (low-fidelity) · INS3282 Capstone Project II · Cập nhật 12/07/2026 — khớp bản triển khai</div>
   </header>
 
   <div class="legend">
@@ -113,7 +110,7 @@
 
   <!-- 1. LOGIN -->
   <section class="screen">
-    <div class="cap"><span class="n">1</span> Đăng nhập <span class="note">màn hình chia đôi · góc phải trên: chuyển VI | EN</span></div>
+    <div class="cap"><span class="n">1</span> Đăng nhập <span class="note">CHỈ đăng nhập — tài khoản do trường cấp · góc phải: VI | EN</span></div>
     <div class="frame">
       <div class="row">
         <div class="box flex1 imgx center" style="min-height:230px;flex-basis:52%">
@@ -126,53 +123,20 @@
           <div class="row" style="justify-content:flex-end"><span class="chip on">VI</span><span class="chip">EN</span></div>
           <div class="h">Chào mừng trở lại</div>
           <div class="muted small">Đăng nhập để tiếp tục vào hệ thống.</div>
-          <div class="tabs mt8"><div class="on">Đăng nhập</div><div>Đăng ký</div></div>
           <div><div class="flabel">Email</div><div class="field">ban@gmail.com</div></div>
           <div><div class="flabel">Mật khẩu</div><div class="field">••••••••</div></div>
           <div class="row" style="justify-content:flex-end"><span class="small muted">Quên mật khẩu?</span></div>
           <div class="btn pri blk">Đăng nhập</div>
+          <div class="small muted" style="text-align:center">Tài khoản do nhà trường cấp. Nếu chưa có, liên hệ cố vấn học tập.</div>
         </div>
       </div>
+      <div class="anno"><b>Không có đăng ký công khai:</b> tài khoản sinh viên được cấp qua màn “Cấp tài khoản” (màn 9); cố vấn/quản lý do quản trị tạo trong Supabase. Đăng nhập xong hệ thống tự vào đúng giao diện theo vai trò (student / advisor / manager).</div>
     </div>
   </section>
 
-  <!-- 2. REGISTER -->
+  <!-- 2. FORGOT PASSWORD -->
   <section class="screen">
-    <div class="cap"><span class="n">2</span> Đăng ký tài khoản <span class="note">chọn Sinh viên / Cố vấn — trường thay đổi theo vai trò</span></div>
-    <div class="frame">
-      <div class="row">
-        <div class="box pad col flex1">
-          <div class="tabs"><div>Đăng nhập</div><div class="on">Đăng ký</div></div>
-          <div class="toggle"><div class="on">Sinh viên</div><div>Cố vấn</div></div>
-          <div class="small muted">Vui lòng điền đầy đủ tất cả các trường bên dưới.</div>
-          <div><div class="flabel">Họ và tên</div><div class="field">Nguyễn Văn A</div></div>
-          <div><div class="flabel">Email</div><div class="field">ban@gmail.com</div>
-            <div class="small muted" style="margin-top:3px">Dùng email thật để nhận thông báo & mã đặt lại MK.</div></div>
-          <div class="row"><div class="flex1"><div class="flabel">Mã sinh viên</div><div class="field">SV001</div></div>
-            <div class="flex1"><div class="flabel">Khóa</div><div class="field">K68</div></div></div>
-          <div><div class="flabel">Ngành</div><div class="field sel">— Chọn ngành —</div></div>
-          <div><div class="flabel">Mật khẩu (≥ 6 ký tự)</div><div class="field">••••••••</div></div>
-          <div class="btn pri blk">Tạo tài khoản</div>
-        </div>
-        <div class="box pad col flex1" style="max-width:300px">
-          <div class="lbl">Biến thể: tab “Cố vấn”</div>
-          <div class="toggle"><div>Sinh viên</div><div class="on">Cố vấn</div></div>
-          <div class="small muted">Đăng ký cố vấn cần nhập Mã cố vấn do trường cấp.</div>
-          <div><div class="flabel">Họ và tên</div><div class="field">TS. Trần Thị B</div></div>
-          <div><div class="flabel">Email</div><div class="field">cvhttt@gmail.com</div></div>
-          <div><div class="flabel">Ngành</div><div class="field sel">— Chọn ngành —</div></div>
-          <div><div class="flabel">Mã cố vấn</div><div class="field">••••••••</div></div>
-          <div><div class="flabel">Mật khẩu</div><div class="field">••••••••</div></div>
-          <div class="btn pri blk">Tạo tài khoản</div>
-          <div class="anno"><b>Bảo mật:</b> vai trò cố vấn chỉ được cấp khi Mã cố vấn khớp (kiểm tra ở database). Sai mã → tạo tài khoản sinh viên.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. FORGOT PASSWORD -->
-  <section class="screen">
-    <div class="cap"><span class="n">3</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước</span></div>
+    <div class="cap"><span class="n">2</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước</span></div>
     <div class="frame row">
       <div class="box pad col flex1">
         <div class="lbl">Bước 1 — nhập email</div>
@@ -195,16 +159,16 @@
     </div>
   </section>
 
-  <!-- 4. STUDENT PORTAL -->
+  <!-- 3. STUDENT PORTAL -->
   <section class="screen">
-    <div class="cap"><span class="n">4</span> Cổng Sinh viên <span class="note">logo góc trái bấm được → cuộn lên đầu</span></div>
+    <div class="cap"><span class="n">3</span> Cổng Sinh viên <span class="note">logo góc trái bấm được → về đầu trang</span></div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
         <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span>
-        <span class="pill">🔔</span><span class="pill">Avatar</span><span class="btn small">Đăng xuất</span>
+        <span class="pill">🔔 2</span><span class="pill">Avatar</span><span class="btn small">Đăng xuất</span>
       </div>
-      <div class="box fill2 pad small" style="border-style:dashed">⚠ Băng cảnh báo (hiện khi CPA thấp / có môn F): “Kết quả học tập đang ở mức báo động…”</div>
+      <div class="box fill2 pad small" style="border-style:dashed">⚠ Băng cảnh báo (hiện khi CPA thấp / có môn F): “Kết quả học tập đang ở mức báo động…” — kèm email tự cảnh báo gửi tới hộp thư sinh viên</div>
       <div class="kpis">
         <div class="kpi"><div class="k">CPA (hệ 4)</div><div class="v">2.35</div></div>
         <div class="kpi"><div class="k">GPA kỳ gần nhất</div><div class="v">2.6</div></div>
@@ -212,7 +176,7 @@
         <div class="kpi"><div class="k">Môn chưa đạt (F)</div><div class="v">1</div></div>
       </div>
       <div class="row">
-        <div class="box pad flex1" style="flex-basis:60%">
+        <div class="box pad flex1" style="flex-basis:58%">
           <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Bảng điểm theo học kỳ</div><span class="btn small">In bảng điểm</span></div>
           <table class="wf mt8">
             <tr><th>Môn học</th><th>TC</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Điểm chữ</th></tr>
@@ -220,33 +184,37 @@
             <tr><td>Giải tích 1</td><td>4</td><td>6.0</td><td>5.5</td><td>6.0</td><td>5.9</td><td><span class="pill">C</span></td></tr>
             <tr><td>Đại số tuyến tính</td><td>3</td><td>4.0</td><td>3.5</td><td>3.0</td><td>3.4</td><td><span class="pill">F</span></td></tr>
           </table>
-          <div class="small muted mt8">GPA kỳ: 2.6 · 10 tín chỉ</div>
+          <div class="small muted mt8">GPA kỳ: 2.6 · 10 tín chỉ · điểm chỉ xem (khóa khi cố vấn “Khóa điểm”)</div>
         </div>
-        <div class="box pad col flex1" style="flex-basis:40%">
+        <div class="box pad col flex1" style="flex-basis:42%">
           <div class="h" style="font-size:14px">Thông báo</div>
-          <div class="box fill2 pad small">• Cố vấn đã cập nhật điểm môn …</div>
-          <div class="box fill2 pad small">• Cảnh báo kết quả học tập …</div>
-          <div class="h mt8" style="font-size:14px">Hỏi đáp với cố vấn</div>
-          <div class="box pad small" style="min-height:52px">💬 …tin nhắn…</div>
+          <div class="box fill2 pad small">• Cố vấn đã cập nhật điểm môn … (kèm email)</div>
+          <div class="h" style="font-size:14px">Hỏi đáp với cố vấn <span class="small muted">(realtime)</span></div>
+          <div class="box pad small" style="min-height:36px">💬 …tin nhắn…</div>
           <div class="row g8"><div class="field flex1">Nhập câu hỏi…</div><div class="btn pri">Gửi</div></div>
+          <div class="h" style="font-size:14px">Lịch hẹn cố vấn</div>
+          <div class="row g8"><div class="field flex1">📅 14/07/2026 10:00</div><div class="field flex1">Ghi chú…</div></div>
+          <div class="btn pri blk">Đặt lịch hẹn</div>
+          <div class="box fill2 pad small row" style="justify-content:space-between"><span>14/07 10:00 — xin tư vấn môn Giải tích</span><span><span class="pill">Chờ duyệt</span> <span class="btn small">Hủy</span></span></div>
         </div>
       </div>
+      <div class="anno"><b>Lịch hẹn:</b> chỉ hiện khi sinh viên đã có cố vấn phụ trách. Trạng thái: Chờ duyệt → Đã xác nhận → Đã gặp (hoặc Hủy) — đồng bộ realtime hai chiều với cố vấn.</div>
     </div>
   </section>
 
-  <!-- 5. ADVISOR DASHBOARD -->
+  <!-- 4. ADVISOR DASHBOARD -->
   <section class="screen">
-    <div class="cap"><span class="n">5</span> Bảng cố vấn — Tổng quan <span class="note">logo bấm được → về Tổng quan</span></div>
+    <div class="cap"><span class="n">4</span> Bảng cố vấn — Tổng quan <span class="note">logo bấm được → về Tổng quan · sidebar 7 mục</span></div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
-        <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span><span class="pill">TS. …Cố Vấn</span><span class="btn small">Đăng xuất</span>
+        <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span><span class="pill">TS. … · Cố vấn · HTTT</span><span class="btn small">Đăng xuất</span>
       </div>
       <div class="row">
         <div class="side">
           <div class="lbl">Điều hướng</div>
           <div class="nav">
-            <div class="on">▦ Tổng quan</div><div>◔ Sinh viên</div><div>⚑ Cảnh báo ①</div><div>▤ Can thiệp</div><div>💬 Tin nhắn ①</div>
+            <div class="on">▦ Tổng quan</div><div>◔ Sinh viên</div><div>▥ Bảng điểm</div><div>⚑ Cảnh báo ①</div><div>▤ Can thiệp</div><div>💬 Tin nhắn ①</div><div>◎ Đánh giá</div>
           </div>
         </div>
         <div class="flex1 col">
@@ -258,7 +226,7 @@
           </div>
           <div class="row">
             <div class="box pad flex1 col" style="flex-basis:55%">
-              <div class="h" style="font-size:14px">Xu hướng rủi ro (14 ngày)</div>
+              <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Xu hướng rủi ro (14 ngày)</div><span class="btn small">Tính lại rủi ro</span></div>
               <div class="box imgx center" style="min-height:90px">Biểu đồ đường</div>
             </div>
             <div class="box pad flex1" style="flex-basis:45%">
@@ -279,30 +247,66 @@
           </div>
         </div>
       </div>
+      <div class="anno"><b>Cảnh báo tổ hợp:</b> ngoài điểm rủi ro tổng, hệ thống tự bắn cảnh báo khi chạm quy tắc: GPA giảm ≥ 0.5 so kỳ trước · ≥ 2 môn chưa đạt · điểm danh &lt; 75% · LMS &lt; 40 (ghi rõ lý do trong cảnh báo).</div>
     </div>
   </section>
 
-  <!-- 6. STUDENT LIST -->
+  <!-- 5. STUDENT LIST -->
   <section class="screen">
-    <div class="cap"><span class="n">6</span> Bảng cố vấn — Danh sách sinh viên <span class="note">tìm kiếm · lọc theo mức · nhập CSV</span></div>
+    <div class="cap"><span class="n">5</span> Bảng cố vấn — Danh sách sinh viên <span class="note">lọc Khóa / Ngành / Môn · xuất báo cáo</span></div>
     <div class="frame col">
       <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div class="on">◔ Sinh viên</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div></div></div>
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div class="on">◔ Sinh viên</div><div>▥ Bảng điểm</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div><div>◎ Đánh giá</div></div></div>
         <div class="flex1 col">
-          <div class="row" style="justify-content:space-between">
+          <div class="row" style="justify-content:space-between;flex-wrap:wrap">
             <div class="h">Sinh viên <span class="muted small">· 24 sinh viên</span></div>
-            <div class="row g8"><span class="btn small">Nhập CSV</span><span class="btn small">Tải mẫu</span><span class="btn pri small">+ Thêm sinh viên</span></div>
+            <div class="row g8" style="flex-wrap:wrap"><span class="btn small">Nhập CSV</span><span class="btn small">Tải mẫu</span><span class="btn small">Nhập điểm</span><span class="btn small">Tải mẫu điểm</span><span class="btn small">Xuất báo cáo</span><span class="btn pri small">+ Thêm sinh viên</span></div>
           </div>
-          <div class="row g8"><div class="field flex1">🔍 Tìm theo tên hoặc mã SV…</div></div>
-          <div class="row g8"><span class="chip on">Tất cả</span><span class="chip">Nghiêm trọng</span><span class="chip">Cao</span><span class="chip">Trung bình</span><span class="chip">Thấp</span></div>
+          <div class="row g8" style="flex-wrap:wrap">
+            <div class="field flex1" style="min-width:170px">🔍 Tìm theo tên hoặc mã SV…</div>
+            <div class="field sel" style="width:120px">Tất cả khóa</div>
+            <div class="field sel" style="width:130px">Tất cả ngành</div>
+            <div class="field sel" style="width:150px">Tất cả môn</div>
+          </div>
+          <div class="row g8"><span class="chip on">Tất cả</span><span class="chip">Nghiêm trọng</span><span class="chip">Cao</span><span class="chip">Trung bình</span><span class="chip">Thấp</span><span class="btn small">Xóa lọc</span></div>
+          <div class="small muted">Hiển thị 3/24 sinh viên</div>
           <div class="box pad">
             <table class="wf">
-              <tr><th>Sinh viên</th><th>Mã SV</th><th>CPA</th><th>Điểm rủi ro</th><th>Mức</th><th>Dự đoán</th><th>Cảnh báo</th></tr>
-              <tr><td>Hoàng Văn Em</td><td>SV004</td><td>0.23</td><td><div class="bar"><i style="width:70%"></i></div> 70.3</td><td><span class="pill">Cao</span></td><td><span class="pill">Đang báo động</span></td><td><span class="pill">Mở</span></td></tr>
-              <tr><td>Lê Văn Cường</td><td>SV002</td><td>1.13</td><td><div class="bar"><i style="width:36%"></i></div> 36.1</td><td><span class="pill">Thấp</span></td><td><span class="pill">Nguy cơ cao</span></td><td>—</td></tr>
-              <tr><td>Phạm Thị Dung</td><td>SV003</td><td>2.30</td><td><div class="bar"><i style="width:6%"></i></div> 3.2</td><td><span class="pill">Thấp</span></td><td><span class="pill">An toàn</span></td><td>—</td></tr>
+              <tr><th>Sinh viên</th><th>Mã SV</th><th>Khóa</th><th>CPA</th><th>Điểm rủi ro</th><th>Mức</th><th>Dự đoán</th><th>Cảnh báo</th></tr>
+              <tr><td>Hoàng Văn Em <div class="small muted">HTTT</div></td><td>SV004</td><td>K69</td><td>0.23</td><td><div class="bar"><i style="width:70%"></i></div> 70.3</td><td><span class="pill">Cao</span></td><td><span class="pill">Đang báo động</span></td><td><span class="pill">Mở</span></td></tr>
+              <tr><td>Lê Văn Cường <div class="small muted">KTPM</div></td><td>SV002</td><td>K70</td><td>1.13</td><td><div class="bar"><i style="width:36%"></i></div> 36.1</td><td><span class="pill">Thấp</span></td><td><span class="pill">Nguy cơ cao</span></td><td>—</td></tr>
+              <tr><td>Phạm Thị Dung <div class="small muted">HTTT</div></td><td>SV003</td><td>K71</td><td>2.30</td><td><div class="bar"><i style="width:6%"></i></div> 3.2</td><td><span class="pill">Thấp</span></td><td><span class="pill">An toàn</span></td><td>—</td></tr>
             </table>
           </div>
+          <div class="anno"><b>Bộ lọc môn học:</b> chọn 1 môn → giữ lại mọi sinh viên có học môn đó, bất kể ngành/khóa (đúng mô hình lớp học phần trộn). Kết hợp được với lọc Khóa + Ngành + mức rủi ro. “Xuất báo cáo” tải CSV theo danh sách đang lọc.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. GRADEBOOK -->
+  <section class="screen">
+    <div class="cap"><span class="n">6</span> Bảng cố vấn — Bảng điểm theo môn <span class="note">nhập cả lớp · xuất Excel · khóa điểm</span></div>
+    <div class="frame col">
+      <div class="row">
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div>◔ Sinh viên</div><div class="on">▥ Bảng điểm</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div><div>◎ Đánh giá</div></div></div>
+        <div class="flex1 col">
+          <div class="row g8" style="flex-wrap:wrap;justify-content:space-between">
+            <div class="field sel" style="width:270px">INT1008 — Nhập môn lập trình · HK1 2025-2026</div>
+            <div class="row g8"><span class="btn small">Xuất Excel</span><span class="btn small">🔒 Khóa điểm</span><span class="btn pri small">Lưu tất cả</span></div>
+          </div>
+          <div class="box pad">
+            <table class="wf">
+              <tr><th>MSSV</th><th>Sinh viên</th><th>Khóa · Ngành</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Chữ</th></tr>
+              <tr><td>SV004</td><td>Hoàng Văn Em</td><td class="small">K69 · HTTT</td>
+                <td><div class="field" style="width:52px;height:26px">3.0</div></td><td><div class="field" style="width:52px;height:26px">2.5</div></td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td></tr>
+              <tr><td>SV002</td><td>Lê Văn Cường</td><td class="small">K70 · KTPM</td>
+                <td><div class="field" style="width:52px;height:26px">6.5</div></td><td><div class="field" style="width:52px;height:26px">7.0</div></td><td><div class="field" style="width:52px;height:26px">6.0</div></td><td>6.4</td><td><span class="pill">C</span></td></tr>
+              <tr><td>SV003</td><td>Phạm Thị Dung</td><td class="small">K71 · HTTT</td>
+                <td><div class="field" style="width:52px;height:26px">8.0</div></td><td><div class="field" style="width:52px;height:26px">8.5</div></td><td><div class="field" style="width:52px;height:26px">9.0</div></td><td>8.6</td><td><span class="pill">A</span></td></tr>
+            </table>
+          </div>
+          <div class="anno"><b>Đúng lớp học phần thực tế:</b> một môn gom mọi sinh viên đang học — nhiều khóa, nhiều ngành. Điểm 0–10, kiểm tra khi nhập. “Khóa điểm” chốt cả môn (ô nhập bị khóa 🔒). Cố vấn chỉ lưu được SV mình phụ trách; nhập cả lớp dùng tài khoản Quản lý — hoặc nạp từ hệ thống trường qua Nhập CSV / Đồng bộ SIS-LMS.</div>
         </div>
       </div>
     </div>
@@ -310,7 +314,7 @@
 
   <!-- 7. STUDENT DETAIL -->
   <section class="screen">
-    <div class="cap"><span class="n">7</span> Bảng cố vấn — Chi tiết sinh viên <span class="note">nhập điểm · rủi ro · cảnh báo · can thiệp · chat</span></div>
+    <div class="cap"><span class="n">7</span> Bảng cố vấn — Chi tiết sinh viên <span class="note">điểm · rủi ro · can thiệp · chat · duyệt lịch hẹn</span></div>
     <div class="frame col">
       <div class="small muted">← Danh sách sinh viên</div>
       <div class="row">
@@ -319,7 +323,7 @@
           <div class="small mt8">Điểm rủi ro: <b>70.3</b> <span class="pill">Cao</span></div>
           <div class="small muted">📧 email liên hệ (mailto)</div>
         </div>
-        <div class="box pad flex1" style="flex-basis:34%"><div class="lbl">Yếu tố rủi ro</div>
+        <div class="box pad flex1" style="flex-basis:34%"><div class="lbl">Yếu tố rủi ro (giải thích được)</div>
           <div class="small">GPA thấp <div class="bar"><i style="width:80%"></i></div></div>
           <div class="small mt8">Điểm danh <div class="bar"><i style="width:45%"></i></div></div>
           <div class="small mt8">Hoạt động LMS <div class="bar"><i style="width:30%"></i></div></div>
@@ -331,7 +335,7 @@
           <div class="btn blk mt8">Lưu & tính lại rủi ro</div>
         </div>
       </div>
-      <div class="box pad"><div class="h" style="font-size:14px">Nhập / sửa điểm</div>
+      <div class="box pad"><div class="h" style="font-size:14px">Nhập / sửa điểm từng môn</div>
         <table class="wf mt8">
           <tr><th>Môn</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Chữ</th><th></th></tr>
           <tr><td>Nhập môn lập trình</td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td><div class="field" style="width:52px;height:26px">2.5</div></td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td><td><span class="btn small">Lưu</span></td></tr>
@@ -346,10 +350,95 @@
         </div>
         <div class="box pad flex1 col"><div class="h" style="font-size:14px">Gửi thông báo / Trao đổi</div>
           <div class="field">Tiêu đề</div>
-          <div class="field" style="height:44px">Nội dung thông báo…</div>
+          <div class="field" style="height:38px">Nội dung thông báo…</div>
           <div class="btn blk">Gửi thông báo cho sinh viên</div>
-          <div class="box pad small" style="min-height:40px">💬 khung chat trực tiếp với sinh viên</div>
+          <div class="box pad small" style="min-height:34px">💬 khung chat trực tiếp với sinh viên</div>
         </div>
+      </div>
+      <div class="box pad"><div class="h" style="font-size:14px">Lịch hẹn cố vấn</div>
+        <div class="box fill2 pad small row mt8" style="justify-content:space-between">
+          <span><b>14/07/2026 10:00</b> — xin tư vấn môn Giải tích</span>
+          <span><span class="pill">Chờ duyệt</span> <span class="btn pri small">Xác nhận</span> <span class="btn small">Hủy</span></span></div>
+        <div class="box fill2 pad small row mt8" style="justify-content:space-between">
+          <span><b>10/07/2026 15:00</b> — kế hoạch cải thiện GPA</span>
+          <span><span class="pill">Đã xác nhận</span> <span class="btn small">Đã gặp</span> <span class="btn small">Hủy</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. EVALUATION + CONFIG + SYNC -->
+  <section class="screen">
+    <div class="cap"><span class="n">8</span> Bảng cố vấn — Đánh giá <span class="note">độ chính xác · hiệu quả can thiệp · cấu hình · đồng bộ SIS/LMS</span></div>
+    <div class="frame col">
+      <div class="row">
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div>◔ Sinh viên</div><div>▥ Bảng điểm</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div><div class="on">◎ Đánh giá</div></div></div>
+        <div class="flex1 col">
+          <div class="row">
+            <div class="box pad flex1"><div class="h" style="font-size:14px">Độ chính xác cảnh báo</div>
+              <div class="small muted">So cảnh báo (Trung bình+) với chuẩn “học lực yếu” (CPA &lt; 2.0)</div>
+              <div class="kpis mt8" style="grid-template-columns:repeat(4,1fr)">
+                <div class="kpi"><div class="k">Precision</div><div class="v">83%</div></div>
+                <div class="kpi"><div class="k">Recall</div><div class="v">71%</div></div>
+                <div class="kpi"><div class="k">F1</div><div class="v">0.77</div></div>
+                <div class="kpi"><div class="k">Accuracy</div><div class="v">88%</div></div>
+              </div>
+              <div class="small muted mt8">Ma trận nhầm lẫn: TP 5 · FP 1 · FN 2 · TN 16</div>
+            </div>
+            <div class="box pad flex1"><div class="h" style="font-size:14px">Hiệu quả can thiệp</div>
+              <div class="small muted">Điểm rủi ro trước / sau mỗi can thiệp đã ghi nhận</div>
+              <div class="kpis mt8" style="grid-template-columns:repeat(3,1fr)">
+                <div class="kpi"><div class="k">Đo được</div><div class="v">8</div></div>
+                <div class="kpi"><div class="k">Có cải thiện</div><div class="v">6</div></div>
+                <div class="kpi"><div class="k">Δ trung bình</div><div class="v">−9.4</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="box pad flex1"><div class="h" style="font-size:14px">Cấu hình rủi ro <span class="small muted">(Quản lý chỉnh · cố vấn chỉ xem)</span></div>
+              <div class="row g8 mt8"><div class="flex1"><div class="flabel">GPA</div><div class="field">0.40</div></div>
+                <div class="flex1"><div class="flabel">Điểm danh</div><div class="field">0.30</div></div>
+                <div class="flex1"><div class="flabel">LMS</div><div class="field">0.15</div></div>
+                <div class="flex1"><div class="flabel">Môn trượt</div><div class="field">0.15</div></div></div>
+              <div class="row g8 mt8"><div class="flex1"><div class="flabel">Ngưỡng TB</div><div class="field">40</div></div>
+                <div class="flex1"><div class="flabel">Ngưỡng Cao</div><div class="field">65</div></div>
+                <div class="flex1"><div class="flabel">Ngưỡng N.trọng</div><div class="field">85</div></div></div>
+              <div class="btn blk mt8">Lưu cấu hình</div>
+            </div>
+            <div class="box pad flex1"><div class="h" style="font-size:14px">Đồng bộ SIS/LMS</div>
+              <div class="small muted">Tự cập nhật chuyên cần & hoạt động LMS theo MSSV</div>
+              <div class="row g8 mt8"><div class="field flex1">https://docs.google.com/…/pub?output=csv</div><div class="btn pri">Kéo & đồng bộ</div></div>
+              <div class="small muted mt8">Hoặc dán CSV trực tiếp:</div>
+              <div class="field" style="height:44px;font-family:monospace">student_code,attendance_rate,lms_activity_score…</div>
+              <div class="row g8 mt8"><div class="btn">Áp dụng CSV</div><span class="small muted">Cập nhật 10 · bỏ qua 0 · nhận 10 dòng</span></div>
+            </div>
+          </div>
+          <div class="anno"><b>Phân quyền đồng bộ:</b> cố vấn chỉ đồng bộ sinh viên mình phụ trách; Quản lý đồng bộ tất cả. Sau đồng bộ hệ thống tự tính lại rủi ro toàn bộ.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. PROVISIONING -->
+  <section class="screen">
+    <div class="cap"><span class="n">9</span> Cấp tài khoản sinh viên <span class="note">Thêm 1 SV · Nhập CSV hàng loạt · xem trước điểm</span></div>
+    <div class="frame row">
+      <div class="box pad col flex1">
+        <div class="lbl">Thêm 1 sinh viên (trường cấp tài khoản)</div>
+        <div class="row g8"><div class="flex1"><div class="flabel">Họ và tên</div><div class="field">Nguyễn Văn A</div></div>
+          <div class="flex1"><div class="flabel">MSSV</div><div class="field">24010011</div></div></div>
+        <div><div class="flabel">Email (nhận thông báo & mã đặt lại MK)</div><div class="field">sv24010011@gmail.com</div></div>
+        <div class="row g8"><div class="flex1"><div class="flabel">Khóa</div><div class="field">K70</div></div>
+          <div class="flex1"><div class="flabel">Ngành</div><div class="field sel">— Chọn ngành —</div></div></div>
+        <div><div class="flabel">Mật khẩu ban đầu (≥ 6 ký tự)</div><div class="field">••••••••</div></div>
+        <div class="btn pri blk">Tạo tài khoản</div>
+      </div>
+      <div class="box pad col flex1">
+        <div class="lbl">Nhập CSV hàng loạt & xem trước điểm</div>
+        <div class="row g8"><span class="btn small">Nhập CSV</span><span class="btn small">Tải mẫu</span><span class="btn small">Nhập điểm</span><span class="btn small">Tải mẫu điểm</span></div>
+        <div class="box fill2 pad small">📄 diem-mau.csv — <span class="pill">Hợp lệ 28</span> <span class="pill">Lỗi 2</span></div>
+        <div class="box pad small" style="min-height:34px;color:var(--mut)">Dòng 12: điểm CK &gt; 10 · Dòng 19: thiếu MSSV…</div>
+        <div class="row g8"><div class="btn pri">Xác nhận nhập (28)</div><div class="btn">Hủy</div><div class="btn">Tải danh sách lỗi</div></div>
+        <div class="anno"><b>Bảo mật:</b> tài khoản tạo qua endpoint máy chủ dùng service_role (không lộ ra trình duyệt), bắt buộc JWT cố vấn/quản lý, email xác nhận sẵn, vai trò luôn là “student”. Điểm nhập theo MSSV — xem trước & kiểm lỗi trước khi ghi.</div>
       </div>
     </div>
   </section>
