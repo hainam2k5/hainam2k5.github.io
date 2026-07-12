@@ -113,18 +113,32 @@ export default function AdvisorPage() {
       factor_gpa: result.factor_gpa, factor_attendance: result.factor_attendance,
       factor_lms: result.factor_lms, factor_failed_credits: result.factor_failed_credits,
     });
+    // Compound rules — early signals that fire an alert even when the composite
+    // score is still low (e.g. a sharp GPA drop, repeated fails, disengagement).
+    const sems = bySemester(cs).filter((x) => x.gpa !== null);
+    const gpaDrop = sems.length >= 2 ? (sems[1].gpa as number) - (sems[0].gpa as number) : 0; // sems newest-first
+    const reasons: string[] = [];
+    if (gpaDrop >= 0.5) reasons.push(t("alert.rGpaDrop", { d: gpaDrop.toFixed(2) }));
+    if (failed >= 2) reasons.push(t("alert.rFailed", { n: failed }));
+    if (student.attendance_rate < 75) reasons.push(t("alert.rAttendance", { att: Math.round(student.attendance_rate) }));
+    if (student.lms_activity_score < 40) reasons.push(t("alert.rLms", { lms: Math.round(student.lms_activity_score) }));
+
     const openAlert = core.alerts.find((a) => a.student_id === student.id && a.status === "Open");
-    if (alertWorthy(result.level) && !openAlert) {
+    if ((alertWorthy(result.level) || reasons.length > 0) && !openAlert) {
+      // A compound-only trigger (score still Low) is floored at Medium so it reads
+      // as a genuine alert.
+      const alertLevel = alertWorthy(result.level) ? result.level : "Medium";
       await sb!.from("alerts").insert({
         student_id: student.id, advisor_id: student.advisor_id || me!.id,
-        risk_level: result.level, score_at_alert: result.score, status: "Open",
+        risk_level: alertLevel, score_at_alert: result.score, status: "Open",
       });
+      const body = t("alert.autoBody", { level: riskLabel(t, alertLevel) })
+        + (reasons.length ? " " + t("alert.reasonsLabel") + " " + reasons.join("; ") + "." : "");
       await sb!.from("notifications").insert({
         student_id: student.id, sender_id: me!.id, type: "alert",
-        title: t("alert.autoTitle"), body: t("alert.autoBody", { level: riskLabel(t, result.level) }),
+        title: t("alert.autoTitle"), body,
       });
-      // Best-effort awareness email to the student (no-op if email unconfigured
-      // or no address). Only fires for a NEW alert, so no repeated spam.
+      // Best-effort awareness email to the student (no-op if email unconfigured).
       if (student.email) {
         try {
           const { data: sess } = await sb!.auth.getSession();
@@ -133,7 +147,7 @@ export default function AdvisorPage() {
             void fetch("/api/notify-alert", {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ studentId: student.id, level: result.level, lang }),
+              body: JSON.stringify({ studentId: student.id, level: alertLevel, lang }),
             }).catch(() => {});
           }
         } catch { /* ignore email errors */ }
@@ -937,6 +951,27 @@ export default function AdvisorPage() {
     );
   };
 
+  // Export a risk report (CSV) for the current student list — for staff meetings.
+  function exportReport(list: { s: Profile; a: Agg }[]) {
+    if (!list.length) return;
+    const esc = (v: unknown) => { const x = String(v ?? ""); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    const header = "student_code,full_name,program,cohort,cpa,credits,failed,risk_score,risk_level,prediction,open_alert,attendance_rate,lms_activity";
+    const lines = list.map(({ s, a }) => {
+      const pred = predOf(s, a);
+      return [
+        s.student_code || "", s.full_name || "", s.program || "", s.cohort || "",
+        a.cpa === null ? "" : a.cpa.toFixed(2), a.credits, a.failed,
+        a.risk ? a.risk.score : "", a.risk ? riskLabel(t, a.risk.risk_level) : t("risk.Unscored"),
+        t("predict.band." + pred.band), openAlertFor(s.id) ? "1" : "", s.attendance_rate, s.lms_activity_score,
+      ].map(esc).join(",");
+    });
+    const csv = "﻿" + [header, ...lines].join("\r\n") + "\r\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "bao_cao_rui_ro_" + new Date().toISOString().slice(0, 10) + ".csv"; a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const renderStudents = () => {
     const levels = ["", "Critical", "High", "Medium", "Low"];
     let rows = students.map((s) => ({ s, a: agg(s) }));
@@ -956,6 +991,7 @@ export default function AdvisorPage() {
               <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) prepareGrades(f); e.target.value = ""; }} />
             </label>
             <button className="btn" onClick={downloadGradeTemplate}>{t("adv.gradeTemplate")}</button>
+            <button className="btn" onClick={() => exportReport(rows)}><Icon name="notes" size={16} /> {t("adv.exportReport")}</button>
             <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
           </div>
         </div>
