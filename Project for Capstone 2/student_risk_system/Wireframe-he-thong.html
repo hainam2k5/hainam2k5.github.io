@@ -86,9 +86,6 @@
   .kpi .v{font-size:20px;font-weight:800;color:var(--dark);margin-top:6px}
   .flex1{flex:1}.g8{gap:8px}.mt8{margin-top:8px}.mt12{margin-top:12px}
   .small{font-size:11px}
-  .anno{font-size:11.5px;color:#a05a00;background:#fff7e6;border:1px dashed #e0b25a;border-radius:5px;
-    padding:6px 9px;margin-top:10px}
-  .anno b{color:#7a4300}
   footer.doc{text-align:center;color:var(--faint);font-size:11.5px;margin-top:10px}
   @media print{body{background:#fff}.screen{break-inside:avoid;box-shadow:none}}
 </style>
@@ -127,10 +124,9 @@
           <div><div class="flabel">Mật khẩu</div><div class="field">••••••••</div></div>
           <div class="row" style="justify-content:flex-end"><span class="small muted">Quên mật khẩu?</span></div>
           <div class="btn pri blk">Đăng nhập</div>
-          <div class="small muted" style="text-align:center">Tài khoản do nhà trường cấp. Nếu chưa có, liên hệ cố vấn học tập.</div>
+          <div class="small muted" style="text-align:center">Tài khoản do nhà trường cấp. Nếu chưa có, hãy liên hệ cố vấn học tập.</div>
         </div>
       </div>
-      <div class="anno"><b>Không có đăng ký công khai:</b> tài khoản sinh viên được cấp qua màn “Cấp tài khoản” (màn 9); cố vấn/quản lý do quản trị tạo trong Supabase. Đăng nhập xong hệ thống tự vào đúng giao diện theo vai trò (student / advisor / manager).</div>
     </div>
   </section>
 
@@ -198,7 +194,6 @@
           <div class="box fill2 pad small row" style="justify-content:space-between"><span>14/07 10:00 — xin tư vấn môn Giải tích</span><span><span class="pill">Chờ duyệt</span> <span class="btn small">Hủy</span></span></div>
         </div>
       </div>
-      <div class="anno"><b>Lịch hẹn:</b> chỉ hiện khi sinh viên đã có cố vấn phụ trách. Trạng thái: Chờ duyệt → Đã xác nhận → Đã gặp (hoặc Hủy) — đồng bộ realtime hai chiều với cố vấn.</div>
     </div>
   </section>
 
@@ -247,7 +242,6 @@
           </div>
         </div>
       </div>
-      <div class="anno"><b>Cảnh báo tổ hợp:</b> ngoài điểm rủi ro tổng, hệ thống tự bắn cảnh báo khi chạm quy tắc: GPA giảm ≥ 0.5 so kỳ trước · ≥ 2 môn chưa đạt · điểm danh &lt; 75% · LMS &lt; 40 (ghi rõ lý do trong cảnh báo).</div>
     </div>
   </section>
 
@@ -278,7 +272,6 @@
               <tr><td>Phạm Thị Dung <div class="small muted">HTTT</div></td><td>SV003</td><td>K71</td><td>2.30</td><td><div class="bar"><i style="width:6%"></i></div> 3.2</td><td><span class="pill">Thấp</span></td><td><span class="pill">An toàn</span></td><td>—</td></tr>
             </table>
           </div>
-          <div class="anno"><b>Bộ lọc môn học:</b> chọn 1 môn → giữ lại mọi sinh viên có học môn đó, bất kể ngành/khóa (đúng mô hình lớp học phần trộn). Kết hợp được với lọc Khóa + Ngành + mức rủi ro. “Xuất báo cáo” tải CSV theo danh sách đang lọc.</div>
         </div>
       </div>
     </div>
@@ -306,7 +299,6 @@
                 <td><div class="field" style="width:52px;height:26px">8.0</div></td><td><div class="field" style="width:52px;height:26px">8.5</div></td><td><div class="field" style="width:52px;height:26px">9.0</div></td><td>8.6</td><td><span class="pill">A</span></td></tr>
             </table>
           </div>
-          <div class="anno"><b>Đúng lớp học phần thực tế:</b> một môn gom mọi sinh viên đang học — nhiều khóa, nhiều ngành. Điểm 0–10, kiểm tra khi nhập. “Khóa điểm” chốt cả môn (ô nhập bị khóa 🔒). Cố vấn chỉ lưu được SV mình phụ trách; nhập cả lớp dùng tài khoản Quản lý — hoặc nạp từ hệ thống trường qua Nhập CSV / Đồng bộ SIS-LMS.</div>
         </div>
       </div>
     </div>
@@ -412,36 +404,11 @@
               <div class="row g8 mt8"><div class="btn">Áp dụng CSV</div><span class="small muted">Cập nhật 10 · bỏ qua 0 · nhận 10 dòng</span></div>
             </div>
           </div>
-          <div class="anno"><b>Phân quyền đồng bộ:</b> cố vấn chỉ đồng bộ sinh viên mình phụ trách; Quản lý đồng bộ tất cả. Sau đồng bộ hệ thống tự tính lại rủi ro toàn bộ.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 9. PROVISIONING -->
-  <section class="screen">
-    <div class="cap"><span class="n">9</span> Cấp tài khoản sinh viên <span class="note">Thêm 1 SV · Nhập CSV hàng loạt · xem trước điểm</span></div>
-    <div class="frame row">
-      <div class="box pad col flex1">
-        <div class="lbl">Thêm 1 sinh viên (trường cấp tài khoản)</div>
-        <div class="row g8"><div class="flex1"><div class="flabel">Họ và tên</div><div class="field">Nguyễn Văn A</div></div>
-          <div class="flex1"><div class="flabel">MSSV</div><div class="field">24010011</div></div></div>
-        <div><div class="flabel">Email (nhận thông báo & mã đặt lại MK)</div><div class="field">sv24010011@gmail.com</div></div>
-        <div class="row g8"><div class="flex1"><div class="flabel">Khóa</div><div class="field">K70</div></div>
-          <div class="flex1"><div class="flabel">Ngành</div><div class="field sel">— Chọn ngành —</div></div></div>
-        <div><div class="flabel">Mật khẩu ban đầu (≥ 6 ký tự)</div><div class="field">••••••••</div></div>
-        <div class="btn pri blk">Tạo tài khoản</div>
-      </div>
-      <div class="box pad col flex1">
-        <div class="lbl">Nhập CSV hàng loạt & xem trước điểm</div>
-        <div class="row g8"><span class="btn small">Nhập CSV</span><span class="btn small">Tải mẫu</span><span class="btn small">Nhập điểm</span><span class="btn small">Tải mẫu điểm</span></div>
-        <div class="box fill2 pad small">📄 diem-mau.csv — <span class="pill">Hợp lệ 28</span> <span class="pill">Lỗi 2</span></div>
-        <div class="box pad small" style="min-height:34px;color:var(--mut)">Dòng 12: điểm CK &gt; 10 · Dòng 19: thiếu MSSV…</div>
-        <div class="row g8"><div class="btn pri">Xác nhận nhập (28)</div><div class="btn">Hủy</div><div class="btn">Tải danh sách lỗi</div></div>
-        <div class="anno"><b>Bảo mật:</b> tài khoản tạo qua endpoint máy chủ dùng service_role (không lộ ra trình duyệt), bắt buộc JWT cố vấn/quản lý, email xác nhận sẵn, vai trò luôn là “student”. Điểm nhập theo MSSV — xem trước & kiểm lỗi trước khi ghi.</div>
-      </div>
-    </div>
-  </section>
 
   <footer class="doc">Wireframe low-fidelity · dùng để phác thảo bố cục & luồng, không phải bản màu cuối cùng ·
   Mở bằng trình duyệt, có thể In → Lưu thành PDF.</footer>
