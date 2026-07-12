@@ -52,6 +52,10 @@ export default function AdvisorPage() {
   // Configurable risk weights/thresholds (loaded from risk_config; default fallback).
   const [riskCfg, setRiskCfg] = useState<RiskConfig>(DEFAULT_CONFIG);
   const [cfgSaving, setCfgSaving] = useState(false);
+  const [syncUrl, setSyncUrl] = useState("");
+  const [syncCsv, setSyncCsv] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
@@ -377,6 +381,31 @@ export default function AdvisorPage() {
     if (r?.error === "admin_not_configured") return t("toast.adminNotConfigured");
     if (r?.error === "forbidden" || r?.error === "unauthorized") return t("toast.notConfigured");
     return String(r?.error || "error");
+  }
+
+  // Pull attendance % + LMS activity from an external SIS/LMS export and apply.
+  async function syncLms(source: "url" | "csv") {
+    if (!sb) return;
+    if (source === "url" && !syncUrl.trim()) return toast(t("sync.needUrl"), "error");
+    if (source === "csv" && !syncCsv.trim()) return toast(t("sync.needCsv"), "error");
+    const { data: sess } = await sb.auth.getSession();
+    const token = sess.session?.access_token;
+    if (!token) return toast(t("toast.notConfigured"), "error");
+    setSyncing(true); setSyncResult(null);
+    try {
+      const res = await fetch("/api/admin/sync-lms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(source === "url" ? { url: syncUrl.trim() } : { csv: syncCsv }),
+      });
+      const r = await res.json().catch(() => ({ ok: false, error: "bad response" }));
+      if (!r.ok) { toast(adminErr(r), "error"); setSyncResult(t("sync.failed") + " " + adminErr(r)); return; }
+      setSyncResult(t("sync.result", { updated: r.updated, skipped: r.skipped, received: r.received }));
+      toast(t("sync.done", { n: r.updated }), "success");
+      await recomputeAll();     // re-fetch new metrics + recompute risk from them
+    } finally {
+      setSyncing(false);
+    }
   }
 
   async function addStudent(s: NewStudent) {
@@ -778,6 +807,35 @@ export default function AdvisorPage() {
     );
   };
 
+  // Automatic SIS/LMS integration: pull attendance % + LMS activity from an
+  // external export (a published Google-Sheet CSV, or pasted CSV) and update
+  // each student, then recompute risk. Advisors sync their own advisees only.
+  const renderSyncCard = () => (
+    <div className="card">
+      <div className="card-head">
+        <div className="card-title"><Icon name="refresh" /> {t("sync.title")}</div>
+        <div className="card-sub">{t("sync.sub")}</div>
+      </div>
+      <div className="muted-note" style={{ marginBottom: 8 }}>{t("sync.help")}</div>
+      <div className="field"><label>{t("sync.url")}</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input type="url" placeholder="https://docs.google.com/.../pub?output=csv" value={syncUrl}
+            onChange={(e) => setSyncUrl(e.target.value)} style={{ flex: 1 }} />
+          <button className="btn btn-primary" disabled={syncing} onClick={() => syncLms("url")} style={{ flex: "none" }}>
+            {syncing ? t("loading") : t("sync.pull")}</button>
+        </div>
+      </div>
+      <div className="card-sub" style={{ margin: "8px 0 6px" }}>{t("sync.orPaste")}</div>
+      <textarea rows={4} placeholder={"student_code,attendance_rate,lms_activity_score\n22000001,88,72"}
+        value={syncCsv} onChange={(e) => setSyncCsv(e.target.value)}
+        style={{ width: "100%", fontFamily: "monospace", fontSize: 12 }} />
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+        <button className="btn" disabled={syncing} onClick={() => syncLms("csv")}>{syncing ? t("loading") : t("sync.applyCsv")}</button>
+        {syncResult && <span className="muted-note">{syncResult}</span>}
+      </div>
+    </div>
+  );
+
   // Evaluation: (1) accuracy of the risk alert vs a ground-truth "weak standing"
   // label (CPA < 2.0), reported as precision/recall/F1; (2) whether logged
   // interventions actually lowered risk (before vs after). Both from loaded data.
@@ -822,6 +880,7 @@ export default function AdvisorPage() {
         </div>
 
         {renderConfigCard()}
+        {renderSyncCard()}
 
         <div className="card">
           <div className="card-head">
