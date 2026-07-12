@@ -14,7 +14,7 @@ import {
   IV_TYPES, NewCourse, NewStudent,
 } from "@/components/advisor-parts";
 import { predictAlarm, type Prediction } from "@/lib/predict";
-import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
+import type { Profile, Course, RiskScore, Alert, Intervention, Message, Appointment } from "@/lib/types";
 
 type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation" | "gradebook";
 // A validated grade row ready to write (used by the grade-import preview).
@@ -52,10 +52,16 @@ export default function AdvisorPage() {
   // Configurable risk weights/thresholds (loaded from risk_config; default fallback).
   const [riskCfg, setRiskCfg] = useState<RiskConfig>(DEFAULT_CONFIG);
   const [cfgSaving, setCfgSaving] = useState(false);
+  const [syncUrl, setSyncUrl] = useState("");
+  const [syncCsv, setSyncCsv] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
 
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
   const [detailReply, setDetailReply] = useState("");
+  const [detailAppts, setDetailAppts] = useState<Appointment[]>([]);
+  const [apptTick, setApptTick] = useState(0);
   const [allMsgs, setAllMsgs] = useState<Message[]>([]);
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   const [reply, setReply] = useState("");
@@ -113,18 +119,32 @@ export default function AdvisorPage() {
       factor_gpa: result.factor_gpa, factor_attendance: result.factor_attendance,
       factor_lms: result.factor_lms, factor_failed_credits: result.factor_failed_credits,
     });
+    // Compound rules — early signals that fire an alert even when the composite
+    // score is still low (e.g. a sharp GPA drop, repeated fails, disengagement).
+    const sems = bySemester(cs).filter((x) => x.gpa !== null);
+    const gpaDrop = sems.length >= 2 ? (sems[1].gpa as number) - (sems[0].gpa as number) : 0; // sems newest-first
+    const reasons: string[] = [];
+    if (gpaDrop >= 0.5) reasons.push(t("alert.rGpaDrop", { d: gpaDrop.toFixed(2) }));
+    if (failed >= 2) reasons.push(t("alert.rFailed", { n: failed }));
+    if (student.attendance_rate < 75) reasons.push(t("alert.rAttendance", { att: Math.round(student.attendance_rate) }));
+    if (student.lms_activity_score < 40) reasons.push(t("alert.rLms", { lms: Math.round(student.lms_activity_score) }));
+
     const openAlert = core.alerts.find((a) => a.student_id === student.id && a.status === "Open");
-    if (alertWorthy(result.level) && !openAlert) {
+    if ((alertWorthy(result.level) || reasons.length > 0) && !openAlert) {
+      // A compound-only trigger (score still Low) is floored at Medium so it reads
+      // as a genuine alert.
+      const alertLevel = alertWorthy(result.level) ? result.level : "Medium";
       await sb!.from("alerts").insert({
         student_id: student.id, advisor_id: student.advisor_id || me!.id,
-        risk_level: result.level, score_at_alert: result.score, status: "Open",
+        risk_level: alertLevel, score_at_alert: result.score, status: "Open",
       });
+      const body = t("alert.autoBody", { level: riskLabel(t, alertLevel) })
+        + (reasons.length ? " " + t("alert.reasonsLabel") + " " + reasons.join("; ") + "." : "");
       await sb!.from("notifications").insert({
         student_id: student.id, sender_id: me!.id, type: "alert",
-        title: t("alert.autoTitle"), body: t("alert.autoBody", { level: riskLabel(t, result.level) }),
+        title: t("alert.autoTitle"), body,
       });
-      // Best-effort awareness email to the student (no-op if email unconfigured
-      // or no address). Only fires for a NEW alert, so no repeated spam.
+      // Best-effort awareness email to the student (no-op if email unconfigured).
       if (student.email) {
         try {
           const { data: sess } = await sb!.auth.getSession();
@@ -133,7 +153,7 @@ export default function AdvisorPage() {
             void fetch("/api/notify-alert", {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ studentId: student.id, level: result.level, lang }),
+              body: JSON.stringify({ studentId: student.id, level: alertLevel, lang }),
             }).catch(() => {});
           }
         } catch { /* ignore email errors */ }
@@ -203,6 +223,13 @@ export default function AdvisorPage() {
     sb.from("messages").select("*").eq("student_id", selectedId).order("created_at", { ascending: true })
       .then(({ data }) => setDetailMsgs((data as Message[]) || []));
   }, [view, selectedId, msgTick]);
+
+  // load this student's advisor appointments for the detail view
+  useEffect(() => {
+    if (view !== "student" || !selectedId || !sb) return;
+    sb.from("appointments").select("*").eq("student_id", selectedId).order("starts_at", { ascending: true })
+      .then(({ data }) => setDetailAppts((data as Appointment[]) || []));
+  }, [view, selectedId, apptTick]);
 
   // load messages for the messages view (and on realtime tick)
   useEffect(() => {
@@ -354,6 +381,31 @@ export default function AdvisorPage() {
     if (r?.error === "admin_not_configured") return t("toast.adminNotConfigured");
     if (r?.error === "forbidden" || r?.error === "unauthorized") return t("toast.notConfigured");
     return String(r?.error || "error");
+  }
+
+  // Pull attendance % + LMS activity from an external SIS/LMS export and apply.
+  async function syncLms(source: "url" | "csv") {
+    if (!sb) return;
+    if (source === "url" && !syncUrl.trim()) return toast(t("sync.needUrl"), "error");
+    if (source === "csv" && !syncCsv.trim()) return toast(t("sync.needCsv"), "error");
+    const { data: sess } = await sb.auth.getSession();
+    const token = sess.session?.access_token;
+    if (!token) return toast(t("toast.notConfigured"), "error");
+    setSyncing(true); setSyncResult(null);
+    try {
+      const res = await fetch("/api/admin/sync-lms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(source === "url" ? { url: syncUrl.trim() } : { csv: syncCsv }),
+      });
+      const r = await res.json().catch(() => ({ ok: false, error: "bad response" }));
+      if (!r.ok) { toast(adminErr(r), "error"); setSyncResult(t("sync.failed") + " " + adminErr(r)); return; }
+      setSyncResult(t("sync.result", { updated: r.updated, skipped: r.skipped, received: r.received }));
+      toast(t("sync.done", { n: r.updated }), "success");
+      await recomputeAll();     // re-fetch new metrics + recompute risk from them
+    } finally {
+      setSyncing(false);
+    }
   }
 
   async function addStudent(s: NewStudent) {
@@ -755,6 +807,35 @@ export default function AdvisorPage() {
     );
   };
 
+  // Automatic SIS/LMS integration: pull attendance % + LMS activity from an
+  // external export (a published Google-Sheet CSV, or pasted CSV) and update
+  // each student, then recompute risk. Advisors sync their own advisees only.
+  const renderSyncCard = () => (
+    <div className="card">
+      <div className="card-head">
+        <div className="card-title"><Icon name="refresh" /> {t("sync.title")}</div>
+        <div className="card-sub">{t("sync.sub")}</div>
+      </div>
+      <div className="muted-note" style={{ marginBottom: 8 }}>{t("sync.help")}</div>
+      <div className="field"><label>{t("sync.url")}</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input type="url" placeholder="https://docs.google.com/.../pub?output=csv" value={syncUrl}
+            onChange={(e) => setSyncUrl(e.target.value)} style={{ flex: 1 }} />
+          <button className="btn btn-primary" disabled={syncing} onClick={() => syncLms("url")} style={{ flex: "none" }}>
+            {syncing ? t("loading") : t("sync.pull")}</button>
+        </div>
+      </div>
+      <div className="card-sub" style={{ margin: "8px 0 6px" }}>{t("sync.orPaste")}</div>
+      <textarea rows={4} placeholder={"student_code,attendance_rate,lms_activity_score\n22000001,88,72"}
+        value={syncCsv} onChange={(e) => setSyncCsv(e.target.value)}
+        style={{ width: "100%", fontFamily: "monospace", fontSize: 12 }} />
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+        <button className="btn" disabled={syncing} onClick={() => syncLms("csv")}>{syncing ? t("loading") : t("sync.applyCsv")}</button>
+        {syncResult && <span className="muted-note">{syncResult}</span>}
+      </div>
+    </div>
+  );
+
   // Evaluation: (1) accuracy of the risk alert vs a ground-truth "weak standing"
   // label (CPA < 2.0), reported as precision/recall/F1; (2) whether logged
   // interventions actually lowered risk (before vs after). Both from loaded data.
@@ -799,6 +880,7 @@ export default function AdvisorPage() {
         </div>
 
         {renderConfigCard()}
+        {renderSyncCard()}
 
         <div className="card">
           <div className="card-head">
@@ -937,6 +1019,27 @@ export default function AdvisorPage() {
     );
   };
 
+  // Export a risk report (CSV) for the current student list — for staff meetings.
+  function exportReport(list: { s: Profile; a: Agg }[]) {
+    if (!list.length) return;
+    const esc = (v: unknown) => { const x = String(v ?? ""); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    const header = "student_code,full_name,program,cohort,cpa,credits,failed,risk_score,risk_level,prediction,open_alert,attendance_rate,lms_activity";
+    const lines = list.map(({ s, a }) => {
+      const pred = predOf(s, a);
+      return [
+        s.student_code || "", s.full_name || "", s.program || "", s.cohort || "",
+        a.cpa === null ? "" : a.cpa.toFixed(2), a.credits, a.failed,
+        a.risk ? a.risk.score : "", a.risk ? riskLabel(t, a.risk.risk_level) : t("risk.Unscored"),
+        t("predict.band." + pred.band), openAlertFor(s.id) ? "1" : "", s.attendance_rate, s.lms_activity_score,
+      ].map(esc).join(",");
+    });
+    const csv = "﻿" + [header, ...lines].join("\r\n") + "\r\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "bao_cao_rui_ro_" + new Date().toISOString().slice(0, 10) + ".csv"; a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const renderStudents = () => {
     const levels = ["", "Critical", "High", "Medium", "Low"];
     let rows = students.map((s) => ({ s, a: agg(s) }));
@@ -956,6 +1059,7 @@ export default function AdvisorPage() {
               <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) prepareGrades(f); e.target.value = ""; }} />
             </label>
             <button className="btn" onClick={downloadGradeTemplate}>{t("adv.gradeTemplate")}</button>
+            <button className="btn" onClick={() => exportReport(rows)}><Icon name="notes" size={16} /> {t("adv.exportReport")}</button>
             <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
           </div>
         </div>
@@ -995,6 +1099,14 @@ export default function AdvisorPage() {
       </>
     );
   };
+
+  async function setApptStatus(id: string, status: Appointment["status"]) {
+    if (!sb) return;
+    const { error } = await sb.from("appointments").update({ status }).eq("id", id);
+    if (error) { toast(t("appt.err"), "error"); return; }
+    setApptTick((n) => n + 1);
+    toast(t("appt.updated"), "success");
+  }
 
   const renderStudentDetail = () => {
     const student = selectedId ? studentById(selectedId) : null;
@@ -1143,6 +1255,27 @@ export default function AdvisorPage() {
                 <input type="text" value={detailReply} onChange={(e) => setDetailReply(e.target.value)} placeholder={t("chat.phAdvisor")} autoComplete="off" />
                 <button className="btn btn-primary" type="submit">{t("btn.send")}</button>
               </form>
+            </div>
+            <div className="card">
+              <div className="card-head"><div className="card-title"><Icon name="notes" /> {t("appt.title")}</div></div>
+              {detailAppts.length === 0 ? (
+                <div className="muted-note">{t("appt.none")}</div>
+              ) : (
+                detailAppts.map((ap) => (
+                  <div key={ap.id} className="spread" style={{ padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+                    <div>
+                      <div><b>{fmtDate(ap.starts_at, locale, true)}</b></div>
+                      {ap.note && <div className="muted-note" style={{ marginTop: 2 }}>{ap.note}</div>}
+                    </div>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center", flex: "none" }}>
+                      <span className={"pill " + (ap.status === "confirmed" ? "Resolved" : ap.status === "done" ? "Dismissed" : ap.status === "cancelled" ? "Open" : "Acknowledged")}>{t("appt.st." + ap.status)}</span>
+                      {ap.status === "requested" && <button className="btn btn-sm btn-primary" onClick={() => setApptStatus(ap.id, "confirmed")}>{t("appt.confirm")}</button>}
+                      {ap.status === "confirmed" && <button className="btn btn-sm" onClick={() => setApptStatus(ap.id, "done")}>{t("appt.done")}</button>}
+                      {(ap.status === "requested" || ap.status === "confirmed") && <button className="btn btn-sm" onClick={() => setApptStatus(ap.id, "cancelled")}>{t("appt.cancel")}</button>}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
