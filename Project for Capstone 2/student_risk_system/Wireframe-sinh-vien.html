@@ -17,12 +17,6 @@
   header.doc h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
   header.doc .sub{color:var(--mut);font-size:13px}
   header.doc .meta{color:var(--faint);font-size:12px;margin-top:6px}
-  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0 28px;
-    font-size:12px;color:var(--mut)}
-  .legend span{display:inline-flex;align-items:center;gap:6px}
-  .sw{width:26px;height:12px;border:1px solid var(--line);border-radius:2px}
-  .sw.fill{background:var(--fill)} .sw.btn{background:var(--dark);border-color:var(--dark)}
-  .sw.txt{background:repeating-linear-gradient(90deg,var(--faint) 0 60%,transparent 60% 100%);border:none;height:4px}
 
   .screen{background:var(--paper);border:1px solid #d3d3d3;border-radius:8px;
     box-shadow:0 1px 3px rgba(0,0,0,.06);margin:0 0 26px;overflow:hidden}
@@ -78,8 +72,6 @@
   .kpi.acc{border-left:4px solid var(--dark)}
   .flex1{flex:1}.g8{gap:8px}.mt8{margin-top:8px}.mt12{margin-top:12px}
   .small{font-size:11px}
-  .flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11.5px;color:var(--mut)}
-  .flow .st{border:1px solid var(--line);border-radius:5px;background:var(--fill2);padding:4px 9px;color:var(--dark)}
   .notif{display:flex;gap:8px;border-bottom:1px solid #eee;padding:7px 0;font-size:12px}
   .notif .dot{width:7px;height:7px;border-radius:50%;background:#9a9a9a;margin-top:5px;flex:none}
   .notif.read .dot{background:transparent;border:1px solid var(--line)}
@@ -90,6 +82,14 @@
   .mail .mb{padding:10px;font-size:12px;color:var(--dark)}
   footer.doc{text-align:center;color:var(--faint);font-size:11.5px;margin-top:10px}
   @media print{body{background:#fff}.screen{break-inside:avoid;box-shadow:none}}
+
+  /* flat, plain wireframe look */
+  body{background:#fff}
+  .screen{border-radius:0;box-shadow:none;border-color:#bbb}
+  .cap{background:none;color:#333;border-bottom:1px solid #bbb;padding:10px 2px 8px;font-size:13.5px}
+  .cap .n{background:none;color:#333;width:auto;height:auto;display:inline;font-size:13.5px}
+  .cap .note{display:none}
+  .box,.field,.btn,.chip,.pill,.top,.side,.kpi,.bar,.otp span,.msg,.mail,.tabs,.toggle>div,.side .nav div,.logo .shield,.notif .dot{border-radius:0}
 </style>
 </head>
 <body>
@@ -97,19 +97,12 @@
   <header class="doc">
     <h1>Wireframe — Luồng Sinh viên</h1>
     <div class="sub">Đăng nhập & toàn bộ tính năng dành cho sinh viên · Hệ thống Cảnh báo Rủi ro Học tập (VNU-IS)</div>
-    <div class="meta">Bổ trợ cho “Wireframe hệ thống” · INS3282 Capstone Project II · 12/07/2026 — khớp bản triển khai</div>
   </header>
 
-  <div class="legend">
-    <span><i class="sw txt"></i> Văn bản / nhãn</span>
-    <span><i class="sw fill"></i> Vùng nội dung</span>
-    <span><i class="sw"></i> Ô nhập</span>
-    <span><i class="sw btn"></i> Nút chính</span>
-  </div>
 
   <!-- 1. LOGIN -->
   <section class="screen">
-    <div class="cap"><span class="n">1</span> Đăng nhập (góc nhìn sinh viên) <span class="note">kèm 2 biến thể: lỗi · đang xử lý</span></div>
+    <div class="cap"><span class="n">1.</span> Đăng nhập (góc nhìn sinh viên) <span class="note">kèm 2 biến thể: lỗi · đang xử lý</span></div>
     <div class="frame col">
       <div class="row">
         <div class="box pad col flex1" style="flex-basis:55%">
@@ -125,7 +118,7 @@
         <div class="col flex1" style="flex-basis:45%">
           <div class="box pad col">
             <div class="lbl">Biến thể — sai thông tin</div>
-            <div class="box fill2 pad small" style="border-style:dashed">⚠ Email hoặc mật khẩu không đúng.</div>
+            <div class="box fill2 pad small" style="border-style:dashed">Email hoặc mật khẩu không đúng.</div>
             <div class="small muted">Form giữ nguyên email đã gõ, chỉ xóa mật khẩu.</div>
           </div>
           <div class="box pad col">
@@ -135,13 +128,12 @@
           </div>
         </div>
       </div>
-      <div class="flow"><span class="st">Nhập email + mật khẩu</span> → <span class="st">Supabase Auth xác thực</span> → <span class="st">Đọc vai trò (profiles.role)</span> → <span class="st">role = student → vào Cổng Sinh viên</span></div>
     </div>
   </section>
 
   <!-- 2. FORGOT PASSWORD -->
   <section class="screen">
-    <div class="cap"><span class="n">2</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước · sinh viên tự làm, không cần cố vấn</span></div>
+    <div class="cap"><span class="n">2.</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước · sinh viên tự làm, không cần cố vấn</span></div>
     <div class="frame row">
       <div class="box pad col flex1">
         <div class="lbl">Bước 1 — nhập email</div>
@@ -166,19 +158,19 @@
 
   <!-- 3. PORTAL OVERVIEW -->
   <section class="screen">
-    <div class="cap"><span class="n">3</span> Cổng Sinh viên — khung tổng & chỉ số <span class="note">ngay sau đăng nhập</span></div>
+    <div class="cap"><span class="n">3.</span> Cổng Sinh viên — khung tổng & chỉ số <span class="note">ngay sau đăng nhập</span></div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
         <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span>
-        <span class="pill">🔔 2</span><span class="pill">NA · Nguyễn Minh Anh<br><span class="small muted">24010001 · K69</span></span><span class="btn small">Đăng xuất</span>
+        <span class="pill">Thông báo (2)</span><span class="pill">NA · Nguyễn Minh Anh<br><span class="small muted">24010001 · K69</span></span><span class="btn small">Đăng xuất</span>
       </div>
       <div class="row" style="justify-content:space-between;align-items:center">
         <div><div class="h">Xin chào, Nguyễn Minh Anh</div><div class="small muted">24010001 · Hệ thống thông tin quản lý · K69</div></div>
-        <span class="btn small">🖨 In bảng điểm</span>
+        <span class="btn small">In bảng điểm</span>
       </div>
-      <div class="box fill2 pad small" style="border-style:dashed">⚠ <b>Cảnh báo nghiêm trọng</b> — CPA hiện tại 1.85, có 2 môn chưa đạt. Hãy liên hệ cố vấn học tập sớm. <span class="muted">(hiện khi CPA &lt; 2.0 hoặc ≥ 2 môn F)</span></div>
-      <div class="box fill2 pad small" style="border-style:dashed">⚠ <b>Lưu ý học tập</b> — CPA hiện tại 2.35. Cần cải thiện ở kỳ tới. <span class="muted">(mức nhẹ: CPA &lt; 2.5 hoặc ≥ 1 môn F — chỉ hiện 1 trong 2 băng)</span></div>
+      <div class="box fill2 pad small" style="border-style:dashed"><b>Cảnh báo nghiêm trọng</b> — CPA hiện tại 1.85, có 2 môn chưa đạt. Hãy liên hệ cố vấn học tập sớm. <span class="muted">(hiện khi CPA &lt; 2.0 hoặc ≥ 2 môn F)</span></div>
+      <div class="box fill2 pad small" style="border-style:dashed"><b>Lưu ý học tập</b> — CPA hiện tại 2.35. Cần cải thiện ở kỳ tới. <span class="muted">(mức nhẹ: CPA &lt; 2.5 hoặc ≥ 1 môn F — chỉ hiện 1 trong 2 băng)</span></div>
       <div class="kpis">
         <div class="kpi acc"><div class="k">CPA (hệ 4)</div><div class="v">2.35</div></div>
         <div class="kpi"><div class="k">GPA kỳ gần nhất</div><div class="v">2.60 <span class="small muted">HK1 2025-2026</span></div></div>
@@ -190,7 +182,7 @@
 
   <!-- 4. TRANSCRIPT -->
   <section class="screen">
-    <div class="cap"><span class="n">4</span> Bảng điểm theo học kỳ <span class="note">chỉ xem · GPA từng kỳ + CPA</span></div>
+    <div class="cap"><span class="n">4.</span> Bảng điểm theo học kỳ <span class="note">chỉ xem · GPA từng kỳ + CPA</span></div>
     <div class="frame col">
       <div class="row g8" style="flex-wrap:wrap">
         <span class="pill">CPA: <b>2.35</b></span><span class="pill">HK1 2024-2025: <b>2.10</b></span><span class="pill">HK2 2024-2025: <b>2.45</b></span><span class="pill">HK1 2025-2026: <b>2.60</b></span>
@@ -213,7 +205,7 @@
 
   <!-- 5. PRINT -->
   <section class="screen">
-    <div class="cap"><span class="n">5</span> In bảng điểm <span class="note">nút 🖨 → hộp thoại in của trình duyệt</span></div>
+    <div class="cap"><span class="n">5.</span> In bảng điểm <span class="note">nút → hộp thoại in của trình duyệt</span></div>
     <div class="frame row">
       <div class="box pad col flex1" style="flex-basis:58%">
         <div class="lbl">Bản in (chỉ vùng bảng điểm)</div>
@@ -238,10 +230,10 @@
 
   <!-- 6. NOTIFICATIONS -->
   <section class="screen">
-    <div class="cap"><span class="n">6</span> Thông báo <span class="note">realtime · chuông 🔔 đếm chưa đọc</span></div>
+    <div class="cap"><span class="n">6.</span> Thông báo <span class="note">realtime · chuông đếm chưa đọc</span></div>
     <div class="frame row">
       <div class="box pad col flex1" style="flex-basis:58%">
-        <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">🔔 Thông báo</div><span class="btn small">Đánh dấu đã đọc tất cả</span></div>
+        <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Thông báo</div><span class="btn small">Đánh dấu đã đọc tất cả</span></div>
         <div class="notif"><span class="dot"></span><div><b>Cập nhật điểm</b><div class="small muted">Cố vấn đã cập nhật điểm môn Cơ sở dữ liệu: TX 8.0 · GK 8.5 · CK 9.0 → Tổng 8.65 (A)</div><div class="small muted">hôm nay 10:21</div></div></div>
         <div class="notif"><span class="dot"></span><div><b>Cảnh báo kết quả học tập</b><div class="small muted">Bạn đang ở mức cảnh báo Cao. Lý do: GPA giảm 0.52 so kỳ trước; điểm danh thấp (54%).</div><div class="small muted">hôm qua 16:03</div></div></div>
         <div class="notif read"><span class="dot"></span><div><b>Tin nhắn từ cố vấn</b><div class="small muted">“Em sắp xếp gặp cô tuần này nhé…”</div><div class="small muted">10/07 09:15</div></div></div>
@@ -249,10 +241,10 @@
       <div class="col flex1" style="flex-basis:42%">
         <div class="box pad col">
           <div class="lbl">4 loại thông báo (icon khác nhau)</div>
-          <div class="small">📊 Điểm — khi có điểm mới/sửa điểm</div>
-          <div class="small">⚑ Cảnh báo — khi vào vùng nguy cơ (kèm lý do)</div>
-          <div class="small">💬 Tin nhắn — khi cố vấn nhắn</div>
-          <div class="small">⚙ Hệ thống — thông báo chung từ cố vấn</div>
+          <div class="small">Điểm — khi có điểm mới/sửa điểm</div>
+          <div class="small">Cảnh báo — khi vào vùng nguy cơ (kèm lý do)</div>
+          <div class="small">Tin nhắn — khi cố vấn nhắn</div>
+          <div class="small">Hệ thống — thông báo chung từ cố vấn</div>
         </div>
       </div>
     </div>
@@ -260,10 +252,10 @@
 
   <!-- 7. CHAT -->
   <section class="screen">
-    <div class="cap"><span class="n">7</span> Hỏi đáp với cố vấn <span class="note">chat realtime 2 chiều</span></div>
+    <div class="cap"><span class="n">7.</span> Hỏi đáp với cố vấn <span class="note">chat realtime 2 chiều</span></div>
     <div class="frame row">
       <div class="box pad col flex1" style="flex-basis:58%">
-        <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">💬 Hỏi đáp</div><span class="small muted">Cố vấn: TS. Trần Thị B</span></div>
+        <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Hỏi đáp</div><span class="small muted">Cố vấn: TS. Trần Thị B</span></div>
         <div class="col" style="gap:6px">
           <div class="msg">Chào em, cô thấy điểm giữa kỳ Giải tích của em hơi thấp. <div class="small muted">TS. Trần Thị B · 10:02</div></div>
           <div class="msg me">Em chào cô, em đang gặp khó phần tích phân ạ. Em muốn xin lịch gặp cô. <div class="small muted">Bạn · 10:05</div></div>
@@ -283,11 +275,11 @@
 
   <!-- 8. APPOINTMENTS -->
   <section class="screen">
-    <div class="cap"><span class="n">8</span> Lịch hẹn cố vấn <span class="note">sinh viên đặt — cố vấn duyệt · realtime</span></div>
+    <div class="cap"><span class="n">8.</span> Lịch hẹn cố vấn <span class="note">sinh viên đặt — cố vấn duyệt · realtime</span></div>
     <div class="frame col">
       <div class="row">
         <div class="box pad col flex1" style="flex-basis:45%">
-          <div class="h" style="font-size:14px">📅 Đặt lịch hẹn</div>
+          <div class="h" style="font-size:14px">Đặt lịch hẹn</div>
           <div><div class="flabel">Thời gian</div><div class="field">14/07/2026 10:00</div></div>
           <div><div class="flabel">Ghi chú (tùy chọn)</div><div class="field">Xin tư vấn cải thiện môn Giải tích…</div></div>
           <div class="btn pri blk">Đặt lịch hẹn</div>
@@ -305,13 +297,12 @@
             <span><span class="pill">Đã gặp</span></span></div>
         </div>
       </div>
-      <div class="flow"><span class="st">SV đặt lịch</span> → <span class="st">Chờ duyệt</span> → <span class="st">Cố vấn “Xác nhận”</span> → <span class="st">Đã xác nhận</span> → <span class="st">Gặp xong → “Đã gặp”</span> <span class="muted">(SV hoặc cố vấn có thể “Hủy” trước buổi gặp)</span></div>
     </div>
   </section>
 
   <!-- 9. EMAILS -->
   <section class="screen">
-    <div class="cap"><span class="n">9</span> Email sinh viên nhận được <span class="note">gửi về email trong hồ sơ SV</span></div>
+    <div class="cap"><span class="n">9.</span> Email sinh viên nhận được <span class="note">gửi về email trong hồ sơ SV</span></div>
     <div class="frame col">
       <div class="row">
         <div class="mail flex1">
@@ -321,7 +312,7 @@
             <span class="small muted">Đăng nhập cổng sinh viên để xem chi tiết.</span></div>
         </div>
         <div class="mail flex1">
-          <div class="mh"><b>Hệ thống Cảnh báo Rủi ro Học tập — VNU-IS</b><br>Tới: sv24010001@gmail.com · Chủ đề: ⚠ Cảnh báo kết quả học tập</div>
+          <div class="mh"><b>Hệ thống Cảnh báo Rủi ro Học tập — VNU-IS</b><br>Tới: sv24010001@gmail.com · Chủ đề: Cảnh báo kết quả học tập</div>
           <div class="mb">Chào Nguyễn Minh Anh,<br>Bạn đang ở mức cảnh báo <b>Cao</b> (điểm rủi ro 70.3).<br>
             Lý do: GPA giảm 0.52 so kỳ trước; điểm danh thấp (54%).<br>
             <span class="small muted">Hãy liên hệ cố vấn học tập hoặc đặt lịch hẹn trong cổng sinh viên.</span></div>
@@ -336,8 +327,6 @@
     </div>
   </section>
 
-  <footer class="doc">Wireframe low-fidelity — luồng sinh viên · dùng kèm “Wireframe hệ thống” ·
-  Mở bằng trình duyệt, có thể In → Lưu thành PDF.</footer>
 </div>
 </body>
 </html>

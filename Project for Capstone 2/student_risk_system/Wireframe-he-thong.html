@@ -17,12 +17,6 @@
   header.doc h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
   header.doc .sub{color:var(--mut);font-size:13px}
   header.doc .meta{color:var(--faint);font-size:12px;margin-top:6px}
-  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0 28px;
-    font-size:12px;color:var(--mut)}
-  .legend span{display:inline-flex;align-items:center;gap:6px}
-  .sw{width:26px;height:12px;border:1px solid var(--line);border-radius:2px}
-  .sw.fill{background:var(--fill)} .sw.btn{background:var(--dark);border-color:var(--dark)}
-  .sw.txt{background:repeating-linear-gradient(90deg,var(--faint) 0 60%,transparent 60% 100%);border:none;height:4px}
 
   .screen{background:var(--paper);border:1px solid #d3d3d3;border-radius:8px;
     box-shadow:0 1px 3px rgba(0,0,0,.06);margin:0 0 26px;overflow:hidden}
@@ -88,6 +82,14 @@
   .small{font-size:11px}
   footer.doc{text-align:center;color:var(--faint);font-size:11.5px;margin-top:10px}
   @media print{body{background:#fff}.screen{break-inside:avoid;box-shadow:none}}
+
+  /* flat, plain wireframe look */
+  body{background:#fff}
+  .screen{border-radius:0;box-shadow:none;border-color:#bbb}
+  .cap{background:none;color:#333;border-bottom:1px solid #bbb;padding:10px 2px 8px;font-size:13.5px}
+  .cap .n{background:none;color:#333;width:auto;height:auto;display:inline;font-size:13.5px}
+  .cap .note{display:none}
+  .box,.field,.btn,.chip,.pill,.top,.side,.kpi,.bar,.otp span,.msg,.mail,.tabs,.toggle>div,.side .nav div,.logo .shield,.notif .dot{border-radius:0}
 </style>
 </head>
 <body>
@@ -95,19 +97,12 @@
   <header class="doc">
     <h1>Wireframe — Hệ thống Cảnh báo Rủi ro Học tập</h1>
     <div class="sub">Academic Decision Support System · Trường Quốc tế — ĐHQG Hà Nội (VNU-IS)</div>
-    <div class="meta">Bản phác thảo bố cục (low-fidelity) · INS3282 Capstone Project II · Cập nhật 12/07/2026 — khớp bản triển khai</div>
   </header>
 
-  <div class="legend">
-    <span><i class="sw txt"></i> Văn bản / nhãn</span>
-    <span><i class="sw fill"></i> Vùng nội dung</span>
-    <span><i class="sw"></i> Ô nhập</span>
-    <span><i class="sw btn"></i> Nút chính</span>
-  </div>
 
   <!-- 1. LOGIN -->
   <section class="screen">
-    <div class="cap"><span class="n">1</span> Đăng nhập <span class="note">CHỈ đăng nhập — tài khoản do trường cấp · góc phải: VI | EN</span></div>
+    <div class="cap"><span class="n">1.</span> Đăng nhập <span class="note">CHỈ đăng nhập — tài khoản do trường cấp · góc phải: VI | EN</span></div>
     <div class="frame">
       <div class="row">
         <div class="box flex1 imgx center" style="min-height:230px;flex-basis:52%">
@@ -132,7 +127,7 @@
 
   <!-- 2. FORGOT PASSWORD -->
   <section class="screen">
-    <div class="cap"><span class="n">2</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước</span></div>
+    <div class="cap"><span class="n">2.</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước</span></div>
     <div class="frame row">
       <div class="box pad col flex1">
         <div class="lbl">Bước 1 — nhập email</div>
@@ -157,14 +152,14 @@
 
   <!-- 3. STUDENT PORTAL -->
   <section class="screen">
-    <div class="cap"><span class="n">3</span> Cổng Sinh viên <span class="note">logo góc trái bấm được → về đầu trang</span></div>
+    <div class="cap"><span class="n">3.</span> Cổng Sinh viên <span class="note">logo góc trái bấm được → về đầu trang</span></div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
         <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span>
-        <span class="pill">🔔 2</span><span class="pill">Avatar</span><span class="btn small">Đăng xuất</span>
+        <span class="pill">Thông báo (2)</span><span class="pill">Avatar</span><span class="btn small">Đăng xuất</span>
       </div>
-      <div class="box fill2 pad small" style="border-style:dashed">⚠ Băng cảnh báo (hiện khi CPA thấp / có môn F): “Kết quả học tập đang ở mức báo động…” — kèm email tự cảnh báo gửi tới hộp thư sinh viên</div>
+      <div class="box fill2 pad small" style="border-style:dashed">Băng cảnh báo (hiện khi CPA thấp / có môn F): “Kết quả học tập đang ở mức báo động…” — kèm email tự cảnh báo gửi tới hộp thư sinh viên</div>
       <div class="kpis">
         <div class="kpi"><div class="k">CPA (hệ 4)</div><div class="v">2.35</div></div>
         <div class="kpi"><div class="k">GPA kỳ gần nhất</div><div class="v">2.6</div></div>
@@ -186,10 +181,10 @@
           <div class="h" style="font-size:14px">Thông báo</div>
           <div class="box fill2 pad small">• Cố vấn đã cập nhật điểm môn … (kèm email)</div>
           <div class="h" style="font-size:14px">Hỏi đáp với cố vấn <span class="small muted">(realtime)</span></div>
-          <div class="box pad small" style="min-height:36px">💬 …tin nhắn…</div>
+          <div class="box pad small" style="min-height:36px">…tin nhắn…</div>
           <div class="row g8"><div class="field flex1">Nhập câu hỏi…</div><div class="btn pri">Gửi</div></div>
           <div class="h" style="font-size:14px">Lịch hẹn cố vấn</div>
-          <div class="row g8"><div class="field flex1">📅 14/07/2026 10:00</div><div class="field flex1">Ghi chú…</div></div>
+          <div class="row g8"><div class="field flex1">14/07/2026 10:00</div><div class="field flex1">Ghi chú…</div></div>
           <div class="btn pri blk">Đặt lịch hẹn</div>
           <div class="box fill2 pad small row" style="justify-content:space-between"><span>14/07 10:00 — xin tư vấn môn Giải tích</span><span><span class="pill">Chờ duyệt</span> <span class="btn small">Hủy</span></span></div>
         </div>
@@ -199,7 +194,7 @@
 
   <!-- 4. ADVISOR DASHBOARD -->
   <section class="screen">
-    <div class="cap"><span class="n">4</span> Bảng cố vấn — Tổng quan <span class="note">logo bấm được → về Tổng quan · sidebar 7 mục</span></div>
+    <div class="cap"><span class="n">4.</span> Bảng cố vấn — Tổng quan <span class="note">logo bấm được → về Tổng quan · sidebar 7 mục</span></div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
@@ -209,7 +204,7 @@
         <div class="side">
           <div class="lbl">Điều hướng</div>
           <div class="nav">
-            <div class="on">▦ Tổng quan</div><div>◔ Sinh viên</div><div>▥ Bảng điểm</div><div>⚑ Cảnh báo ①</div><div>▤ Can thiệp</div><div>💬 Tin nhắn ①</div><div>◎ Đánh giá</div>
+            <div class="on">Tổng quan</div><div>Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo (1)</div><div>Can thiệp</div><div>Tin nhắn (1)</div><div>Đánh giá</div>
           </div>
         </div>
         <div class="flex1 col">
@@ -247,17 +242,17 @@
 
   <!-- 5. STUDENT LIST -->
   <section class="screen">
-    <div class="cap"><span class="n">5</span> Bảng cố vấn — Danh sách sinh viên <span class="note">lọc Khóa / Ngành / Môn · xuất báo cáo</span></div>
+    <div class="cap"><span class="n">5.</span> Bảng cố vấn — Danh sách sinh viên <span class="note">lọc Khóa / Ngành / Môn · xuất báo cáo</span></div>
     <div class="frame col">
       <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div class="on">◔ Sinh viên</div><div>▥ Bảng điểm</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div><div>◎ Đánh giá</div></div></div>
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div class="on">Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
         <div class="flex1 col">
           <div class="row" style="justify-content:space-between;flex-wrap:wrap">
             <div class="h">Sinh viên <span class="muted small">· 24 sinh viên</span></div>
             <div class="row g8" style="flex-wrap:wrap"><span class="btn small">Nhập CSV</span><span class="btn small">Tải mẫu</span><span class="btn small">Nhập điểm</span><span class="btn small">Tải mẫu điểm</span><span class="btn small">Xuất báo cáo</span><span class="btn pri small">+ Thêm sinh viên</span></div>
           </div>
           <div class="row g8" style="flex-wrap:wrap">
-            <div class="field flex1" style="min-width:170px">🔍 Tìm theo tên hoặc mã SV…</div>
+            <div class="field flex1" style="min-width:170px">Tìm theo tên hoặc mã SV…</div>
             <div class="field sel" style="width:120px">Tất cả khóa</div>
             <div class="field sel" style="width:130px">Tất cả ngành</div>
             <div class="field sel" style="width:150px">Tất cả môn</div>
@@ -279,14 +274,14 @@
 
   <!-- 6. GRADEBOOK -->
   <section class="screen">
-    <div class="cap"><span class="n">6</span> Bảng cố vấn — Bảng điểm theo môn <span class="note">nhập cả lớp · xuất Excel · khóa điểm</span></div>
+    <div class="cap"><span class="n">6.</span> Bảng cố vấn — Bảng điểm theo môn <span class="note">nhập cả lớp · xuất Excel · khóa điểm</span></div>
     <div class="frame col">
       <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div>◔ Sinh viên</div><div class="on">▥ Bảng điểm</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div><div>◎ Đánh giá</div></div></div>
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div class="on">Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
         <div class="flex1 col">
           <div class="row g8" style="flex-wrap:wrap;justify-content:space-between">
             <div class="field sel" style="width:270px">INT1008 — Nhập môn lập trình · HK1 2025-2026</div>
-            <div class="row g8"><span class="btn small">Xuất Excel</span><span class="btn small">🔒 Khóa điểm</span><span class="btn pri small">Lưu tất cả</span></div>
+            <div class="row g8"><span class="btn small">Xuất Excel</span><span class="btn small">Khóa điểm</span><span class="btn pri small">Lưu tất cả</span></div>
           </div>
           <div class="box pad">
             <table class="wf">
@@ -306,14 +301,14 @@
 
   <!-- 7. STUDENT DETAIL -->
   <section class="screen">
-    <div class="cap"><span class="n">7</span> Bảng cố vấn — Chi tiết sinh viên <span class="note">điểm · rủi ro · can thiệp · chat · duyệt lịch hẹn</span></div>
+    <div class="cap"><span class="n">7.</span> Bảng cố vấn — Chi tiết sinh viên <span class="note">điểm · rủi ro · can thiệp · chat · duyệt lịch hẹn</span></div>
     <div class="frame col">
       <div class="small muted">← Danh sách sinh viên</div>
       <div class="row">
         <div class="box pad flex1" style="flex-basis:33%"><div class="lbl">Thông tin sinh viên</div>
           <div class="h" style="font-size:14px">Hoàng Văn Em</div><div class="small muted">SV004 · K69 · Hệ thống thông tin</div>
           <div class="small mt8">Điểm rủi ro: <b>70.3</b> <span class="pill">Cao</span></div>
-          <div class="small muted">📧 email liên hệ (mailto)</div>
+          <div class="small muted">email liên hệ (mailto)</div>
         </div>
         <div class="box pad flex1" style="flex-basis:34%"><div class="lbl">Yếu tố rủi ro (giải thích được)</div>
           <div class="small">GPA thấp <div class="bar"><i style="width:80%"></i></div></div>
@@ -344,7 +339,7 @@
           <div class="field">Tiêu đề</div>
           <div class="field" style="height:38px">Nội dung thông báo…</div>
           <div class="btn blk">Gửi thông báo cho sinh viên</div>
-          <div class="box pad small" style="min-height:34px">💬 khung chat trực tiếp với sinh viên</div>
+          <div class="box pad small" style="min-height:34px">khung chat trực tiếp với sinh viên</div>
         </div>
       </div>
       <div class="box pad"><div class="h" style="font-size:14px">Lịch hẹn cố vấn</div>
@@ -360,10 +355,10 @@
 
   <!-- 8. EVALUATION + CONFIG + SYNC -->
   <section class="screen">
-    <div class="cap"><span class="n">8</span> Bảng cố vấn — Đánh giá <span class="note">độ chính xác · hiệu quả can thiệp · cấu hình · đồng bộ SIS/LMS</span></div>
+    <div class="cap"><span class="n">8.</span> Bảng cố vấn — Đánh giá <span class="note">độ chính xác · hiệu quả can thiệp · cấu hình · đồng bộ SIS/LMS</span></div>
     <div class="frame col">
       <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>▦ Tổng quan</div><div>◔ Sinh viên</div><div>▥ Bảng điểm</div><div>⚑ Cảnh báo</div><div>▤ Can thiệp</div><div>💬 Tin nhắn</div><div class="on">◎ Đánh giá</div></div></div>
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div class="on">Đánh giá</div></div></div>
         <div class="flex1 col">
           <div class="row">
             <div class="box pad flex1"><div class="h" style="font-size:14px">Độ chính xác cảnh báo</div>
@@ -410,8 +405,6 @@
   </section>
 
 
-  <footer class="doc">Wireframe low-fidelity · dùng để phác thảo bố cục & luồng, không phải bản màu cuối cùng ·
-  Mở bằng trình duyệt, có thể In → Lưu thành PDF.</footer>
 </div>
 </body>
 </html>
