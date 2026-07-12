@@ -37,6 +37,16 @@ export interface Course {
   updated_at?: string;
 }
 
+export interface Appointment {
+  id: string;
+  student_id: string;
+  advisor_id: string | null;
+  starts_at: string;
+  note: string;
+  status: "requested" | "confirmed" | "cancelled" | "done";
+  created_at?: string;
+}
+
 export type RiskLevel = "Low" | "Medium" | "High" | "Critical";
 
 export interface RiskScore {

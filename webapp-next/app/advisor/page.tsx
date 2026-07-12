@@ -14,7 +14,7 @@ import {
   IV_TYPES, NewCourse, NewStudent,
 } from "@/components/advisor-parts";
 import { predictAlarm, type Prediction } from "@/lib/predict";
-import type { Profile, Course, RiskScore, Alert, Intervention, Message } from "@/lib/types";
+import type { Profile, Course, RiskScore, Alert, Intervention, Message, Appointment } from "@/lib/types";
 
 type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation" | "gradebook";
 // A validated grade row ready to write (used by the grade-import preview).
@@ -56,6 +56,8 @@ export default function AdvisorPage() {
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [detailMsgs, setDetailMsgs] = useState<Message[]>([]);
   const [detailReply, setDetailReply] = useState("");
+  const [detailAppts, setDetailAppts] = useState<Appointment[]>([]);
+  const [apptTick, setApptTick] = useState(0);
   const [allMsgs, setAllMsgs] = useState<Message[]>([]);
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   const [reply, setReply] = useState("");
@@ -217,6 +219,13 @@ export default function AdvisorPage() {
     sb.from("messages").select("*").eq("student_id", selectedId).order("created_at", { ascending: true })
       .then(({ data }) => setDetailMsgs((data as Message[]) || []));
   }, [view, selectedId, msgTick]);
+
+  // load this student's advisor appointments for the detail view
+  useEffect(() => {
+    if (view !== "student" || !selectedId || !sb) return;
+    sb.from("appointments").select("*").eq("student_id", selectedId).order("starts_at", { ascending: true })
+      .then(({ data }) => setDetailAppts((data as Appointment[]) || []));
+  }, [view, selectedId, apptTick]);
 
   // load messages for the messages view (and on realtime tick)
   useEffect(() => {
@@ -1032,6 +1041,14 @@ export default function AdvisorPage() {
     );
   };
 
+  async function setApptStatus(id: string, status: Appointment["status"]) {
+    if (!sb) return;
+    const { error } = await sb.from("appointments").update({ status }).eq("id", id);
+    if (error) { toast(t("appt.err"), "error"); return; }
+    setApptTick((n) => n + 1);
+    toast(t("appt.updated"), "success");
+  }
+
   const renderStudentDetail = () => {
     const student = selectedId ? studentById(selectedId) : null;
     if (!student) return <div className="empty">{t("adv.notFound")}</div>;
@@ -1179,6 +1196,27 @@ export default function AdvisorPage() {
                 <input type="text" value={detailReply} onChange={(e) => setDetailReply(e.target.value)} placeholder={t("chat.phAdvisor")} autoComplete="off" />
                 <button className="btn btn-primary" type="submit">{t("btn.send")}</button>
               </form>
+            </div>
+            <div className="card">
+              <div className="card-head"><div className="card-title"><Icon name="notes" /> {t("appt.title")}</div></div>
+              {detailAppts.length === 0 ? (
+                <div className="muted-note">{t("appt.none")}</div>
+              ) : (
+                detailAppts.map((ap) => (
+                  <div key={ap.id} className="spread" style={{ padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+                    <div>
+                      <div><b>{fmtDate(ap.starts_at, locale, true)}</b></div>
+                      {ap.note && <div className="muted-note" style={{ marginTop: 2 }}>{ap.note}</div>}
+                    </div>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center", flex: "none" }}>
+                      <span className={"pill " + (ap.status === "confirmed" ? "Resolved" : ap.status === "done" ? "Dismissed" : ap.status === "cancelled" ? "Open" : "Acknowledged")}>{t("appt.st." + ap.status)}</span>
+                      {ap.status === "requested" && <button className="btn btn-sm btn-primary" onClick={() => setApptStatus(ap.id, "confirmed")}>{t("appt.confirm")}</button>}
+                      {ap.status === "confirmed" && <button className="btn btn-sm" onClick={() => setApptStatus(ap.id, "done")}>{t("appt.done")}</button>}
+                      {(ap.status === "requested" || ap.status === "confirmed") && <button className="btn btn-sm" onClick={() => setApptStatus(ap.id, "cancelled")}>{t("appt.cancel")}</button>}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

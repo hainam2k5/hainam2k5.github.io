@@ -8,7 +8,7 @@ import { Icon } from "@/lib/icons";
 import { BrandLogo, LangSwitch } from "@/components/common";
 import { gpaOf, bySemester, failedCount } from "@/lib/gpa";
 import { fmtDate, initials, numFmt, gradeClass } from "@/lib/format";
-import type { Profile, Course, Notification, Message } from "@/lib/types";
+import type { Profile, Course, Notification, Message, Appointment } from "@/lib/types";
 
 const NOTIF_IC: Record<string, string> = { grade: "notes", alert: "alert", message: "message", system: "bell" };
 
@@ -21,6 +21,9 @@ export default function StudentPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [advisor, setAdvisor] = useState<Profile | null>(null);
   const [draft, setDraft] = useState("");
+  const [appts, setAppts] = useState<Appointment[]>([]);
+  const [apptWhen, setApptWhen] = useState("");
+  const [apptNote, setApptNote] = useState("");
   const notifRef = useRef<HTMLDivElement | null>(null);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
@@ -57,8 +60,13 @@ export default function StudentPage() {
       const { data } = await sb.from("profiles").select("id, full_name, email").eq("id", me.advisor_id).maybeSingle();
       if (active) setAdvisor(data as Profile);
     };
+    const loadAppts = async () => {
+      // Graceful if the appointments table doesn't exist yet (migration not run).
+      const { data } = await sb.from("appointments").select("*").eq("student_id", me.id).order("starts_at", { ascending: true });
+      if (active) setAppts((data as Appointment[]) || []);
+    };
 
-    loadCourses(); loadNotifications(); loadMessages(); loadAdvisor();
+    loadCourses(); loadNotifications(); loadMessages(); loadAdvisor(); loadAppts();
 
     const chCourses = sb.channel("rt-courses-" + me.id)
       .on("postgres_changes", { event: "*", schema: "public", table: "courses", filter: "student_id=eq." + me.id },
@@ -104,6 +112,31 @@ export default function StudentPage() {
       student_id: me.id, advisor_id: me.advisor_id, sender_id: me.id, sender_role: "student", body,
     });
     if (error) { toast(error.message, "error"); setDraft(body); }
+  }
+
+  async function reloadAppts(sid: string) {
+    if (!supabase) return;
+    const { data } = await supabase.from("appointments").select("*").eq("student_id", sid).order("starts_at", { ascending: true });
+    setAppts((data as Appointment[]) || []);
+  }
+  async function bookAppt(e: FormEvent) {
+    e.preventDefault();
+    if (!supabase || !me) return;
+    if (!me.advisor_id) return toast(t("student.notAssigned"), "error");
+    if (!apptWhen) return toast(t("appt.pickTime"), "error");
+    const { error } = await supabase.from("appointments").insert({
+      student_id: me.id, advisor_id: me.advisor_id, starts_at: new Date(apptWhen).toISOString(),
+      note: apptNote.trim(), status: "requested",
+    });
+    if (error) return toast(t("appt.err"), "error");
+    setApptWhen(""); setApptNote("");
+    toast(t("appt.requested"), "success");
+    reloadAppts(me.id);
+  }
+  async function cancelAppt(id: string) {
+    if (!supabase || !me) return;
+    await supabase.from("appointments").update({ status: "cancelled" }).eq("id", id);
+    reloadAppts(me.id);
   }
 
   if (!me) return <div className="empty" style={{ paddingTop: 80 }}>{t("loading")}</div>;
@@ -269,6 +302,40 @@ export default function StudentPage() {
                 <button className="btn btn-primary" type="submit">{t("btn.send")}</button>
               </form>
               {!me.advisor_id && <div className="muted-note">{t("student.chatNote")}</div>}
+            </div>
+
+            <div className="card">
+              <div className="card-head"><div className="card-title"><Icon name="notes" /> {t("appt.title")}</div></div>
+              {me.advisor_id ? (
+                <>
+                  <form onSubmit={bookAppt}>
+                    <div className="field"><label>{t("appt.when")}</label>
+                      <input type="datetime-local" value={apptWhen} onChange={(e) => setApptWhen(e.target.value)} /></div>
+                    <div className="field"><label>{t("appt.note")}</label>
+                      <input type="text" value={apptNote} onChange={(e) => setApptNote(e.target.value)} placeholder={t("appt.notePh")} /></div>
+                    <button className="btn btn-primary btn-block" type="submit">{t("appt.book")}</button>
+                  </form>
+                  <div className="divider" />
+                  {appts.filter((a) => a.status !== "cancelled").length === 0 ? (
+                    <div className="muted-note">{t("appt.none")}</div>
+                  ) : (
+                    appts.filter((a) => a.status !== "cancelled").map((a) => (
+                      <div key={a.id} className="spread" style={{ padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+                        <div>
+                          <div><b>{fmtDate(a.starts_at, locale, true)}</b></div>
+                          {a.note && <div className="muted-note" style={{ marginTop: 2 }}>{a.note}</div>}
+                        </div>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center", flex: "none" }}>
+                          <span className={"pill " + (a.status === "confirmed" ? "Resolved" : a.status === "done" ? "Dismissed" : "Acknowledged")}>{t("appt.st." + a.status)}</span>
+                          {(a.status === "requested" || a.status === "confirmed") && <button className="btn btn-sm" onClick={() => cancelAppt(a.id)}>{t("appt.cancel")}</button>}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </>
+              ) : (
+                <div className="muted-note">{t("student.chatNote")}</div>
+              )}
             </div>
           </div>
         </div>
