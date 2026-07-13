@@ -958,7 +958,7 @@ export default function AdvisorPage() {
             </div>
           </div>
         )}
-        <div className="toolbar">
+        <div className="toolbar" style={{ marginBottom: 8 }}>
           <div className="search"><Icon name="search" size={16} /><input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("ph.search")} /></div>
           <select value={cohortF} onChange={(e) => setCohortF(e.target.value)}>
             <option value="">{t("adv.allCohorts")}</option>
@@ -968,6 +968,8 @@ export default function AdvisorPage() {
             <option value="">{t("adv.allSemesters")}</option>
             {semesterOpts.map((sm) => <option key={sm} value={sm}>{sm}</option>)}
           </select>
+        </div>
+        <div className="toolbar">
           <div className="chips">
             {levels.map((lv) => <span key={lv} className={"chip" + (level === lv ? " active" : "")} onClick={() => setLevel(lv)}>{lv === "" ? t("status.All") : t("risk." + lv)}</span>)}
           </div>
