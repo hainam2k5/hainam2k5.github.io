@@ -65,6 +65,18 @@ export function gpaOf(courses: Course[]): { gpa: number | null; credits: number 
   return cr > 0 ? { gpa: round2(pts / cr), credits: cr } : { gpa: null, credits: 0 };
 }
 
+// Cumulative 10-point average (credit-weighted), as shown on the SIS transcript.
+export function avg10Of(courses: Course[]): number | null {
+  let pts = 0, cr = 0;
+  for (const c of courses || []) {
+    if (c.total_score === null || c.total_score === undefined) continue;
+    const credits = numOr(c.credits, 0);
+    pts += Number(c.total_score) * credits;
+    cr += credits;
+  }
+  return cr > 0 ? round2(pts / cr) : null;
+}
+
 export interface Semester {
   semester: string;
   courses: Course[];

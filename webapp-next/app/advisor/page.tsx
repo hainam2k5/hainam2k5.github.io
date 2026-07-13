@@ -6,7 +6,7 @@ import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClien
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { BrandLogo, LangSwitch, RiskBadge, RiskBar } from "@/components/common";
-import { gpaOf, bySemester, failedCount, computeCourse, numOr } from "@/lib/gpa";
+import { gpaOf, bySemester, failedCount, computeCourse, numOr, avg10Of } from "@/lib/gpa";
 import { compute as computeRisk, alertWorthy, DEFAULT_CONFIG, type RiskConfig } from "@/lib/risk";
 import { fmtDate, initials, riskLabel } from "@/lib/format";
 import {
@@ -16,7 +16,7 @@ import {
 import { predictAlarm, type Prediction } from "@/lib/predict";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message, Appointment } from "@/lib/types";
 
-type View = "dashboard" | "students" | "student" | "alerts" | "interventions" | "messages" | "evaluation" | "gradebook";
+type View = "dashboard" | "students" | "student" | "alerts" | "messages" | "evaluation";
 // A validated grade row ready to write (used by the grade-import preview).
 type PGrade = { sid: string; code: string; name: string; credits: number; semester: string; academic_year: string; wr: number; wm: number; wf: number; sr: number | null; sm: number | null; sf: number | null; total: number | null; letter: string | null; point: number | null };
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
@@ -41,17 +41,12 @@ export default function AdvisorPage() {
   const [q, setQ] = useState("");
   const [level, setLevel] = useState("");
   const [cohortF, setCohortF] = useState("");
-  const [programF, setProgramF] = useState("");
-  const [courseF, setCourseF] = useState("");
+  const [semF, setSemF] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [alertStatusFilter, setAlertStatusFilter] = useState("Open");
   // Grade-import preview: parsed + validated rows awaiting confirmation.
   const [gradePreview, setGradePreview] = useState<null | { rows: PGrade[]; errors: { line: number; reason: string }[]; fileName: string }>(null);
   const [importing, setImporting] = useState(false);
-  // Gradebook grid: pick a course (code|semester) and edit the whole class inline.
-  const [gbCourse, setGbCourse] = useState<string | null>(null);
-  const [gbEdits, setGbEdits] = useState<Record<string, { sr?: string; sm?: string; sf?: string }>>({});
-  const [gbSaving, setGbSaving] = useState(false);
   // Configurable risk weights/thresholds (loaded from risk_config; default fallback).
   const [riskCfg, setRiskCfg] = useState<RiskConfig>(DEFAULT_CONFIG);
   const [cfgSaving, setCfgSaving] = useState(false);
@@ -263,17 +258,6 @@ export default function AdvisorPage() {
     for (const r of risks) if (!m[r.student_id]) m[r.student_id] = r; // risks are desc → first is latest
     return m;
   }, [risks]);
-  // Distinct courses (code + semester) for the gradebook selector.
-  const courseOptions = useMemo(() => {
-    const m = new Map<string, { k: string; code: string; name: string; semester: string; count: number }>();
-    for (const c of courses) {
-      if (!c.code) continue;
-      const k = c.code + "|" + c.semester;
-      const e = m.get(k);
-      if (e) e.count++; else m.set(k, { k, code: c.code, name: c.name, semester: c.semester, count: 1 });
-    }
-    return [...m.values()].sort((a, b) => (b.semester + a.code).localeCompare(a.semester + b.code));
-  }, [courses]);
 
   const studentById = (id: string) => students.find((s) => s.id === id);
   const openAlertFor = (id: string) => alerts.find((a) => a.student_id === id && a.status === "Open") || null;
@@ -642,129 +626,6 @@ export default function AdvisorPage() {
     );
   };
 
-  // ---- Gradebook grid: grade a whole class (one course) at once ----
-  const gbVal = (c: Course, field: "sr" | "sm" | "sf") => {
-    const e = gbEdits[c.id];
-    if (e && e[field] !== undefined) return e[field] as string;
-    const src = field === "sr" ? c.score_regular : field === "sm" ? c.score_midterm : c.score_final;
-    return src === null || src === undefined ? "" : String(src);
-  };
-  const gbSet = (id: string, field: "sr" | "sm" | "sf", v: string) =>
-    setGbEdits((p) => ({ ...p, [id]: { ...p[id], [field]: v } }));
-
-  async function saveGradebook(rows: Course[]) {
-    if (!sb) return;
-    for (const c of rows) {
-      if (![gbVal(c, "sr"), gbVal(c, "sm"), gbVal(c, "sf")].every((v) => parseScore(v).ok)) return toast(t("gimp.errScore"), "error");
-    }
-    setGbSaving(true);
-    const now = new Date().toISOString();
-    const affected = new Set<string>();
-    const ups = rows.map((c) => {
-      const sr = gbVal(c, "sr"), sm = gbVal(c, "sm"), sf = gbVal(c, "sf");
-      const g = computeCourse({ score_regular: sr, score_midterm: sm, score_final: sf, weight_regular: c.weight_regular, weight_midterm: c.weight_midterm, weight_final: c.weight_final });
-      affected.add(c.student_id);
-      return sb!.from("courses").update({
-        score_regular: parseScore(sr).val, score_midterm: parseScore(sm).val, score_final: parseScore(sf).val,
-        total_score: g.total, letter_grade: g.letter, grade_point: g.point, updated_at: now,
-      }).eq("id", c.id);
-    });
-    const res = await Promise.all(ups);
-    const failed = res.filter((r) => r.error).length;
-    const core = await fetchCore();
-    for (const sid of affected) { const st = core.students.find((x) => x.id === sid); if (st) await recomputeStudent(st, core); }
-    await loadCore();
-    setGbSaving(false);
-    setGbEdits({});
-    toast(failed ? t("adv.importFail", { n: failed }) : t("gb.saved"), failed ? "error" : "success");
-  }
-
-  // Lock/unlock all rows of the selected course (finalize grades).
-  async function toggleLock(rows: Course[], lock: boolean) {
-    if (!sb || !rows.length) return;
-    setGbSaving(true);
-    const { error } = await sb.from("courses").update({ locked: lock }).in("id", rows.map((c) => c.id));
-    setGbSaving(false);
-    if (error) return toast(t("gb.lockErr"), "error");
-    await loadCore();
-    toast(lock ? t("gb.locked") : t("gb.unlocked"), "success");
-  }
-
-  // Export a course's grade sheet to CSV (same columns as the grade importer, so
-  // it round-trips: download → edit in Excel → re-import via "Nhập điểm").
-  function exportGradebook(rows: Course[]) {
-    if (!rows.length) return;
-    const esc = (v: unknown) => { const s = String(v ?? ""); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
-    const header = "student_code,student_name,course_code,course_name,credits,semester,academic_year,weight_regular,weight_midterm,weight_final,score_regular,score_midterm,score_final";
-    const lines = rows
-      .map((c) => ({ c, s: studentById(c.student_id) }))
-      .sort((a, b) => (a.s?.full_name || "").localeCompare(b.s?.full_name || ""))
-      .map(({ c, s }) => [
-        s?.student_code || "", s?.full_name || "", c.code || "", c.name || "", c.credits, c.semester, c.academic_year || "",
-        c.weight_regular, c.weight_midterm, c.weight_final, c.score_regular ?? "", c.score_midterm ?? "", c.score_final ?? "",
-      ].map(esc).join(","));
-    const csv = "﻿" + [header, ...lines].join("\r\n") + "\r\n";
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const [xc, xs] = (gbCourse || "|").split("|");
-    const a = document.createElement("a"); a.href = url; a.download = "diem_" + xc + "_" + xs + ".csv"; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  const renderGradebook = () => {
-    const [code, sem] = gbCourse ? gbCourse.split("|") : ["", ""];
-    const rows = gbCourse ? courses.filter((c) => c.code === code && c.semester === sem) : [];
-    const list = rows.map((c) => ({ c, s: studentById(c.student_id) })).filter((r): r is { c: Course; s: Profile } => !!r.s);
-    list.sort((a, b) => (a.s.full_name || "").localeCompare(b.s.full_name || ""));
-    const locked = list.length > 0 && list.every(({ c }) => c.locked);
-    return (
-      <>
-        <div className="page-head"><div><div className="page-title">{t("gb.title")}</div><div className="page-sub">{t("gb.sub")}</div></div></div>
-        <div className="card">
-          <div className="field" style={{ maxWidth: 480 }}>
-            <label>{t("gb.pickCourse")}</label>
-            <select value={gbCourse || ""} onChange={(e) => { setGbCourse(e.target.value || null); setGbEdits({}); }}>
-              <option value="">{t("gb.selectCourse")}</option>
-              {courseOptions.map((o) => <option key={o.k} value={o.k}>{o.code} — {o.name} · {o.semester} ({o.count})</option>)}
-            </select>
-          </div>
-          {!gbCourse && <div className="muted-note">{t("gb.hint")}</div>}
-          {gbCourse && (list.length ? (
-            <>
-              <div style={{ overflowX: "auto" }}>
-                <table>
-                  <thead><tr><th>{t("th.student")}</th><th>{t("th.studentId")}</th><th>{t("th.reg")}</th><th>{t("th.mid")}</th><th>{t("th.final")}</th><th>{t("th.total")}</th><th>{t("th.grade")}</th></tr></thead>
-                  <tbody>
-                    {list.map(({ c, s }) => {
-                      const sr = gbVal(c, "sr"), sm = gbVal(c, "sm"), sf = gbVal(c, "sf");
-                      const g = computeCourse({ score_regular: sr, score_midterm: sm, score_final: sf, weight_regular: c.weight_regular, weight_midterm: c.weight_midterm, weight_final: c.weight_final });
-                      return (
-                        <tr key={c.id}>
-                          <td>{s.full_name}</td><td className="mono">{s.student_code || "—"}</td>
-                          <td><input className="cell-in" inputMode="decimal" value={sr} disabled={locked} onChange={(e) => gbSet(c.id, "sr", e.target.value)} /></td>
-                          <td><input className="cell-in" inputMode="decimal" value={sm} disabled={locked} onChange={(e) => gbSet(c.id, "sm", e.target.value)} /></td>
-                          <td><input className="cell-in" inputMode="decimal" value={sf} disabled={locked} onChange={(e) => gbSet(c.id, "sf", e.target.value)} /></td>
-                          <td className="mono">{g.total === null ? "—" : g.total}</td>
-                          <td><span className={"grade-chip grade-" + (g.letter || "").replace("+", "p")}>{g.letter || "—"}</span></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                {locked && <span className="pill Resolved">{t("gb.lockedBadge")}</span>}
-                <button className="btn btn-primary" disabled={gbSaving || locked} onClick={() => saveGradebook(rows)}>{gbSaving ? t("loading") : t("gb.saveAll", { n: list.length })}</button>
-                <button className="btn" onClick={() => exportGradebook(rows)}><Icon name="inbox" size={16} /> {t("gb.export")}</button>
-                <button className="btn" disabled={gbSaving} onClick={() => toggleLock(rows, !locked)}>{locked ? t("gb.unlock") : t("gb.lock")}</button>
-              </div>
-            </>
-          ) : <div className="empty">{t("gb.noStudents")}</div>)}
-        </div>
-      </>
-    );
-  };
-
   // Risk config: managers edit weights + thresholds; persisted to risk_config.
   const setCfg = (k: keyof RiskConfig, v: number) => setRiskCfg((p) => ({ ...p, [k]: v }));
   async function saveConfig() {
@@ -1046,14 +907,13 @@ export default function AdvisorPage() {
   const renderStudents = () => {
     const levels = ["", "Critical", "High", "Medium", "Low"];
     const cohorts = [...new Set(students.map((s) => s.cohort).filter(Boolean))].sort();
-    const programs = [...new Set(students.map((s) => s.program).filter(Boolean))].sort();
-    const courseOpts = [...new Map(courses.filter((c) => c.code).map((c) => [c.code, c.name || c.code])).entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    // Semesters (HK1 / HK2 / summer term) present in the loaded grade data, newest first.
+    const semesterOpts = [...new Set(courses.map((c) => c.semester).filter(Boolean))].sort((a, b) => (a < b ? 1 : -1));
     let rows = students.map((s) => ({ s, a: agg(s) }));
     if (q) { const qq = q.toLowerCase(); rows = rows.filter(({ s }) => (s.full_name || "").toLowerCase().includes(qq) || (s.student_code || "").toLowerCase().includes(qq)); }
     if (level) rows = rows.filter(({ a }) => (a.risk ? a.risk.risk_level : "Unscored") === level);
     if (cohortF) rows = rows.filter(({ s }) => s.cohort === cohortF);
-    if (programF) rows = rows.filter(({ s }) => s.program === programF);
-    if (courseF) rows = rows.filter(({ s }) => courses.some((c) => c.student_id === s.id && c.code === courseF));
+    if (semF) rows = rows.filter(({ s }) => courses.some((c) => c.student_id === s.id && c.semester === semF));
     rows.sort((x, y) => (y.a.risk ? y.a.risk.score : -1) - (x.a.risk ? x.a.risk.score : -1));
     return (
       <>
@@ -1104,19 +964,15 @@ export default function AdvisorPage() {
             <option value="">{t("adv.allCohorts")}</option>
             {cohorts.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={programF} onChange={(e) => setProgramF(e.target.value)}>
-            <option value="">{t("adv.allPrograms")}</option>
-            {programs.map((pg) => <option key={pg} value={pg}>{pg}</option>)}
-          </select>
-          <select value={courseF} onChange={(e) => setCourseF(e.target.value)}>
-            <option value="">{t("adv.allCourses")}</option>
-            {courseOpts.map(([code, name]) => <option key={code} value={code}>{name && name !== code ? code + " — " + name : code}</option>)}
+          <select value={semF} onChange={(e) => setSemF(e.target.value)}>
+            <option value="">{t("adv.allSemesters")}</option>
+            {semesterOpts.map((sm) => <option key={sm} value={sm}>{sm}</option>)}
           </select>
           <div className="chips">
             {levels.map((lv) => <span key={lv} className={"chip" + (level === lv ? " active" : "")} onClick={() => setLevel(lv)}>{lv === "" ? t("status.All") : t("risk." + lv)}</span>)}
           </div>
-          {(cohortF || programF || courseF || level || q) && (
-            <button className="btn btn-sm" onClick={() => { setQ(""); setLevel(""); setCohortF(""); setProgramF(""); setCourseF(""); }}>{t("adv.clearFilters")}</button>
+          {(cohortF || semF || level || q) && (
+            <button className="btn btn-sm" onClick={() => { setQ(""); setLevel(""); setCohortF(""); setSemF(""); }}>{t("adv.clearFilters")}</button>
           )}
         </div>
         <div className="muted-note" style={{ marginTop: -8, marginBottom: 10 }}>{t("adv.matchCount", { n: rows.length, total: students.length })}</div>
@@ -1176,18 +1032,25 @@ export default function AdvisorPage() {
               {semesters.length === 0 ? (
                 <div className="empty" style={{ padding: 18 }}><Icon name="edit" size={28} />{t("empty.noCourses")}</div>
               ) : (
-                semesters.map((s) => (
-                  <div key={s.semester} style={{ marginBottom: 16 }}>
-                    <div className="spread" style={{ marginBottom: 6 }}>
-                      <b>{t("sem.label", { sem: s.semester })}</b>
-                      <span className="pill">GPA: {s.gpa === null ? "—" : s.gpa.toFixed(2)} · {s.credits} {t("th.cr")}</span>
+                <>
+                  {semesters.map((s) => (
+                    <div key={s.semester} style={{ marginBottom: 16 }}>
+                      <div className="spread" style={{ marginBottom: 6 }}>
+                        <b>{t("sem.label", { sem: s.semester })}</b>
+                        <span className="pill">GPA: {s.gpa === null ? "—" : s.gpa.toFixed(2)} · {s.credits} {t("th.cr")}</span>
+                      </div>
+                      <table>
+                        <thead><tr><th>{t("th.courseShort")}</th><th>{t("th.cr")}</th><th>{t("th.reg")}</th><th>{t("th.mid")}</th><th>{t("th.final")}</th><th>{t("th.total")}</th><th>{t("th.gradeShort")}</th><th></th></tr></thead>
+                        <tbody>{s.courses.map((c) => <CourseRow key={c.id} course={c} onSave={saveCourse} />)}</tbody>
+                      </table>
                     </div>
-                    <table>
-                      <thead><tr><th>{t("th.courseShort")}</th><th>{t("th.cr")}</th><th>{t("th.reg")}</th><th>{t("th.mid")}</th><th>{t("th.final")}</th><th>{t("th.total")}</th><th>{t("th.gradeShort")}</th><th></th></tr></thead>
-                      <tbody>{s.courses.map((c) => <CourseRow key={c.id} course={c} onSave={saveCourse} />)}</tbody>
-                    </table>
+                  ))}
+                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div><b>{t("sum.h10")}:</b> {avg10Of(a.courses) === null ? "—" : avg10Of(a.courses)!.toFixed(2)}</div>
+                    <div><b>{t("sum.h4")}:</b> {a.cpa === null ? "—" : a.cpa.toFixed(2)}</div>
+                    <div><b>{t("sum.credits")}:</b> {a.credits}</div>
                   </div>
-                ))
+                </>
               )}
             </div>
             <div className="card">
@@ -1308,9 +1171,14 @@ export default function AdvisorPage() {
     );
   };
 
+  // Alerts & interventions merged in one view: handle the alert (status/assignee)
+  // up top, with the intervention log — the actions taken for those alerts — below.
   const renderAlerts = () => {
     const opts = ["Open", "Acknowledged", "Resolved", "Dismissed", "All"];
     const list = alerts.filter((a) => alertStatusFilter === "All" || a.status === alertStatusFilter);
+    const alertMap: Record<string, Alert> = {};
+    alerts.forEach((a) => (alertMap[a.id] = a));
+    const ivList = interventions.filter((iv) => alertMap[iv.alert_id]); // scoped to this advisor's students
     return (
       <>
         <div className="page-head"><div><div className="page-title">{t("adv.alertsTitle")}</div><div className="page-sub">{t("adv.alertsSub")}</div></div></div>
@@ -1336,25 +1204,18 @@ export default function AdvisorPage() {
             </table>
           )}
         </div>
-      </>
-    );
-  };
-
-  const renderInterventions = () => {
-    const alertMap: Record<string, Alert> = {};
-    alerts.forEach((a) => (alertMap[a.id] = a));
-    const list = interventions.filter((iv) => alertMap[iv.alert_id]); // scoped to this advisor's students
-    return (
-      <>
-        <div className="page-head"><div><div className="page-title">{t("adv.ivTitle")}</div><div className="page-sub">{t("adv.ivSub", { n: list.length })}</div></div></div>
         <div className="card">
-          {list.length === 0 ? (
+          <div className="card-head">
+            <div className="card-title"><Icon name="notes" /> {t("adv.ivTitle")}</div>
+            <div className="card-sub">{t("adv.ivSub", { n: ivList.length })}</div>
+          </div>
+          {ivList.length === 0 ? (
             <div className="empty"><Icon name="notes" size={30} />{t("empty.noIv")}</div>
           ) : (
             <table>
               <thead><tr><th>{t("th.time")}</th><th>{t("th.student")}</th><th>{t("th.type")}</th><th>{t("th.notes")}</th><th>{t("th.status")}</th></tr></thead>
               <tbody>
-                {list.map((iv) => { const al = alertMap[iv.alert_id]; const s = al ? studentById(al.student_id) : null; return (
+                {ivList.map((iv) => { const al = alertMap[iv.alert_id]; const s = al ? studentById(al.student_id) : null; return (
                   <tr key={iv.id} className={s ? "row-link" : ""} onClick={() => s && openStudent(s.id)}>
                     <td className="text-muted">{fmtDate(iv.created_at, locale, true)}</td><td>{s ? s.full_name : "—"}</td>
                     <td>{ivTypeLabel(iv.action_type)}</td><td className="text-muted">{iv.notes || "—"}</td>
@@ -1432,9 +1293,7 @@ export default function AdvisorPage() {
   const navItems: [View, string, string][] = [
     ["dashboard", "dashboard", "nav.dashboard"],
     ["students", "students", "nav.students"],
-    ["gradebook", "edit", "nav.gradebook"],
     ["alerts", "alert", "nav.alerts"],
-    ["interventions", "notes", "nav.interventions"],
     ["messages", "message", "nav.messages"],
     ["evaluation", "target", "nav.evaluation"],
   ];
@@ -1469,10 +1328,8 @@ export default function AdvisorPage() {
         <main className="main">
           {view === "dashboard" && renderDashboard()}
           {view === "students" && renderStudents()}
-          {view === "gradebook" && renderGradebook()}
           {view === "student" && renderStudentDetail()}
           {view === "alerts" && renderAlerts()}
-          {view === "interventions" && renderInterventions()}
           {view === "messages" && renderMessages()}
           {view === "evaluation" && renderEvaluation()}
         </main>
