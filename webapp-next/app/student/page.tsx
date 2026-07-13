@@ -6,7 +6,7 @@ import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClien
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { BrandLogo, LangSwitch } from "@/components/common";
-import { gpaOf, bySemester, failedCount } from "@/lib/gpa";
+import { gpaOf, bySemester, failedCount, avg10Of } from "@/lib/gpa";
 import { fmtDate, initials, numFmt, gradeClass } from "@/lib/format";
 import type { Profile, Course, Notification, Message, Appointment } from "@/lib/types";
 
@@ -221,7 +221,8 @@ export default function StudentPage() {
               {semesters.length === 0 ? (
                 <div className="empty"><Icon name="inbox" size={30} />{t("empty.noGrades")}</div>
               ) : (
-                semesters.map((s) => (
+                <>
+                {semesters.map((s) => (
                   <div key={s.semester} style={{ marginBottom: 18 }}>
                     <div className="spread" style={{ marginBottom: 6 }}>
                       <b>{t("sem.label", { sem: s.semester })}</b>
@@ -250,7 +251,13 @@ export default function StudentPage() {
                       </tbody>
                     </table>
                   </div>
-                ))
+                ))}
+                <div style={{ borderTop: "1px solid var(--border)", paddingTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+                  <div><b>{t("sum.h10")}:</b> {avg10Of(courses) === null ? "—" : avg10Of(courses)!.toFixed(2)}</div>
+                  <div><b>{t("sum.h4")}:</b> {cpa === null ? "—" : cpa.toFixed(2)}</div>
+                  <div><b>{t("sum.credits")}:</b> {overall.credits || 0}</div>
+                </div>
+                </>
               )}
             </div>
           </div>
