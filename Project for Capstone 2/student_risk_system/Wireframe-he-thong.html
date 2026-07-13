@@ -24,7 +24,6 @@
     display:flex;align-items:center;gap:10px}
   .cap .n{background:#fff;color:#2f3237;width:22px;height:22px;border-radius:50%;
     display:grid;place-items:center;font-size:12px;font-weight:700}
-  .cap .note{margin-left:auto;font-weight:400;color:#c7c7c7;font-size:11.5px}
   .frame{padding:16px}
 
   /* wireframe atoms */
@@ -88,7 +87,6 @@
   .screen{border-radius:0;box-shadow:none;border-color:#bbb}
   .cap{background:none;color:#333;border-bottom:1px solid #bbb;padding:10px 2px 8px;font-size:13.5px}
   .cap .n{background:none;color:#333;width:auto;height:auto;display:inline;font-size:13.5px}
-  .cap .note{display:none}
   .box,.field,.btn,.chip,.pill,.top,.side,.kpi,.bar,.otp span,.msg,.mail,.tabs,.toggle>div,.side .nav div,.logo .shield,.notif .dot{border-radius:0}
 </style>
 </head>
@@ -102,7 +100,7 @@
 
   <!-- 1. LOGIN -->
   <section class="screen">
-    <div class="cap"><span class="n">1.</span> Đăng nhập <span class="note">CHỈ đăng nhập — tài khoản do trường cấp · góc phải: VI | EN</span></div>
+    <div class="cap"><span class="n">1.</span> Đăng nhập</div>
     <div class="frame">
       <div class="row">
         <div class="box flex1 imgx center" style="min-height:230px;flex-basis:52%">
@@ -127,7 +125,7 @@
 
   <!-- 2. FORGOT PASSWORD -->
   <section class="screen">
-    <div class="cap"><span class="n">2.</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước</span></div>
+    <div class="cap"><span class="n">2.</span> Quên mật khẩu — mã 6 số qua email</div>
     <div class="frame row">
       <div class="box pad col flex1">
         <div class="lbl">Bước 1 — nhập email</div>
@@ -152,14 +150,14 @@
 
   <!-- 3. STUDENT PORTAL -->
   <section class="screen">
-    <div class="cap"><span class="n">3.</span> Cổng Sinh viên <span class="note">logo góc trái bấm được → về đầu trang</span></div>
+    <div class="cap"><span class="n">3.</span> Cổng Sinh viên</div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
         <div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span>
         <span class="pill">Thông báo (2)</span><span class="pill">Avatar</span><span class="btn small">Đăng xuất</span>
       </div>
-      <div class="box fill2 pad small" style="border-style:dashed">Băng cảnh báo (hiện khi CPA thấp / có môn F): “Kết quả học tập đang ở mức báo động…” — kèm email tự cảnh báo gửi tới hộp thư sinh viên</div>
+      <div class="box fill2 pad small" style="border-style:dashed">Cảnh báo: Kết quả học tập đang ở mức báo động — CPA 2.35, có 1 môn chưa đạt. Hãy liên hệ cố vấn học tập.</div>
       <div class="kpis">
         <div class="kpi"><div class="k">CPA (hệ 4)</div><div class="v">2.35</div></div>
         <div class="kpi"><div class="k">GPA kỳ gần nhất</div><div class="v">2.6</div></div>
@@ -175,12 +173,12 @@
             <tr><td>Giải tích 1</td><td>4</td><td>6.0</td><td>5.5</td><td>6.0</td><td>5.9</td><td><span class="pill">C</span></td></tr>
             <tr><td>Đại số tuyến tính</td><td>3</td><td>4.0</td><td>3.5</td><td>3.0</td><td>3.4</td><td><span class="pill">F</span></td></tr>
           </table>
-          <div class="small muted mt8">GPA kỳ: 2.6 · 10 tín chỉ · điểm chỉ xem (khóa khi cố vấn “Khóa điểm”)</div>
+          <div class="small muted mt8">GPA kỳ: 2.6 · 10 tín chỉ</div>
         </div>
         <div class="box pad col flex1" style="flex-basis:42%">
           <div class="h" style="font-size:14px">Thông báo</div>
-          <div class="box fill2 pad small">• Cố vấn đã cập nhật điểm môn … (kèm email)</div>
-          <div class="h" style="font-size:14px">Hỏi đáp với cố vấn <span class="small muted">(realtime)</span></div>
+          <div class="box fill2 pad small">• Cố vấn đã cập nhật điểm môn …</div>
+          <div class="h" style="font-size:14px">Hỏi đáp với cố vấn</div>
           <div class="box pad small" style="min-height:36px">…tin nhắn…</div>
           <div class="row g8"><div class="field flex1">Nhập câu hỏi…</div><div class="btn pri">Gửi</div></div>
           <div class="h" style="font-size:14px">Lịch hẹn cố vấn</div>
@@ -194,7 +192,7 @@
 
   <!-- 4. ADVISOR DASHBOARD -->
   <section class="screen">
-    <div class="cap"><span class="n">4.</span> Bảng cố vấn — Tổng quan <span class="note">logo bấm được → về Tổng quan · sidebar 7 mục</span></div>
+    <div class="cap"><span class="n">4.</span> Bảng cố vấn — Tổng quan</div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
@@ -242,7 +240,7 @@
 
   <!-- 5. STUDENT LIST -->
   <section class="screen">
-    <div class="cap"><span class="n">5.</span> Bảng cố vấn — Danh sách sinh viên <span class="note">lọc Khóa / Ngành / Môn · xuất báo cáo</span></div>
+    <div class="cap"><span class="n">5.</span> Bảng cố vấn — Danh sách sinh viên</div>
     <div class="frame col">
       <div class="row">
         <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div class="on">Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
@@ -274,7 +272,7 @@
 
   <!-- 6. GRADEBOOK -->
   <section class="screen">
-    <div class="cap"><span class="n">6.</span> Bảng cố vấn — Bảng điểm theo môn <span class="note">nhập cả lớp · xuất Excel · khóa điểm</span></div>
+    <div class="cap"><span class="n">6.</span> Bảng cố vấn — Bảng điểm theo môn</div>
     <div class="frame col">
       <div class="row">
         <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div class="on">Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
@@ -301,16 +299,16 @@
 
   <!-- 7. STUDENT DETAIL -->
   <section class="screen">
-    <div class="cap"><span class="n">7.</span> Bảng cố vấn — Chi tiết sinh viên <span class="note">điểm · rủi ro · can thiệp · chat · duyệt lịch hẹn</span></div>
+    <div class="cap"><span class="n">7.</span> Bảng cố vấn — Chi tiết sinh viên</div>
     <div class="frame col">
       <div class="small muted">← Danh sách sinh viên</div>
       <div class="row">
         <div class="box pad flex1" style="flex-basis:33%"><div class="lbl">Thông tin sinh viên</div>
           <div class="h" style="font-size:14px">Hoàng Văn Em</div><div class="small muted">SV004 · K69 · Hệ thống thông tin</div>
           <div class="small mt8">Điểm rủi ro: <b>70.3</b> <span class="pill">Cao</span></div>
-          <div class="small muted">email liên hệ (mailto)</div>
+          <div class="small muted">email liên hệ</div>
         </div>
-        <div class="box pad flex1" style="flex-basis:34%"><div class="lbl">Yếu tố rủi ro (giải thích được)</div>
+        <div class="box pad flex1" style="flex-basis:34%"><div class="lbl">Yếu tố rủi ro</div>
           <div class="small">GPA thấp <div class="bar"><i style="width:80%"></i></div></div>
           <div class="small mt8">Điểm danh <div class="bar"><i style="width:45%"></i></div></div>
           <div class="small mt8">Hoạt động LMS <div class="bar"><i style="width:30%"></i></div></div>
@@ -355,7 +353,7 @@
 
   <!-- 8. EVALUATION + CONFIG + SYNC -->
   <section class="screen">
-    <div class="cap"><span class="n">8.</span> Bảng cố vấn — Đánh giá <span class="note">độ chính xác · hiệu quả can thiệp · cấu hình · đồng bộ SIS/LMS</span></div>
+    <div class="cap"><span class="n">8.</span> Bảng cố vấn — Đánh giá</div>
     <div class="frame col">
       <div class="row">
         <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div class="on">Đánh giá</div></div></div>
@@ -381,7 +379,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="box pad flex1"><div class="h" style="font-size:14px">Cấu hình rủi ro <span class="small muted">(Quản lý chỉnh · cố vấn chỉ xem)</span></div>
+            <div class="box pad flex1"><div class="h" style="font-size:14px">Cấu hình rủi ro</div>
               <div class="row g8 mt8"><div class="flex1"><div class="flabel">GPA</div><div class="field">0.40</div></div>
                 <div class="flex1"><div class="flabel">Điểm danh</div><div class="field">0.30</div></div>
                 <div class="flex1"><div class="flabel">LMS</div><div class="field">0.15</div></div>
