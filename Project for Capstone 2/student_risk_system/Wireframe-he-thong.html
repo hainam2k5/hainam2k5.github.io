@@ -174,6 +174,7 @@
             <tr><td>Đại số tuyến tính</td><td>3</td><td>4.0</td><td>3.5</td><td>3.0</td><td>3.4</td><td><span class="pill">F</span></td></tr>
           </table>
           <div class="small muted mt8">GPA kỳ: 2.6 · 10 tín chỉ</div>
+          <div class="small mt8" style="border-top:1px solid #eee;padding-top:6px"><b>Điểm TB tích lũy (hệ 10):</b> 7.36 · <b>(hệ 4):</b> 2.35 · <b>Tín chỉ tích lũy:</b> 42</div>
         </div>
         <div class="box pad col flex1" style="flex-basis:42%">
           <div class="h" style="font-size:14px">Thông báo</div>
@@ -202,7 +203,7 @@
         <div class="side">
           <div class="lbl">Điều hướng</div>
           <div class="nav">
-            <div class="on">Tổng quan</div><div>Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo (1)</div><div>Can thiệp</div><div>Tin nhắn (1)</div><div>Đánh giá</div>
+            <div class="on">Tổng quan</div><div>Sinh viên</div><div>Cảnh báo & Can thiệp (1)</div><div>Tin nhắn (1)</div><div>Đánh giá</div>
           </div>
         </div>
         <div class="flex1 col">
@@ -243,7 +244,7 @@
     <div class="cap"><span class="n">5.</span> Bảng cố vấn — Danh sách sinh viên</div>
     <div class="frame col">
       <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div class="on">Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div class="on">Sinh viên</div><div>Cảnh báo & Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
         <div class="flex1 col">
           <div class="row" style="justify-content:space-between;flex-wrap:wrap">
             <div class="h">Sinh viên <span class="muted small">· 24 sinh viên</span></div>
@@ -252,8 +253,7 @@
           <div class="row g8" style="flex-wrap:wrap">
             <div class="field flex1" style="min-width:170px">Tìm theo tên hoặc mã SV…</div>
             <div class="field sel" style="width:120px">Tất cả khóa</div>
-            <div class="field sel" style="width:130px">Tất cả ngành</div>
-            <div class="field sel" style="width:150px">Tất cả môn</div>
+            <div class="field sel" style="width:150px">Tất cả học kỳ</div>
           </div>
           <div class="row g8"><span class="chip on">Tất cả</span><span class="chip">Nghiêm trọng</span><span class="chip">Cao</span><span class="chip">Trung bình</span><span class="chip">Thấp</span><span class="btn small">Xóa lọc</span></div>
           <div class="small muted">Hiển thị 3/24 sinh viên</div>
@@ -270,36 +270,10 @@
     </div>
   </section>
 
-  <!-- 6. GRADEBOOK -->
-  <section class="screen">
-    <div class="cap"><span class="n">6.</span> Bảng cố vấn — Bảng điểm theo môn</div>
-    <div class="frame col">
-      <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div class="on">Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div>Đánh giá</div></div></div>
-        <div class="flex1 col">
-          <div class="row g8" style="flex-wrap:wrap;justify-content:space-between">
-            <div class="field sel" style="width:360px;flex:none">INT1008 — Nhập môn lập trình · HK1 2025-2026</div>
-            <div class="row g8"><span class="btn small">Xuất Excel</span><span class="btn small">Khóa điểm</span><span class="btn pri small">Lưu tất cả</span></div>
-          </div>
-          <div class="box pad">
-            <table class="wf">
-              <tr><th>MSSV</th><th>Sinh viên</th><th>Khóa · Ngành</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Chữ</th></tr>
-              <tr><td>SV004</td><td>Hoàng Văn Em</td><td class="small">K69 · HTTT</td>
-                <td><div class="field" style="width:52px;height:26px">3.0</div></td><td><div class="field" style="width:52px;height:26px">2.5</div></td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td></tr>
-              <tr><td>SV002</td><td>Lê Văn Cường</td><td class="small">K70 · KTPM</td>
-                <td><div class="field" style="width:52px;height:26px">6.5</div></td><td><div class="field" style="width:52px;height:26px">7.0</div></td><td><div class="field" style="width:52px;height:26px">6.0</div></td><td>6.4</td><td><span class="pill">C</span></td></tr>
-              <tr><td>SV003</td><td>Phạm Thị Dung</td><td class="small">K71 · HTTT</td>
-                <td><div class="field" style="width:52px;height:26px">8.0</div></td><td><div class="field" style="width:52px;height:26px">8.5</div></td><td><div class="field" style="width:52px;height:26px">9.0</div></td><td>8.6</td><td><span class="pill">A</span></td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- 7. STUDENT DETAIL -->
   <section class="screen">
-    <div class="cap"><span class="n">7.</span> Bảng cố vấn — Chi tiết sinh viên</div>
+    <div class="cap"><span class="n">6.</span> Bảng cố vấn — Chi tiết sinh viên</div>
     <div class="frame col">
       <div class="small muted">← Danh sách sinh viên</div>
       <div class="row">
@@ -321,10 +295,12 @@
         </div>
       </div>
       <div class="box pad"><div class="h" style="font-size:14px">Nhập / sửa điểm từng môn</div>
+        <div class="row mt8" style="justify-content:space-between"><b>Học kỳ HK1 2025-2026</b><span class="pill">GPA 0.23 · 12 tín chỉ</span></div>
         <table class="wf mt8">
           <tr><th>Môn</th><th>TX</th><th>GK</th><th>CK</th><th>Tổng</th><th>Chữ</th><th></th></tr>
           <tr><td>Nhập môn lập trình</td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td><div class="field" style="width:52px;height:26px">2.5</div></td><td><div class="field" style="width:52px;height:26px">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td><td><span class="btn small">Lưu</span></td></tr>
         </table>
+        <div class="small mt8" style="border-top:1px solid #ddd;padding-top:8px"><div><b>Điểm trung bình tích lũy (hệ 10):</b> 3.10</div><div><b>Điểm trung bình tích lũy (hệ 4):</b> 0.23</div><div><b>Tổng số tín chỉ tích lũy:</b> 12</div></div>
       </div>
       <div class="row">
         <div class="box pad flex1"><div class="h" style="font-size:14px">Cảnh báo & Can thiệp</div>
@@ -353,10 +329,10 @@
 
   <!-- 8. EVALUATION + CONFIG + SYNC -->
   <section class="screen">
-    <div class="cap"><span class="n">8.</span> Bảng cố vấn — Đánh giá</div>
+    <div class="cap"><span class="n">7.</span> Bảng cố vấn — Đánh giá</div>
     <div class="frame col">
       <div class="row">
-        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div>Bảng điểm</div><div>Cảnh báo</div><div>Can thiệp</div><div>Tin nhắn</div><div class="on">Đánh giá</div></div></div>
+        <div class="side"><div class="lbl">Điều hướng</div><div class="nav"><div>Tổng quan</div><div>Sinh viên</div><div>Cảnh báo & Can thiệp</div><div>Tin nhắn</div><div class="on">Đánh giá</div></div></div>
         <div class="flex1 col">
           <div class="row">
             <div class="box pad flex1"><div class="h" style="font-size:14px">Độ chính xác cảnh báo</div>
