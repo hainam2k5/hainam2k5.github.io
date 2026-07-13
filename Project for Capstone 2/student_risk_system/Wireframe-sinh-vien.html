@@ -24,7 +24,6 @@
     display:flex;align-items:center;gap:10px}
   .cap .n{background:#fff;color:#2f3237;width:22px;height:22px;border-radius:50%;
     display:grid;place-items:center;font-size:12px;font-weight:700}
-  .cap .note{margin-left:auto;font-weight:400;color:#c7c7c7;font-size:11.5px}
   .frame{padding:16px}
 
   .row{display:flex;gap:12px}
@@ -88,7 +87,6 @@
   .screen{border-radius:0;box-shadow:none;border-color:#bbb}
   .cap{background:none;color:#333;border-bottom:1px solid #bbb;padding:10px 2px 8px;font-size:13.5px}
   .cap .n{background:none;color:#333;width:auto;height:auto;display:inline;font-size:13.5px}
-  .cap .note{display:none}
   .box,.field,.btn,.chip,.pill,.top,.side,.kpi,.bar,.otp span,.msg,.mail,.tabs,.toggle>div,.side .nav div,.logo .shield,.notif .dot{border-radius:0}
 </style>
 </head>
@@ -102,7 +100,7 @@
 
   <!-- 1. LOGIN -->
   <section class="screen">
-    <div class="cap"><span class="n">1.</span> Đăng nhập (góc nhìn sinh viên) <span class="note">kèm 2 biến thể: lỗi · đang xử lý</span></div>
+    <div class="cap"><span class="n">1.</span> Đăng nhập (góc nhìn sinh viên)</div>
     <div class="frame col">
       <div class="row">
         <div class="box pad col flex1" style="flex-basis:55%">
@@ -119,12 +117,12 @@
           <div class="box pad col">
             <div class="lbl">Biến thể — sai thông tin</div>
             <div class="box fill2 pad small" style="border-style:dashed">Email hoặc mật khẩu không đúng.</div>
-            <div class="small muted">Form giữ nguyên email đã gõ, chỉ xóa mật khẩu.</div>
+            
           </div>
           <div class="box pad col">
             <div class="lbl">Biến thể — đang xử lý</div>
             <div class="btn blk">Đang đăng nhập…</div>
-            <div class="small muted">Nút bị khóa trong lúc chờ, tránh bấm lặp.</div>
+            
           </div>
         </div>
       </div>
@@ -133,7 +131,7 @@
 
   <!-- 2. FORGOT PASSWORD -->
   <section class="screen">
-    <div class="cap"><span class="n">2.</span> Quên mật khẩu — mã 6 số qua email <span class="note">2 bước · sinh viên tự làm, không cần cố vấn</span></div>
+    <div class="cap"><span class="n">2.</span> Quên mật khẩu — mã 6 số qua email</div>
     <div class="frame row">
       <div class="box pad col flex1">
         <div class="lbl">Bước 1 — nhập email</div>
@@ -158,7 +156,7 @@
 
   <!-- 3. PORTAL OVERVIEW -->
   <section class="screen">
-    <div class="cap"><span class="n">3.</span> Cổng Sinh viên — khung tổng & chỉ số <span class="note">ngay sau đăng nhập</span></div>
+    <div class="cap"><span class="n">3.</span> Cổng Sinh viên — khung tổng & chỉ số</div>
     <div class="frame col">
       <div class="top">
         <div class="logo"><div class="shield">VNU<br>iS</div><div class="txt" style="width:120px"></div></div>
@@ -169,8 +167,8 @@
         <div><div class="h">Xin chào, Nguyễn Minh Anh</div><div class="small muted">24010001 · Hệ thống thông tin quản lý · K69</div></div>
         <span class="btn small">In bảng điểm</span>
       </div>
-      <div class="box fill2 pad small" style="border-style:dashed"><b>Cảnh báo nghiêm trọng</b> — CPA hiện tại 1.85, có 2 môn chưa đạt. Hãy liên hệ cố vấn học tập sớm. <span class="muted">(hiện khi CPA &lt; 2.0 hoặc ≥ 2 môn F)</span></div>
-      <div class="box fill2 pad small" style="border-style:dashed"><b>Lưu ý học tập</b> — CPA hiện tại 2.35. Cần cải thiện ở kỳ tới. <span class="muted">(mức nhẹ: CPA &lt; 2.5 hoặc ≥ 1 môn F — chỉ hiện 1 trong 2 băng)</span></div>
+      <div class="box fill2 pad small" style="border-style:dashed"><b>Cảnh báo nghiêm trọng</b> — CPA hiện tại 1.85, có 2 môn chưa đạt. Hãy liên hệ cố vấn học tập sớm.</div>
+      <div class="box fill2 pad small" style="border-style:dashed"><b>Lưu ý học tập</b> — CPA hiện tại 2.35. Cần cải thiện ở kỳ tới.</div>
       <div class="kpis">
         <div class="kpi acc"><div class="k">CPA (hệ 4)</div><div class="v">2.35</div></div>
         <div class="kpi"><div class="k">GPA kỳ gần nhất</div><div class="v">2.60 <span class="small muted">HK1 2025-2026</span></div></div>
@@ -182,7 +180,7 @@
 
   <!-- 4. TRANSCRIPT -->
   <section class="screen">
-    <div class="cap"><span class="n">4.</span> Bảng điểm theo học kỳ <span class="note">chỉ xem · GPA từng kỳ + CPA</span></div>
+    <div class="cap"><span class="n">4.</span> Bảng điểm theo học kỳ</div>
     <div class="frame col">
       <div class="row g8" style="flex-wrap:wrap">
         <span class="pill">CPA: <b>2.35</b></span><span class="pill">HK1 2024-2025: <b>2.10</b></span><span class="pill">HK2 2024-2025: <b>2.45</b></span><span class="pill">HK1 2025-2026: <b>2.60</b></span>
@@ -205,10 +203,10 @@
 
   <!-- 5. PRINT -->
   <section class="screen">
-    <div class="cap"><span class="n">5.</span> In bảng điểm <span class="note">nút → hộp thoại in của trình duyệt</span></div>
+    <div class="cap"><span class="n">5.</span> In bảng điểm</div>
     <div class="frame row">
       <div class="box pad col flex1" style="flex-basis:58%">
-        <div class="lbl">Bản in (chỉ vùng bảng điểm)</div>
+        <div class="lbl">Bản in</div>
         <div style="font-weight:800;font-size:14px">BẢNG ĐIỂM SINH VIÊN</div>
         <div class="small">Nguyễn Minh Anh · 24010001 · Hệ thống thông tin quản lý · K69</div>
         <div class="small muted">In lúc: 12/07/2026 14:00</div>
@@ -230,7 +228,7 @@
 
   <!-- 6. NOTIFICATIONS -->
   <section class="screen">
-    <div class="cap"><span class="n">6.</span> Thông báo <span class="note">realtime · chuông đếm chưa đọc</span></div>
+    <div class="cap"><span class="n">6.</span> Thông báo</div>
     <div class="frame row">
       <div class="box pad col flex1" style="flex-basis:58%">
         <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Thông báo</div><span class="btn small">Đánh dấu đã đọc tất cả</span></div>
@@ -238,21 +236,12 @@
         <div class="notif"><span class="dot"></span><div><b>Cảnh báo kết quả học tập</b><div class="small muted">Bạn đang ở mức cảnh báo Cao. Lý do: GPA giảm 0.52 so kỳ trước; điểm danh thấp (54%).</div><div class="small muted">hôm qua 16:03</div></div></div>
         <div class="notif read"><span class="dot"></span><div><b>Tin nhắn từ cố vấn</b><div class="small muted">“Em sắp xếp gặp cô tuần này nhé…”</div><div class="small muted">10/07 09:15</div></div></div>
       </div>
-      <div class="col flex1" style="flex-basis:42%">
-        <div class="box pad col">
-          <div class="lbl">4 loại thông báo</div>
-          <div class="small">Điểm — khi có điểm mới/sửa điểm</div>
-          <div class="small">Cảnh báo — khi vào vùng nguy cơ (kèm lý do)</div>
-          <div class="small">Tin nhắn — khi cố vấn nhắn</div>
-          <div class="small">Hệ thống — thông báo chung từ cố vấn</div>
-        </div>
-      </div>
     </div>
   </section>
 
   <!-- 7. CHAT -->
   <section class="screen">
-    <div class="cap"><span class="n">7.</span> Hỏi đáp với cố vấn <span class="note">chat realtime 2 chiều</span></div>
+    <div class="cap"><span class="n">7.</span> Hỏi đáp với cố vấn</div>
     <div class="frame row">
       <div class="box pad col flex1" style="flex-basis:58%">
         <div class="row" style="justify-content:space-between"><div class="h" style="font-size:14px">Hỏi đáp</div><span class="small muted">Cố vấn: TS. Trần Thị B</span></div>
@@ -267,7 +256,7 @@
         <div class="box pad col">
           <div class="lbl">Biến thể — chưa có cố vấn phụ trách</div>
           <div class="box fill2 pad small">Cố vấn sẽ nhận sinh viên phụ trách trước khi có thể trao đổi.</div>
-          <div class="small muted">Ô nhập vẫn hiển thị nhưng tin không gửi được khi chưa gán cố vấn.</div>
+          
         </div>
       </div>
     </div>
@@ -275,7 +264,7 @@
 
   <!-- 8. APPOINTMENTS -->
   <section class="screen">
-    <div class="cap"><span class="n">8.</span> Lịch hẹn cố vấn <span class="note">sinh viên đặt — cố vấn duyệt · realtime</span></div>
+    <div class="cap"><span class="n">8.</span> Lịch hẹn cố vấn</div>
     <div class="frame col">
       <div class="row">
         <div class="box pad col flex1" style="flex-basis:45%">
@@ -302,7 +291,7 @@
 
   <!-- 9. EMAILS -->
   <section class="screen">
-    <div class="cap"><span class="n">9.</span> Email sinh viên nhận được <span class="note">gửi về email trong hồ sơ SV</span></div>
+    <div class="cap"><span class="n">9.</span> Email sinh viên nhận được</div>
     <div class="frame col">
       <div class="row">
         <div class="mail flex1">
