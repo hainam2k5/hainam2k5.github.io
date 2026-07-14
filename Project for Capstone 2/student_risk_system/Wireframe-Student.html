@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wireframe — Student</title>
 <style>
-  :root{--ink:#333;--mut:#8a8a8a;--line:#c4c4c4;--fill:#e2e2e2;--fill2:#f1f1f1;--dark:#6b6b6b;--paper:#fff}
+  :root{--ink:#333;--mut:#888;--faint:#aaa;--line:#c4c4c4;--fill:#e6e6e6;--fill2:#f2f2f2;--dark:#5f5f5f}
   *{box-sizing:border-box}
   body{margin:0;background:#fff;color:var(--ink);font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13px;line-height:1.5}
   .page{max-width:1000px;margin:0 auto;padding:28px 20px 70px}
@@ -15,37 +15,35 @@
 
   .screen{border:1px solid #bbb;margin:0 0 22px}
   .cap{border-bottom:1px solid #bbb;padding:9px 12px;font-size:14px;font-weight:600}
-  .cap b{font-weight:700} .cap span{font-weight:400;color:var(--mut)}
   .frame{padding:16px;display:flex;flex-direction:column;gap:12px}
 
   .row{display:flex;gap:12px} .col{display:flex;flex-direction:column;gap:12px}
-  .flex1{flex:1} .sp{justify-content:space-between} .ac{align-items:center} .end{justify-content:flex-end}
+  .flex1{flex:1} .sp{justify-content:space-between} .ac{align-items:center} .end{justify-content:flex-end} .wrap{flex-wrap:wrap}
   .box{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px}
   .box.dash{border-style:dashed}
   .plain{border:none;padding:0}
-
-  .tx{height:9px;background:var(--fill);border-radius:2px}
-  .tx.s{height:7px} .tx.lg{height:13px}
-  .w15{width:15%}.w20{width:20%}.w30{width:30%}.w40{width:40%}.w50{width:50%}.w60{width:60%}.w70{width:70%}.w80{width:80%}.w100{width:100%}
-  .mb{margin-bottom:5px}
-  .field{border:1px solid var(--line);height:30px;background:#fff}
-  .btn{border:1px solid var(--dark);height:30px;width:104px;background:#fff}
-  .btn.sm{height:24px;width:80px} .btn.pri{background:var(--dark)} .btn.blk{width:100%}
-  .chip{border:1px solid var(--line);border-radius:999px;height:22px;width:64px}
-  .chip.on{background:var(--fill)}
-  .pill{border:1px solid var(--line);border-radius:999px;height:15px;width:48px;display:inline-block}
-  .img{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);min-height:200px;display:flex;align-items:flex-start}
-  .logo{width:30px;height:34px;border:1px solid var(--dark)}
-  .bar{height:7px;background:var(--fill)} .bar i{display:block;height:100%;background:#9a9a9a}
-  .top{border:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:10px}
+  .h{font-weight:700;font-size:14px} .muted{color:var(--mut)} .small{font-size:11px}
+  .lbl{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+  .flabel{font-size:11px;color:var(--mut);margin-bottom:4px}
+  .field{border:1px solid var(--line);min-height:30px;display:flex;align-items:center;padding:5px 9px;color:var(--faint);font-size:12px}
+  .field.sel::after{content:"▾";margin-left:auto;color:var(--mut)}
+  .btn{border:1px solid var(--dark);height:30px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;font-size:12px;color:var(--dark);background:#fff;white-space:nowrap}
+  .btn.pri{background:var(--dark);color:#fff} .btn.blk{width:100%;display:flex} .btn.sm{height:24px;font-size:11px;padding:0 9px}
+  .chip{border:1px solid var(--line);border-radius:999px;height:24px;display:inline-flex;align-items:center;padding:0 11px;font-size:11.5px;color:var(--mut)} .chip.on{background:var(--fill);color:var(--ink)}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:11px;background:var(--fill2)}
+  .img{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);min-height:200px;display:grid;place-items:center;color:var(--mut);text-align:center;position:relative}
+  .logo{border:1px solid var(--dark);padding:2px 6px;font-size:9px;font-weight:700;color:var(--dark);position:absolute;top:12px;left:12px}
+  .bar{height:7px;background:var(--fill);flex:1} .bar i{display:block;height:100%;background:#9a9a9a}
+  .top{border:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:10px;font-size:12px}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .kpi{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:58px}
-  .kpi.acc{border-left:4px solid var(--dark)}
-  table.wf{width:100%;border-collapse:collapse}
-  table.wf td{border-bottom:1px solid var(--line);padding:9px 8px}
-  table.wf tr:first-child td{border-bottom:1px solid #9a9a9a}
-  .otp{display:flex;gap:6px}.otp span{flex:1;height:34px;border:1px solid var(--line)}
-  .mail{border:1px solid var(--line)} .mail .mh{border-bottom:1px solid var(--line);padding:9px 10px;display:flex;flex-direction:column;gap:6px} .mail .mb{padding:10px;display:flex;flex-direction:column;gap:7px}
+  .kpi{border:1px solid var(--line);padding:10px} .kpi.acc{border-left:4px solid var(--dark)}
+  .kpi .k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em} .kpi .v{font-size:19px;font-weight:800;margin-top:5px}
+  table.wf{width:100%;border-collapse:collapse;font-size:12px}
+  table.wf th{text-align:left;color:var(--faint);font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:7px 8px;border-bottom:1px solid var(--line);font-weight:700}
+  table.wf td{padding:8px;border-bottom:1px solid #eee;color:var(--dark)}
+  .otp{display:flex;gap:6px}.otp span{flex:1;height:34px;border:1px solid var(--line);display:grid;place-items:center;color:var(--faint)}
+  .mail{border:1px solid var(--line)} .mail .mh{border-bottom:1px solid var(--line);padding:8px 10px;font-size:11px;color:var(--mut)} .mail .mb{padding:10px;font-size:12px}
+  .dots{letter-spacing:3px;color:var(--faint)}
   @media print{.screen{break-inside:avoid}}
 </style>
 </head>
@@ -59,18 +57,19 @@
 
   <!-- 1 -->
   <section class="screen">
-    <div class="cap"><b>1.</b> Log in</div>
+    <div class="cap">1. Log in</div>
     <div class="frame">
       <div class="row">
-        <div class="img flex1" style="flex-basis:52%;padding:12px"><div class="logo"></div></div>
+        <div class="img flex1" style="flex-basis:52%"><div class="logo">VNU iS</div>School photo (carousel)<br><span class="dots">● ● ● ●</span></div>
         <div class="box flex1" style="flex-basis:48%">
-          <div class="row end"><span class="chip on"></span><span class="chip"></span></div>
-          <div class="tx lg w60"></div><div class="tx s w80"></div>
-          <div><div class="tx s w20 mb"></div><div class="field"></div></div>
-          <div><div class="tx s w20 mb"></div><div class="field"></div></div>
-          <div class="row end"><span class="tx s w30"></span></div>
-          <div class="btn pri blk"></div>
-          <div class="tx s w80" style="margin:2px auto 0"></div>
+          <div class="row end"><span class="chip on">VI</span><span class="chip">EN</span></div>
+          <div class="h">Welcome back</div>
+          <div class="muted small">Sign in to continue.</div>
+          <div><div class="flabel">Email</div><div class="field">you@gmail.com</div></div>
+          <div><div class="flabel">Password</div><div class="field">••••••••</div></div>
+          <div class="row end"><span class="small muted">Forgot password?</span></div>
+          <div class="btn pri blk">Sign in</div>
+          <div class="small muted" style="text-align:center">Accounts are issued by the school. Contact your advisor if you don't have one.</div>
         </div>
       </div>
     </div>
@@ -78,52 +77,58 @@
 
   <!-- 2 -->
   <section class="screen">
-    <div class="cap"><b>2.</b> Forgot password</div>
+    <div class="cap">2. Forgot password</div>
     <div class="frame row">
       <div class="box flex1">
-        <div class="tx lg w50"></div><div class="tx s w80"></div>
-        <div><div class="tx s w20 mb"></div><div class="field"></div></div>
-        <div class="btn pri blk"></div>
-        <div class="tx s w40" style="margin:2px auto 0"></div>
+        <div class="lbl">Step 1 — enter email</div>
+        <div class="h">Reset password</div>
+        <div class="muted small">Enter your email; we'll send a 6-digit code.</div>
+        <div><div class="flabel">Email</div><div class="field">you@gmail.com</div></div>
+        <div class="btn pri blk">Send code</div>
+        <div class="small muted" style="text-align:center">← Back to login</div>
       </div>
       <div class="box flex1">
-        <div class="tx lg w50"></div><div class="tx s w80"></div>
-        <div><div class="tx s w30 mb"></div><div class="otp"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-        <div><div class="tx s w30 mb"></div><div class="field"></div></div>
-        <div><div class="tx s w40 mb"></div><div class="field"></div></div>
-        <div class="btn pri blk"></div>
+        <div class="lbl">Step 2 — code &amp; new password</div>
+        <div class="h">Set new password</div>
+        <div class="muted small">Enter the 6-digit code sent to your email.</div>
+        <div><div class="flabel">Verification code (6 digits)</div><div class="otp"><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span></div></div>
+        <div><div class="flabel">New password</div><div class="field">••••••••</div></div>
+        <div><div class="flabel">Confirm new password</div><div class="field">••••••••</div></div>
+        <div class="btn pri blk">Update password</div>
       </div>
     </div>
   </section>
 
   <!-- 3 -->
   <section class="screen">
-    <div class="cap"><b>3.</b> Dashboard</div>
+    <div class="cap">3. Dashboard</div>
     <div class="frame">
-      <div class="top"><div class="logo" style="width:26px;height:30px"></div><div class="flex1"></div><span class="chip on"></span><span class="chip"></span><span class="pill" style="width:60px"></span><span class="pill" style="width:60px"></span><span class="btn sm"></span></div>
-      <div class="box dash"><div class="tx s w80"></div></div>
+      <div class="top"><b>VNU iS</b><div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span><span class="pill">Notifications (2)</span><span class="pill">Avatar</span><span class="btn sm">Log out</span></div>
+      <div class="box dash"><div class="small">⚠ Alert — academic standing at risk: CPA 2.35, 1 failed course. Contact your advisor.</div></div>
       <div class="kpis">
-        <div class="kpi acc"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
-        <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
-        <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
-        <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
+        <div class="kpi acc"><div class="k">CPA (4-scale)</div><div class="v">2.35</div></div>
+        <div class="kpi"><div class="k">Latest GPA</div><div class="v">2.60</div></div>
+        <div class="kpi"><div class="k">Credits earned</div><div class="v">42</div></div>
+        <div class="kpi"><div class="k">Failed (F)</div><div class="v">1</div></div>
       </div>
       <div class="row">
         <div class="box flex1" style="flex-basis:58%">
-          <div class="row sp ac"><div class="tx w40"></div><span class="btn sm"></span></div>
+          <div class="row sp ac"><div class="h">Transcript by semester</div><span class="btn sm">Print transcript</span></div>
           <table class="wf">
-            <tr><td><div class="tx s w80"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
-            <tr><td><div class="tx s w70"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
-            <tr><td><div class="tx s w60"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
+            <tr><th>Course</th><th>Cr</th><th>Reg</th><th>Mid</th><th>Final</th><th>Total</th><th>Grade</th></tr>
+            <tr><td>Database Systems</td><td>3</td><td>8.0</td><td>8.5</td><td>9.0</td><td>8.65</td><td><span class="pill">A</span></td></tr>
+            <tr><td>Calculus 1</td><td>4</td><td>6.0</td><td>5.5</td><td>6.0</td><td>5.85</td><td><span class="pill">C</span></td></tr>
           </table>
-          <div class="tx s w80" style="margin-top:4px"></div>
+          <div class="small muted">Cumulative (10): 7.36 · (4): 2.35 · Credits: 42</div>
         </div>
         <div class="box flex1" style="flex-basis:42%">
-          <div class="tx w40"></div>
-          <div class="box plain" style="border:1px solid var(--line);padding:9px"><div class="tx s w80"></div></div>
-          <div class="tx w40" style="margin-top:2px"></div>
-          <div class="box" style="min-height:44px"></div>
-          <div class="row g8" style="gap:8px"><div class="field flex1"></div><div class="btn" style="width:70px"></div></div>
+          <div class="h">Notifications</div>
+          <div class="field" style="min-height:30px">Advisor updated a grade …</div>
+          <div class="h">Advisor Q&amp;A (realtime)</div>
+          <div class="field small" style="min-height:40px">Chat messages …</div>
+          <div class="row" style="gap:8px"><div class="field flex1">Type a question…</div><div class="btn">Send</div></div>
+          <div class="h">Appointments</div>
+          <div class="row" style="gap:8px"><div class="field flex1">Pick a time</div><div class="btn">Book</div></div>
         </div>
       </div>
     </div>
@@ -131,87 +136,88 @@
 
   <!-- 4 -->
   <section class="screen">
-    <div class="cap"><b>4.</b> Transcript</div>
+    <div class="cap">4. Transcript</div>
     <div class="frame">
-      <div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill" style="width:70px"></span><span class="pill" style="width:90px"></span><span class="pill" style="width:90px"></span></div>
+      <div class="row wrap" style="gap:6px"><span class="pill">CPA: 2.35</span><span class="pill">Sem 1 24-25: 2.10</span><span class="pill">Sem 2 24-25: 2.45</span><span class="pill">Sem 1 25-26: 2.60</span></div>
       <div class="box">
-        <div class="row sp ac"><div class="tx w40"></div><span class="pill" style="width:110px;height:18px"></span></div>
+        <div class="row sp ac"><b>Semester 1 · 2025-2026</b><span class="pill">GPA 2.60 · 10 credits</span></div>
         <table class="wf">
-          <tr><td><div class="tx s w20"></div></td><td><div class="tx s w15"></div></td><td><div class="tx s w15"></div></td><td><div class="tx s w15"></div></td><td><div class="tx s w15"></div></td><td><div class="tx s w15"></div></td><td><span class="pill"></span></td></tr>
-          <tr><td><div class="tx s w80"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
-          <tr><td><div class="tx s w70"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
+          <tr><th>Course</th><th>Cr</th><th>Reg</th><th>Mid</th><th>Final</th><th>Total</th><th>Grade</th></tr>
+          <tr><td>Database Systems</td><td>3</td><td>8.0</td><td>8.5</td><td>9.0</td><td>8.65</td><td><span class="pill">A</span></td></tr>
+          <tr><td>Calculus 1</td><td>4</td><td>6.0</td><td>5.5</td><td>6.0</td><td>5.85</td><td><span class="pill">C</span></td></tr>
+          <tr><td>Linear Algebra</td><td>3</td><td>4.0</td><td>3.5</td><td>3.0</td><td>3.35</td><td><span class="pill">F</span></td></tr>
         </table>
       </div>
       <div class="box">
-        <div class="row sp ac"><div class="tx w40"></div><span class="pill" style="width:110px;height:18px"></span></div>
-        <table class="wf">
-          <tr><td><div class="tx s w80"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
-        </table>
+        <div class="row sp ac"><b>Semester 2 · 2024-2025</b><span class="pill">GPA 2.45 · 14 credits</span></div>
+        <div class="field" style="justify-content:center">… more semester tables …</div>
       </div>
-      <div class="box plain" style="border-top:1px solid var(--line);padding-top:10px;gap:6px">
-        <div class="tx s w60"></div><div class="tx s w50"></div><div class="tx s w40"></div>
+      <div class="box plain" style="border-top:1px solid var(--line);padding-top:10px;gap:5px">
+        <div><b>Cumulative average (10-point):</b> 7.36</div>
+        <div><b>Cumulative average (4-point):</b> 2.35</div>
+        <div><b>Total credits earned:</b> 42</div>
       </div>
     </div>
   </section>
 
   <!-- 5 -->
   <section class="screen">
-    <div class="cap"><b>5.</b> Notifications</div>
-    <div class="frame row">
-      <div class="box flex1" style="flex-basis:100%">
-        <div class="row sp ac"><div class="tx w30"></div><span class="btn sm" style="width:120px"></span></div>
-        <div class="row" style="gap:8px;border-top:1px solid var(--line);padding-top:9px"><span class="pill" style="width:8px;height:8px;border-radius:50%"></span><div class="col flex1" style="gap:5px"><div class="tx s w40"></div><div class="tx s w80"></div></div></div>
-        <div class="row" style="gap:8px;border-top:1px solid var(--line);padding-top:9px"><span class="pill" style="width:8px;height:8px;border-radius:50%"></span><div class="col flex1" style="gap:5px"><div class="tx s w40"></div><div class="tx s w70"></div></div></div>
-        <div class="row" style="gap:8px;border-top:1px solid var(--line);padding-top:9px"><span class="pill" style="width:8px;height:8px;border-radius:50%;background:#fff"></span><div class="col flex1" style="gap:5px"><div class="tx s w40"></div><div class="tx s w60"></div></div></div>
+    <div class="cap">5. Notifications</div>
+    <div class="frame">
+      <div class="box">
+        <div class="row sp ac"><div class="h">Notifications</div><span class="btn sm">Mark all read</span></div>
+        <div class="row" style="gap:8px;border-top:1px solid var(--line);padding-top:9px"><span class="pill" style="width:8px;height:8px;padding:0;border-radius:50%"></span><div class="flex1"><b>Grade updated</b> — Database Systems: total 8.65 (A)<div class="small muted">today 10:21</div></div></div>
+        <div class="row" style="gap:8px;border-top:1px solid var(--line);padding-top:9px"><span class="pill" style="width:8px;height:8px;padding:0;border-radius:50%"></span><div class="flex1"><b>Risk alert — level High</b>: GPA dropped 0.52; attendance 54%.<div class="small muted">yesterday 16:03</div></div></div>
+        <div class="row" style="gap:8px;border-top:1px solid var(--line);padding-top:9px"><span class="pill" style="width:8px;height:8px;padding:0;border-radius:50%;background:#fff"></span><div class="flex1 muted"><b>Message from advisor</b> — "Let's meet this week…"<div class="small muted">10/07 09:15</div></div></div>
       </div>
     </div>
   </section>
 
   <!-- 6 -->
   <section class="screen">
-    <div class="cap"><b>6.</b> Advisor chat</div>
+    <div class="cap">6. Advisor chat</div>
     <div class="frame">
       <div class="box">
-        <div class="row sp ac"><div class="tx w30"></div><div class="tx s w30"></div></div>
-        <div class="col" style="gap:7px;min-height:120px;justify-content:flex-end">
-          <div style="border:1px solid var(--line);width:70%;height:30px"></div>
-          <div style="border:1px solid var(--line);width:70%;height:30px;margin-left:auto;background:var(--fill2)"></div>
-          <div style="border:1px solid var(--line);width:55%;height:24px"></div>
+        <div class="row sp ac"><div class="h">Advisor Q&amp;A</div><span class="small muted">Advisor: Dr. Tran Thi B</span></div>
+        <div class="col" style="gap:7px;min-height:110px;justify-content:flex-end">
+          <div class="field" style="width:70%;min-height:30px">Your midterm in Calculus looks low.</div>
+          <div class="field" style="width:70%;min-height:30px;margin-left:auto;background:var(--fill2)">I'm struggling with integrals. Can I book a slot?</div>
+          <div class="field" style="width:60%;min-height:26px">Sure — use the Appointments card.</div>
         </div>
-        <div class="row g8" style="gap:8px"><div class="field flex1"></div><div class="btn" style="width:70px"></div></div>
+        <div class="row" style="gap:8px"><div class="field flex1">Type a question for your advisor…</div><div class="btn">Send</div></div>
       </div>
     </div>
   </section>
 
   <!-- 7 -->
   <section class="screen">
-    <div class="cap"><b>7.</b> Appointments</div>
+    <div class="cap">7. Appointments</div>
     <div class="frame row">
       <div class="box flex1" style="flex-basis:45%">
-        <div class="tx w40"></div>
-        <div><div class="tx s w30 mb"></div><div class="field"></div></div>
-        <div><div class="tx s w40 mb"></div><div class="field"></div></div>
-        <div class="btn pri blk"></div>
+        <div class="h">Book appointment</div>
+        <div><div class="flabel">Time</div><div class="field">14/07/2026 10:00</div></div>
+        <div><div class="flabel">Note (optional)</div><div class="field">What you'd like to discuss…</div></div>
+        <div class="btn pri blk">Book appointment</div>
       </div>
       <div class="box flex1" style="flex-basis:55%">
-        <div class="tx w40"></div>
-        <div class="row sp ac" style="border-bottom:1px solid var(--line);padding-bottom:8px"><div class="col" style="gap:5px;flex:1"><div class="tx s w40"></div><div class="tx s w70"></div></div><div class="row ac" style="gap:6px"><span class="pill"></span><span class="btn sm" style="width:56px"></span></div></div>
-        <div class="row sp ac" style="border-bottom:1px solid var(--line);padding-bottom:8px"><div class="col" style="gap:5px;flex:1"><div class="tx s w40"></div><div class="tx s w60"></div></div><div class="row ac" style="gap:6px"><span class="pill"></span><span class="btn sm" style="width:56px"></span></div></div>
-        <div class="row sp ac"><div class="col" style="gap:5px;flex:1"><div class="tx s w40"></div><div class="tx s w60"></div></div><span class="pill"></span></div>
+        <div class="h">My upcoming appointments</div>
+        <div class="row sp ac" style="border-bottom:1px solid var(--line);padding-bottom:8px"><div class="flex1"><b>14/07/2026 10:00</b><div class="small muted">Advice on Calculus</div></div><div class="row ac" style="gap:6px"><span class="pill">Requested</span><span class="btn sm">Cancel</span></div></div>
+        <div class="row sp ac" style="border-bottom:1px solid var(--line);padding-bottom:8px"><div class="flex1"><b>17/07/2026 15:30</b><div class="small muted">Study plan</div></div><div class="row ac" style="gap:6px"><span class="pill">Confirmed</span><span class="btn sm">Cancel</span></div></div>
+        <div class="row sp ac"><div class="flex1"><b>05/07/2026 09:00</b><div class="small muted">Midterm review</div></div><span class="pill">Done</span></div>
       </div>
     </div>
   </section>
 
   <!-- 8 -->
   <section class="screen">
-    <div class="cap"><b>8.</b> Email notifications</div>
+    <div class="cap">8. Email notifications</div>
     <div class="frame">
       <div class="row">
-        <div class="mail flex1"><div class="mh"><div class="tx s w60"></div><div class="tx s w80"></div></div><div class="mb"><div class="tx s w100"></div><div class="tx s w80"></div><div class="tx s w40"></div></div></div>
-        <div class="mail flex1"><div class="mh"><div class="tx s w60"></div><div class="tx s w80"></div></div><div class="mb"><div class="tx s w100"></div><div class="tx s w70"></div><div class="tx s w50"></div></div></div>
+        <div class="mail flex1"><div class="mh">From: Academic Risk Alert — VNU-IS<br>Subject: Grade updated — Database Systems</div><div class="mb">Reg 8.0 · Mid 8.5 · Final 9.0 → <b>Total 8.65 (A)</b>. Sign in to view details.</div></div>
+        <div class="mail flex1"><div class="mh">From: Academic Risk Alert — VNU-IS<br>Subject: ⚠ Risk alert</div><div class="mb">You are at <b>High</b> risk (score 70.3). Reason: GPA dropped 0.52; attendance 54%. Contact your advisor.</div></div>
       </div>
       <div class="row">
-        <div class="mail flex1" style="max-width:50%"><div class="mh"><div class="tx s w50"></div></div><div class="mb"><div class="tx lg w40"></div><div class="tx s w70"></div></div></div>
+        <div class="mail flex1" style="max-width:50%"><div class="mh">From: Supabase Auth · Subject: Password reset</div><div class="mb">Your code: <b style="font-size:16px;letter-spacing:3px">4 8 2 9 1 7</b><br><span class="small muted">Valid for a few minutes. Do not share.</span></div></div>
       </div>
     </div>
   </section>
