@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wireframe — Advisor</title>
 <style>
-  :root{--ink:#333;--mut:#8a8a8a;--line:#c4c4c4;--fill:#e2e2e2;--fill2:#f1f1f1;--dark:#6b6b6b;--paper:#fff}
+  :root{--ink:#333;--mut:#888;--faint:#aaa;--line:#c4c4c4;--fill:#e6e6e6;--fill2:#f2f2f2;--dark:#5f5f5f}
   *{box-sizing:border-box}
   body{margin:0;background:#fff;color:var(--ink);font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13px;line-height:1.5}
   .page{max-width:1000px;margin:0 auto;padding:28px 20px 70px}
@@ -15,40 +15,36 @@
 
   .screen{border:1px solid #bbb;margin:0 0 22px}
   .cap{border-bottom:1px solid #bbb;padding:9px 12px;font-size:14px;font-weight:600}
-  .cap b{font-weight:700} .cap span{font-weight:400;color:var(--mut)}
   .frame{padding:16px;display:flex;flex-direction:column;gap:12px}
 
   .row{display:flex;gap:12px} .col{display:flex;flex-direction:column;gap:12px}
-  .flex1{flex:1} .sp{justify-content:space-between} .ac{align-items:center} .end{justify-content:flex-end}
+  .flex1{flex:1} .sp{justify-content:space-between} .ac{align-items:center} .end{justify-content:flex-end} .wrap{flex-wrap:wrap}
   .box{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px}
-  .box.dash{border-style:dashed}
   .plain{border:none;padding:0}
-
-  .tx{height:9px;background:var(--fill);border-radius:2px}
-  .tx.s{height:7px} .tx.lg{height:13px}
-  .w15{width:15%}.w20{width:20%}.w30{width:30%}.w40{width:40%}.w50{width:50%}.w60{width:60%}.w70{width:70%}.w80{width:80%}.w100{width:100%}
-  .mb{margin-bottom:5px}
-  .field{border:1px solid var(--line);height:30px;background:#fff}
-  .field.sm{height:26px;width:52px}
-  .btn{border:1px solid var(--dark);height:30px;width:104px;background:#fff}
-  .btn.sm{height:24px;width:80px} .btn.pri{background:var(--dark)} .btn.blk{width:100%}
-  .chip{border:1px solid var(--line);border-radius:999px;height:22px;width:64px}
-  .chip.on{background:var(--fill)}
-  .pill{border:1px solid var(--line);border-radius:999px;height:15px;width:48px;display:inline-block}
-  .img{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);min-height:200px;display:flex;align-items:flex-start}
-  .logo{width:30px;height:34px;border:1px solid var(--dark)}
-  .bar{height:7px;background:var(--fill);flex:1} .bar i{display:block;height:100%;background:#9a9a9a}
-  .top{border:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:10px}
-  .side{width:152px;border:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:6px;flex:none}
-  .navi{height:24px;border:1px solid var(--line);background:var(--fill2)}
-  .navi.on{background:var(--fill)}
+  .h{font-weight:700;font-size:14px} .muted{color:var(--mut)} .small{font-size:11px}
+  .lbl{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+  .flabel{font-size:11px;color:var(--mut);margin-bottom:4px}
+  .field{border:1px solid var(--line);min-height:30px;display:flex;align-items:center;padding:5px 9px;color:var(--faint);font-size:12px}
+  .field.sel::after{content:"▾";margin-left:auto;color:var(--mut)}
+  .field.in{width:56px;justify-content:center;color:var(--ink)}
+  .btn{border:1px solid var(--dark);height:30px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;font-size:12px;color:var(--dark);background:#fff;white-space:nowrap}
+  .btn.pri{background:var(--dark);color:#fff} .btn.blk{width:100%;display:flex} .btn.sm{height:24px;font-size:11px;padding:0 9px}
+  .chip{border:1px solid var(--line);border-radius:999px;height:24px;display:inline-flex;align-items:center;padding:0 11px;font-size:11.5px;color:var(--mut)} .chip.on{background:var(--fill);color:var(--ink)}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:11px;background:var(--fill2)}
+  .img{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);min-height:200px;display:grid;place-items:center;color:var(--mut);text-align:center;position:relative}
+  .logo{border:1px solid var(--dark);padding:2px 6px;font-size:9px;font-weight:700;color:var(--dark);position:absolute;top:12px;left:12px}
+  .bar{height:7px;background:var(--fill);flex:1;min-width:60px} .bar i{display:block;height:100%;background:#9a9a9a}
+  .top{border:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:10px;font-size:12px}
+  .side{width:172px;border:1px solid var(--line);padding:10px;flex:none;display:flex;flex-direction:column;gap:4px}
+  .side .lbl{margin-bottom:4px}
+  .side .nav div{padding:6px 9px;color:var(--mut);font-size:12px;border:1px solid transparent} .side .nav div.on{background:var(--fill2);border:1px solid var(--line);color:var(--ink);font-weight:600}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .kpi{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:58px}
-  .kpi.acc{border-left:4px solid var(--dark)}
-  table.wf{width:100%;border-collapse:collapse}
-  table.wf td{border-bottom:1px solid var(--line);padding:9px 8px}
-  table.wf tr:first-child td{border-bottom:1px solid #9a9a9a}
-  .otp{display:flex;gap:6px}.otp span{flex:1;height:34px;border:1px solid var(--line)}
+  .kpi{border:1px solid var(--line);padding:10px} .kpi .k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em} .kpi .v{font-size:19px;font-weight:800;margin-top:5px}
+  table.wf{width:100%;border-collapse:collapse;font-size:12px}
+  table.wf th{text-align:left;color:var(--faint);font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:7px 8px;border-bottom:1px solid var(--line);font-weight:700}
+  table.wf td{padding:8px;border-bottom:1px solid #eee;color:var(--dark)}
+  .otp{display:flex;gap:6px}.otp span{flex:1;height:34px;border:1px solid var(--line);display:grid;place-items:center;color:var(--faint)}
+  .dots{letter-spacing:3px;color:var(--faint)}
   @media print{.screen{break-inside:avoid}}
 </style>
 </head>
@@ -62,18 +58,19 @@
 
   <!-- 1 -->
   <section class="screen">
-    <div class="cap"><b>1.</b> Log in</div>
+    <div class="cap">1. Log in</div>
     <div class="frame">
       <div class="row">
-        <div class="img flex1" style="flex-basis:52%;padding:12px"><div class="logo"></div></div>
+        <div class="img flex1" style="flex-basis:52%"><div class="logo">VNU iS</div>School photo (carousel)<br><span class="dots">● ● ● ●</span></div>
         <div class="box flex1" style="flex-basis:48%">
-          <div class="row end"><span class="chip on"></span><span class="chip"></span></div>
-          <div class="tx lg w60"></div><div class="tx s w80"></div>
-          <div><div class="tx s w20 mb"></div><div class="field"></div></div>
-          <div><div class="tx s w20 mb"></div><div class="field"></div></div>
-          <div class="row end"><span class="tx s w30"></span></div>
-          <div class="btn pri blk"></div>
-          <div class="tx s w80" style="margin:2px auto 0"></div>
+          <div class="row end"><span class="chip on">VI</span><span class="chip">EN</span></div>
+          <div class="h">Welcome back</div>
+          <div class="muted small">Sign in to continue.</div>
+          <div><div class="flabel">Email</div><div class="field">advisor@school.edu.vn</div></div>
+          <div><div class="flabel">Password</div><div class="field">••••••••</div></div>
+          <div class="row end"><span class="small muted">Forgot password?</span></div>
+          <div class="btn pri blk">Sign in</div>
+          <div class="small muted" style="text-align:center">Signs in to the advisor/manager view based on role.</div>
         </div>
       </div>
     </div>
@@ -81,47 +78,53 @@
 
   <!-- 2 -->
   <section class="screen">
-    <div class="cap"><b>2.</b> Forgot password</div>
+    <div class="cap">2. Forgot password</div>
     <div class="frame row">
       <div class="box flex1">
-        <div class="tx lg w50"></div><div class="tx s w80"></div>
-        <div><div class="tx s w20 mb"></div><div class="field"></div></div>
-        <div class="btn pri blk"></div>
-        <div class="tx s w40" style="margin:2px auto 0"></div>
+        <div class="lbl">Step 1 — enter email</div>
+        <div class="h">Reset password</div>
+        <div class="muted small">Enter your email; we'll send a 6-digit code.</div>
+        <div><div class="flabel">Email</div><div class="field">advisor@school.edu.vn</div></div>
+        <div class="btn pri blk">Send code</div>
+        <div class="small muted" style="text-align:center">← Back to login</div>
       </div>
       <div class="box flex1">
-        <div class="tx lg w50"></div><div class="tx s w80"></div>
-        <div><div class="tx s w30 mb"></div><div class="otp"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-        <div><div class="tx s w30 mb"></div><div class="field"></div></div>
-        <div><div class="tx s w40 mb"></div><div class="field"></div></div>
-        <div class="btn pri blk"></div>
+        <div class="lbl">Step 2 — code &amp; new password</div>
+        <div class="h">Set new password</div>
+        <div class="muted small">Enter the 6-digit code sent to your email.</div>
+        <div><div class="flabel">Verification code (6 digits)</div><div class="otp"><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span></div></div>
+        <div><div class="flabel">New password</div><div class="field">••••••••</div></div>
+        <div><div class="flabel">Confirm new password</div><div class="field">••••••••</div></div>
+        <div class="btn pri blk">Update password</div>
       </div>
     </div>
   </section>
 
   <!-- 3 -->
   <section class="screen">
-    <div class="cap"><b>3.</b> Dashboard</div>
+    <div class="cap">3. Dashboard</div>
     <div class="frame">
-      <div class="top"><div class="logo" style="width:26px;height:30px"></div><div class="flex1"></div><span class="chip on"></span><span class="chip"></span><span class="pill" style="width:110px"></span><span class="btn sm"></span></div>
+      <div class="top"><b>VNU iS</b><div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span><span class="pill">Dr. B · Advisor · MIS</span><span class="btn sm">Log out</span></div>
       <div class="row">
-        <div class="side"><div class="tx s w60 mb"></div><div class="navi on"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div></div>
+        <div class="side"><div class="lbl">Menu</div><div class="nav"><div class="on">Overview</div><div>Students</div><div>Alerts &amp; interventions</div><div>Messages</div><div>Evaluation</div></div></div>
         <div class="col flex1">
           <div class="kpis">
-            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
-            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
-            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
-            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
+            <div class="kpi"><div class="k">Total students</div><div class="v">24</div></div>
+            <div class="kpi"><div class="k">Open alerts</div><div class="v">3</div></div>
+            <div class="kpi"><div class="k">High / Critical</div><div class="v">5</div></div>
+            <div class="kpi"><div class="k">Average CPA</div><div class="v">2.7</div></div>
           </div>
           <div class="row">
-            <div class="box flex1" style="flex-basis:55%"><div class="row sp ac"><div class="tx w50"></div><span class="btn sm" style="width:96px"></span></div><div class="img" style="min-height:96px"></div></div>
-            <div class="box flex1" style="flex-basis:45%"><div class="tx w60"></div>
-              <table class="wf"><tr><td><div class="tx s w60"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
-              <tr><td><div class="tx s w50"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr></table>
+            <div class="box flex1" style="flex-basis:55%"><div class="row sp ac"><div class="h">Risk trend (14 days)</div><span class="btn sm">Recompute</span></div><div class="img" style="min-height:96px">Line chart</div></div>
+            <div class="box flex1" style="flex-basis:45%"><div class="h">Top-risk students</div>
+              <table class="wf"><tr><th>Student</th><th>Score</th><th>Level</th></tr>
+              <tr><td>Hoang Van Em</td><td>70.3</td><td><span class="pill">High</span></td></tr>
+              <tr><td>Le Van Cuong</td><td>36.1</td><td><span class="pill">Medium</span></td></tr></table>
             </div>
           </div>
-          <div class="box"><div class="tx w40"></div>
-            <table class="wf"><tr><td><div class="tx s w40"></div></td><td><span class="pill"></span></td><td><span class="pill"></span></td><td><div class="tx s w60"></div></td></tr></table>
+          <div class="box"><div class="h">Recent alerts</div>
+            <table class="wf"><tr><th>Student</th><th>Level</th><th>Status</th><th>Time</th></tr>
+            <tr><td>Hoang Van Em</td><td><span class="pill">High</span></td><td><span class="pill">Open</span></td><td>today</td></tr></table>
           </div>
         </div>
       </div>
@@ -130,20 +133,21 @@
 
   <!-- 4 -->
   <section class="screen">
-    <div class="cap"><b>4.</b> Students</div>
+    <div class="cap">4. Students</div>
     <div class="frame">
       <div class="row">
-        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi on"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div></div>
+        <div class="side"><div class="lbl">Menu</div><div class="nav"><div>Overview</div><div class="on">Students</div><div>Alerts &amp; interventions</div><div>Messages</div><div>Evaluation</div></div></div>
         <div class="col flex1">
-          <div class="row sp ac" style="flex-wrap:wrap;gap:8px"><div class="tx w20"></div><div class="row" style="gap:8px;flex-wrap:wrap"><span class="btn sm"></span><span class="btn sm"></span><span class="btn sm"></span><span class="btn sm"></span><span class="btn sm pri" style="width:110px"></span></div></div>
-          <div class="row" style="gap:8px"><div class="field flex1"></div><div class="field" style="width:120px"></div><div class="field" style="width:150px"></div></div>
-          <div class="row ac" style="gap:8px"><span class="chip on"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span><span class="btn sm" style="width:70px"></span></div>
-          <div class="tx s w30"></div>
+          <div class="row sp ac wrap" style="gap:8px"><div class="h">Students · 24</div><div class="row wrap" style="gap:6px"><span class="btn sm">Import CSV</span><span class="btn sm">Template</span><span class="btn sm">Import grades</span><span class="btn sm">Grade template</span><span class="btn sm">Export report</span><span class="btn sm pri">+ Add student</span></div></div>
+          <div class="row" style="gap:8px"><div class="field flex1">Search name or student ID…</div><div class="field sel" style="width:130px">All cohorts</div><div class="field sel" style="width:150px">All semesters</div></div>
+          <div class="row ac wrap" style="gap:8px"><span class="chip on">All</span><span class="chip">Critical</span><span class="chip">High</span><span class="chip">Medium</span><span class="chip">Low</span><span class="btn sm">Clear filters</span></div>
+          <div class="small muted">Showing 3 / 24 students</div>
           <div class="box">
             <table class="wf">
-              <tr><td><div class="tx s w70"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="bar"></div></td><td><span class="pill"></span></td><td><span class="pill"></span></td></tr>
-              <tr><td><div class="tx s w60"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="bar"><i style="width:36%"></i></div></td><td><span class="pill"></span></td><td><div class="tx s w20"></div></td></tr>
-              <tr><td><div class="tx s w70"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="bar"><i style="width:70%"></i></div></td><td><span class="pill"></span></td><td><span class="pill"></span></td></tr>
+              <tr><th>Student</th><th>ID</th><th>Cohort</th><th>CPA</th><th>Risk score</th><th>Level</th><th>Prediction</th><th>Alert</th></tr>
+              <tr><td>Hoang Van Em</td><td>SV004</td><td>K69</td><td>0.23</td><td><div class="bar"><i style="width:70%"></i></div> 70.3</td><td><span class="pill">High</span></td><td><span class="pill">In alarm</span></td><td><span class="pill">Open</span></td></tr>
+              <tr><td>Le Van Cuong</td><td>SV002</td><td>K70</td><td>1.13</td><td><div class="bar"><i style="width:36%"></i></div> 36.1</td><td><span class="pill">Low</span></td><td><span class="pill">At risk</span></td><td>—</td></tr>
+              <tr><td>Pham Thi Dung</td><td>SV003</td><td>K71</td><td>2.30</td><td><div class="bar"><i style="width:6%"></i></div> 3.2</td><td><span class="pill">Low</span></td><td><span class="pill">Safe</span></td><td>—</td></tr>
             </table>
           </div>
         </div>
@@ -153,49 +157,61 @@
 
   <!-- 5 -->
   <section class="screen">
-    <div class="cap"><b>5.</b> Student detail</div>
+    <div class="cap">5. Student detail</div>
     <div class="frame">
-      <div class="tx s w20"></div>
-      <div class="row sp ac"><div class="col" style="gap:5px"><div class="tx w30"></div><div class="tx s w40"></div></div><span class="pill" style="width:70px;height:20px"></span></div>
+      <div class="small muted">← Students</div>
+      <div class="row sp ac"><div><div class="h">Hoang Van Em</div><div class="small muted">SV004 · K69 · MIS</div></div><span class="pill">High · 70.3</span></div>
       <div class="row">
-        <div class="box flex1" style="flex-basis:33%"><div class="tx s w60"></div><div class="tx w70"></div><div class="tx s w80"></div></div>
-        <div class="box flex1" style="flex-basis:34%"><div class="tx s w50"></div><div class="bar"><i style="width:80%"></i></div><div class="bar"><i style="width:45%"></i></div><div class="bar"><i style="width:30%"></i></div><div class="bar"><i style="width:60%"></i></div></div>
-        <div class="box flex1" style="flex-basis:33%"><div class="tx s w50"></div><div><div class="tx s w40 mb"></div><div class="field"></div></div><div><div class="tx s w60 mb"></div><div class="field"></div></div><div class="btn blk"></div></div>
+        <div class="box flex1" style="flex-basis:33%"><div class="lbl">Student info</div><div class="small">ID: SV004</div><div class="small">Program: MIS</div><div class="small">Cohort: K69</div><div class="small muted">email@school.edu.vn</div></div>
+        <div class="box flex1" style="flex-basis:34%"><div class="lbl">Risk factors</div>
+          <div class="small">GPA <div class="bar"><i style="width:80%"></i></div></div>
+          <div class="small">Attendance <div class="bar"><i style="width:45%"></i></div></div>
+          <div class="small">LMS activity <div class="bar"><i style="width:30%"></i></div></div>
+          <div class="small">Failed credits <div class="bar"><i style="width:60%"></i></div></div>
+        </div>
+        <div class="box flex1" style="flex-basis:33%"><div class="lbl">Indicators</div><div><div class="flabel">Attendance (%)</div><div class="field">54</div></div><div><div class="flabel">LMS activity (0–100)</div><div class="field">28</div></div><div class="btn blk">Save &amp; recompute</div></div>
       </div>
-      <div class="box"><div class="tx w40"></div>
-        <div class="row sp ac"><div class="tx s w40"></div><span class="pill" style="width:110px;height:18px"></span></div>
-        <table class="wf"><tr><td><div class="tx s w70"></div></td><td><div class="field sm"></div></td><td><div class="field sm"></div></td><td><div class="field sm"></div></td><td><div class="tx s w20"></div></td><td><span class="pill"></span></td><td><span class="btn sm" style="width:54px"></span></td></tr></table>
-        <div class="box plain" style="border-top:1px solid var(--line);padding-top:9px;gap:6px"><div class="tx s w60"></div><div class="tx s w50"></div><div class="tx s w40"></div></div>
+      <div class="box"><div class="h">Grade entry by semester</div>
+        <div class="row sp ac"><b>Semester 1 · 2025-2026</b><span class="pill">GPA 0.23 · 12 credits</span></div>
+        <table class="wf"><tr><th>Course</th><th>Reg</th><th>Mid</th><th>Final</th><th>Total</th><th>Grade</th><th></th></tr>
+          <tr><td>Intro to Programming</td><td><div class="field in">3.0</div></td><td><div class="field in">2.5</div></td><td><div class="field in">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td><td><span class="btn sm">Save</span></td></tr></table>
+        <div class="box plain" style="border-top:1px solid var(--line);padding-top:9px;gap:4px">
+          <div class="small"><b>Cumulative average (10-point):</b> 3.10</div>
+          <div class="small"><b>Cumulative average (4-point):</b> 0.23</div>
+          <div class="small"><b>Total credits earned:</b> 12</div>
+        </div>
       </div>
       <div class="row">
-        <div class="box flex1"><div class="tx w50"></div><div class="tx s w70"></div><div><div class="tx s w40 mb"></div><div class="field"></div></div><div class="field" style="height:44px"></div><div class="btn blk"></div></div>
-        <div class="box flex1"><div class="tx w50"></div><div class="field"></div><div class="field" style="height:38px"></div><div class="btn blk"></div><div class="box" style="min-height:34px"></div></div>
+        <div class="box flex1"><div class="h">Alert &amp; intervention</div><div class="small muted">Open alert · High — <span class="pill">Take</span> <span class="pill">In progress ▾</span></div><div><div class="flabel">Type</div><div class="field sel">Counseling session</div></div><div class="field" style="min-height:40px">Intervention notes…</div><div class="btn blk">Log intervention</div></div>
+        <div class="box flex1"><div class="h">Send notification / message</div><div class="field">Title</div><div class="field" style="min-height:38px">Notification body…</div><div class="btn blk">Send to student</div><div class="field small" style="min-height:34px">Direct chat with student</div></div>
       </div>
-      <div class="box"><div class="tx w40"></div>
-        <div class="row sp ac" style="border-top:1px solid var(--line);padding-top:8px"><div class="tx s w40"></div><div class="row ac" style="gap:6px"><span class="pill"></span><span class="btn sm" style="width:60px"></span><span class="btn sm" style="width:50px"></span></div></div>
-        <div class="row sp ac" style="border-top:1px solid var(--line);padding-top:8px"><div class="tx s w40"></div><div class="row ac" style="gap:6px"><span class="pill"></span><span class="btn sm" style="width:60px"></span></div></div>
+      <div class="box"><div class="h">Advisor appointments</div>
+        <div class="row sp ac" style="border-top:1px solid var(--line);padding-top:8px"><div class="flex1"><b>14/07/2026 10:00</b> — Advice on Calculus</div><div class="row ac" style="gap:6px"><span class="pill">Requested</span><span class="btn sm pri">Confirm</span><span class="btn sm">Cancel</span></div></div>
+        <div class="row sp ac" style="border-top:1px solid var(--line);padding-top:8px"><div class="flex1"><b>10/07/2026 15:00</b> — Study plan</div><div class="row ac" style="gap:6px"><span class="pill">Confirmed</span><span class="btn sm">Mark done</span><span class="btn sm">Cancel</span></div></div>
       </div>
     </div>
   </section>
 
   <!-- 6 -->
   <section class="screen">
-    <div class="cap"><b>6.</b> Alerts &amp; interventions</div>
+    <div class="cap">6. Alerts &amp; interventions</div>
     <div class="frame">
       <div class="row">
-        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi"></div><div class="navi on"></div><div class="navi"></div><div class="navi"></div></div>
+        <div class="side"><div class="lbl">Menu</div><div class="nav"><div>Overview</div><div>Students</div><div class="on">Alerts &amp; interventions</div><div>Messages</div><div>Evaluation</div></div></div>
         <div class="col flex1">
-          <div class="row ac" style="gap:8px"><span class="chip on"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span></div>
-          <div class="box"><div class="tx s w30"></div>
+          <div class="row ac wrap" style="gap:8px"><span class="chip on">Open</span><span class="chip">Acknowledged</span><span class="chip">Resolved</span><span class="chip">Dismissed</span><span class="chip">All</span></div>
+          <div class="box">
             <table class="wf">
-              <tr><td><div class="tx s w60"></div></td><td><span class="pill"></span></td><td><div class="tx s"></div></td><td><span class="pill"></span></td><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td></tr>
-              <tr><td><div class="tx s w50"></div></td><td><span class="pill"></span></td><td><div class="tx s"></div></td><td><span class="pill"></span></td><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td></tr>
+              <tr><th>Student</th><th>Level</th><th>Score</th><th>Status</th><th>Handler</th><th>Time</th></tr>
+              <tr><td>Hoang Van Em</td><td><span class="pill">High</span></td><td>70.3</td><td><span class="pill">Open</span></td><td>You</td><td>today</td></tr>
+              <tr><td>Le Van Cuong</td><td><span class="pill">Medium</span></td><td>52.0</td><td><span class="pill">Acknowledged</span></td><td>You</td><td>2d ago</td></tr>
             </table>
           </div>
-          <div class="box"><div class="tx w40"></div>
+          <div class="box"><div class="h">Intervention log</div>
             <table class="wf">
-              <tr><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td><td><div class="tx s"></div></td><td><div class="tx s w70"></div></td><td><span class="pill"></span></td></tr>
-              <tr><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td><td><div class="tx s"></div></td><td><div class="tx s w60"></div></td><td><span class="pill"></span></td></tr>
+              <tr><th>Time</th><th>Student</th><th>Type</th><th>Notes</th><th>Status</th></tr>
+              <tr><td>12/07 14:00</td><td>Hoang Van Em</td><td>Counseling session</td><td>Agreed a study plan…</td><td><span class="pill">Completed</span></td></tr>
+              <tr><td>08/07 09:30</td><td>Le Van Cuong</td><td>Email</td><td>Sent attendance reminder</td><td><span class="pill">Follow-up</span></td></tr>
             </table>
           </div>
         </div>
@@ -205,21 +221,21 @@
 
   <!-- 7 -->
   <section class="screen">
-    <div class="cap"><b>7.</b> Messages</div>
+    <div class="cap">7. Messages</div>
     <div class="frame">
       <div class="row">
-        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi on"></div><div class="navi"></div></div>
+        <div class="side"><div class="lbl">Menu</div><div class="nav"><div>Overview</div><div>Students</div><div>Alerts &amp; interventions</div><div class="on">Messages</div><div>Evaluation</div></div></div>
         <div class="row flex1">
-          <div class="box" style="flex-basis:38%"><div class="tx w50"></div>
-            <div class="row ac" style="gap:8px;border-top:1px solid var(--line);padding-top:8px"><span class="pill" style="width:22px;height:22px;border-radius:50%"></span><div class="col flex1" style="gap:5px"><div class="tx s w50"></div><div class="tx s w80"></div></div></div>
-            <div class="row ac" style="gap:8px;border-top:1px solid var(--line);padding-top:8px"><span class="pill" style="width:22px;height:22px;border-radius:50%"></span><div class="col flex1" style="gap:5px"><div class="tx s w40"></div><div class="tx s w70"></div></div></div>
+          <div class="box" style="flex-basis:38%"><div class="h">Conversations</div>
+            <div class="row ac" style="gap:8px;border-top:1px solid var(--line);padding-top:8px"><span class="pill" style="width:24px;height:24px;padding:0;border-radius:50%"></span><div class="flex1"><b>Hoang Van Em</b><div class="small muted">Can I book a slot?</div></div></div>
+            <div class="row ac" style="gap:8px;border-top:1px solid var(--line);padding-top:8px"><span class="pill" style="width:24px;height:24px;padding:0;border-radius:50%"></span><div class="flex1">Le Van Cuong<div class="small muted">Thanks!</div></div></div>
           </div>
-          <div class="box flex1"><div class="tx w40"></div>
-            <div class="col" style="gap:7px;min-height:120px;justify-content:flex-end">
-              <div style="border:1px solid var(--line);width:65%;height:28px"></div>
-              <div style="border:1px solid var(--line);width:65%;height:28px;margin-left:auto;background:var(--fill2)"></div>
+          <div class="box flex1"><div class="h">Hoang Van Em</div>
+            <div class="col" style="gap:7px;min-height:110px;justify-content:flex-end">
+              <div class="field" style="width:65%;min-height:28px">Your midterm looks low.</div>
+              <div class="field" style="width:65%;min-height:28px;margin-left:auto;background:var(--fill2)">Can I book a slot?</div>
             </div>
-            <div class="row g8" style="gap:8px"><div class="field flex1"></div><div class="btn" style="width:70px"></div></div>
+            <div class="row" style="gap:8px"><div class="field flex1">Reply…</div><div class="btn">Send</div></div>
           </div>
         </div>
       </div>
@@ -228,28 +244,31 @@
 
   <!-- 8 -->
   <section class="screen">
-    <div class="cap"><b>8.</b> Evaluation</div>
+    <div class="cap">8. Evaluation</div>
     <div class="frame">
       <div class="row">
-        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi on"></div></div>
+        <div class="side"><div class="lbl">Menu</div><div class="nav"><div>Overview</div><div>Students</div><div>Alerts &amp; interventions</div><div>Messages</div><div class="on">Evaluation</div></div></div>
         <div class="col flex1">
           <div class="row">
-            <div class="box flex1"><div class="tx w50"></div><div class="tx s w80"></div>
-              <div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div></div>
+            <div class="box flex1"><div class="h">Alert accuracy</div><div class="small muted">Alerts (Medium+) vs weak standing (CPA &lt; 2.0)</div>
+              <div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi"><div class="k">Precision</div><div class="v">83%</div></div><div class="kpi"><div class="k">Recall</div><div class="v">71%</div></div><div class="kpi"><div class="k">F1</div><div class="v">0.77</div></div><div class="kpi"><div class="k">Accuracy</div><div class="v">88%</div></div></div>
+              <div class="small muted">Confusion: TP 5 · FP 1 · FN 2 · TN 16</div>
             </div>
-            <div class="box flex1"><div class="tx w50"></div><div class="tx s w80"></div>
-              <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div></div>
+            <div class="box flex1"><div class="h">Intervention effectiveness</div><div class="small muted">Risk before / after each logged intervention</div>
+              <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><div class="k">Measured</div><div class="v">8</div></div><div class="kpi"><div class="k">Improved</div><div class="v">6</div></div><div class="kpi"><div class="k">Avg Δ</div><div class="v">−9.4</div></div></div>
             </div>
           </div>
           <div class="row">
-            <div class="box flex1"><div class="tx w50"></div>
-              <div class="row" style="gap:8px"><div class="flex1"><div class="tx s w40 mb"></div><div class="field"></div></div><div class="flex1"><div class="tx s w60 mb"></div><div class="field"></div></div><div class="flex1"><div class="tx s w40 mb"></div><div class="field"></div></div><div class="flex1"><div class="tx s w60 mb"></div><div class="field"></div></div></div>
-              <div class="btn blk"></div>
+            <div class="box flex1"><div class="h">Risk config <span class="small muted">(Manager edits)</span></div>
+              <div class="row" style="gap:8px"><div class="flex1"><div class="flabel">GPA</div><div class="field">0.40</div></div><div class="flex1"><div class="flabel">Attendance</div><div class="field">0.30</div></div><div class="flex1"><div class="flabel">LMS</div><div class="field">0.15</div></div><div class="flex1"><div class="flabel">Failed</div><div class="field">0.15</div></div></div>
+              <div class="row" style="gap:8px"><div class="flex1"><div class="flabel">Medium</div><div class="field">40</div></div><div class="flex1"><div class="flabel">High</div><div class="field">65</div></div><div class="flex1"><div class="flabel">Critical</div><div class="field">85</div></div></div>
+              <div class="btn blk">Save config</div>
             </div>
-            <div class="box flex1"><div class="tx w50"></div><div class="tx s w80"></div>
-              <div class="row" style="gap:8px"><div class="field flex1"></div><div class="btn" style="width:110px"></div></div>
-              <div class="field" style="height:40px"></div>
-              <div class="row" style="gap:8px"><div class="btn" style="width:96px"></div><div class="tx s w40" style="align-self:center"></div></div>
+            <div class="box flex1"><div class="h">SIS/LMS sync</div><div class="small muted">Auto-update attendance &amp; LMS activity</div>
+              <div class="row" style="gap:8px"><div class="field flex1">Published CSV link…</div><div class="btn">Pull &amp; sync</div></div>
+              <div class="small muted">Or paste CSV:</div>
+              <div class="field" style="min-height:40px">student_code, attendance_rate, lms_activity_score …</div>
+              <div class="row ac" style="gap:8px"><div class="btn">Apply CSV</div><span class="small muted">Updated 10 · skipped 0</span></div>
             </div>
           </div>
         </div>
