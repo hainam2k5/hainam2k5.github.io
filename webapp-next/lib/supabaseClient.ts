@@ -16,7 +16,9 @@ export const supabase: SupabaseClient | null = configured
   : null;
 
 export function homeFor(role: string | undefined | null): string {
-  return role === "student" ? "/student" : "/advisor";
+  if (role === "student") return "/student";
+  if (role === "teacher") return "/teacher";
+  return "/advisor";
 }
 
 export async function getMyProfile(): Promise<Profile | null> {

@@ -9,9 +9,10 @@ type Dict = Record<string, string>;
 const DICT: Record<Lang, Dict> = {
   vi: {
     "nav.section": "Điều hướng", "nav.dashboard": "Tổng quan", "nav.students": "Sinh viên",
-    "nav.alerts": "Cảnh báo & Can thiệp", "nav.messages": "Tin nhắn", "nav.evaluation": "Đánh giá",
+    "nav.alerts": "Cảnh báo & Can thiệp", "nav.messages": "Tin nhắn", "nav.evaluation": "Đánh giá", "nav.classes": "Lớp học",
+    "cls.title": "Lớp học", "cls.sub": "Điểm danh & nhập điểm thành phần cho lớp bạn dạy", "cls.addClass": "Thêm lớp", "cls.newClass": "Tạo lớp học phần", "cls.fCode": "Mã môn", "cls.fName": "Tên môn", "cls.fNamePh": "Nhập môn lập trình", "cls.fCredits": "Số tín chỉ", "cls.fSemester": "Học kỳ", "cls.fYear": "Năm học", "cls.create": "Tạo lớp", "cls.rosterNote": "Danh sách sinh viên tự lấy từ các bản ghi điểm có cùng Mã môn + Học kỳ + Năm học.", "cls.pickClass": "Chọn lớp", "cls.selectClass": "— Chọn lớp —", "cls.noClasses": "Bạn chưa có lớp nào. Bấm “Thêm lớp” để tạo.", "cls.tabAttend": "Điểm danh", "cls.tabGrades": "Nhập điểm", "cls.session": "Buổi ngày", "cls.noStudents": "Chưa có sinh viên nào trong lớp này (cần có bản ghi điểm khớp Mã môn + Học kỳ).", "cls.present": "Có mặt", "cls.attRate": "Chuyên cần", "cls.saveAttend": "Lưu điểm danh", "cls.attHint": "Tick = có mặt. Lưu sẽ tự cập nhật tỷ lệ chuyên cần của sinh viên.", "cls.saveGrades": "Lưu điểm", "cls.weightsNote": "Trọng số: TX {r} · GK {m} · CK {f}", "cls.needFields": "Nhập Mã môn, Tên môn và Học kỳ.", "cls.addErr": "Không tạo được lớp (kiểm tra đã chạy teacher-classes.sql).", "cls.added": "Đã tạo lớp học", "cls.attErr": "Không lưu được điểm danh.", "cls.attSaved": "Đã lưu điểm danh", "cls.gErr": "Điểm phải trong khoảng 0–10.", "cls.gSaved": "Đã lưu điểm",
     "btn.logout": "Đăng xuất", "bell.title": "Thông báo", "loading": "Đang tải…",
-    "role.student": "Sinh viên", "role.advisor": "Cố vấn", "role.manager": "Quản lý chương trình",
+    "role.student": "Sinh viên", "role.advisor": "Cố vấn", "role.manager": "Quản lý chương trình", "role.teacher": "Giáo viên",
     "meta.advisor": "Cố vấn học tập", "you": "Bạn", "advisor": "Cố vấn",
     "risk.Low": "Thấp", "risk.Medium": "Trung bình", "risk.High": "Cao", "risk.Critical": "Nghiêm trọng", "risk.Unscored": "Chưa chấm",
     "status.Open": "Mở", "status.Acknowledged": "Đang xử lý", "status.Resolved": "Đã xử lý", "status.Dismissed": "Bỏ qua", "status.All": "Tất cả",
@@ -134,9 +135,10 @@ const DICT: Record<Lang, Dict> = {
   },
   en: {
     "nav.section": "Navigation", "nav.dashboard": "Overview", "nav.students": "Students",
-    "nav.alerts": "Alerts & Interventions", "nav.messages": "Messages", "nav.evaluation": "Evaluation",
+    "nav.alerts": "Alerts & Interventions", "nav.messages": "Messages", "nav.evaluation": "Evaluation", "nav.classes": "Classes",
+    "cls.title": "Classes", "cls.sub": "Take attendance & enter component grades for the classes you teach", "cls.addClass": "Add class", "cls.newClass": "Create a class", "cls.fCode": "Course code", "cls.fName": "Course name", "cls.fNamePh": "Intro to Programming", "cls.fCredits": "Credits", "cls.fSemester": "Semester", "cls.fYear": "Academic year", "cls.create": "Create class", "cls.rosterNote": "The roster is pulled automatically from grade records with the same course code + semester + academic year.", "cls.pickClass": "Pick a class", "cls.selectClass": "— Select class —", "cls.noClasses": "You have no classes yet. Click “Add class” to create one.", "cls.tabAttend": "Attendance", "cls.tabGrades": "Grades", "cls.session": "Session date", "cls.noStudents": "No students in this class yet (needs grade records matching the course code + semester).", "cls.present": "Present", "cls.attRate": "Attendance", "cls.saveAttend": "Save attendance", "cls.attHint": "Ticked = present. Saving updates each student's attendance rate automatically.", "cls.saveGrades": "Save grades", "cls.weightsNote": "Weights: Reg {r} · Mid {m} · Final {f}", "cls.needFields": "Enter course code, name and semester.", "cls.addErr": "Couldn't create the class (check teacher-classes.sql was run).", "cls.added": "Class created", "cls.attErr": "Couldn't save attendance.", "cls.attSaved": "Attendance saved", "cls.gErr": "Scores must be between 0 and 10.", "cls.gSaved": "Grades saved",
     "btn.logout": "Sign out", "bell.title": "Notifications", "loading": "Loading…",
-    "role.student": "Student", "role.advisor": "Advisor", "role.manager": "Programme manager",
+    "role.student": "Student", "role.advisor": "Advisor", "role.manager": "Programme manager", "role.teacher": "Teacher",
     "meta.advisor": "Academic advisor", "you": "You", "advisor": "Advisor",
     "risk.Low": "Low", "risk.Medium": "Medium", "risk.High": "High", "risk.Critical": "Critical", "risk.Unscored": "Unscored",
     "status.Open": "Open", "status.Acknowledged": "In progress", "status.Resolved": "Resolved", "status.Dismissed": "Dismissed", "status.All": "All",
