@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Advisor</title>
+<style>
+  :root{--ink:#333;--mut:#8a8a8a;--line:#c4c4c4;--fill:#e2e2e2;--fill2:#f1f1f1;--dark:#6b6b6b;--paper:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13px;line-height:1.5}
+  .page{max-width:1000px;margin:0 auto;padding:28px 20px 70px}
+  header.doc h1{font-size:22px;margin:0;text-align:center;letter-spacing:-.01em}
+  header.doc .sub{text-align:center;color:var(--mut);font-size:12px;margin-top:4px}
+  .rule{height:1px;background:var(--line);margin:14px 0 22px}
+
+  .screen{border:1px solid #bbb;margin:0 0 22px}
+  .cap{border-bottom:1px solid #bbb;padding:9px 12px;font-size:14px;font-weight:600}
+  .cap b{font-weight:700} .cap span{font-weight:400;color:var(--mut)}
+  .frame{padding:16px;display:flex;flex-direction:column;gap:12px}
+
+  .row{display:flex;gap:12px} .col{display:flex;flex-direction:column;gap:12px}
+  .flex1{flex:1} .sp{justify-content:space-between} .ac{align-items:center} .end{justify-content:flex-end}
+  .box{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px}
+  .box.dash{border-style:dashed}
+  .plain{border:none;padding:0}
+
+  .tx{height:9px;background:var(--fill);border-radius:2px}
+  .tx.s{height:7px} .tx.lg{height:13px}
+  .w15{width:15%}.w20{width:20%}.w30{width:30%}.w40{width:40%}.w50{width:50%}.w60{width:60%}.w70{width:70%}.w80{width:80%}.w100{width:100%}
+  .mb{margin-bottom:5px}
+  .field{border:1px solid var(--line);height:30px;background:#fff}
+  .field.sm{height:26px;width:52px}
+  .btn{border:1px solid var(--dark);height:30px;width:104px;background:#fff}
+  .btn.sm{height:24px;width:80px} .btn.pri{background:var(--dark)} .btn.blk{width:100%}
+  .chip{border:1px solid var(--line);border-radius:999px;height:22px;width:64px}
+  .chip.on{background:var(--fill)}
+  .pill{border:1px solid var(--line);border-radius:999px;height:15px;width:48px;display:inline-block}
+  .img{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);min-height:200px;display:flex;align-items:flex-start}
+  .logo{width:30px;height:34px;border:1px solid var(--dark)}
+  .bar{height:7px;background:var(--fill);flex:1} .bar i{display:block;height:100%;background:#9a9a9a}
+  .top{border:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:10px}
+  .side{width:152px;border:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:6px;flex:none}
+  .navi{height:24px;border:1px solid var(--line);background:var(--fill2)}
+  .navi.on{background:var(--fill)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .kpi{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:58px}
+  .kpi.acc{border-left:4px solid var(--dark)}
+  table.wf{width:100%;border-collapse:collapse}
+  table.wf td{border-bottom:1px solid var(--line);padding:9px 8px}
+  table.wf tr:first-child td{border-bottom:1px solid #9a9a9a}
+  .otp{display:flex;gap:6px}.otp span{flex:1;height:34px;border:1px solid var(--line)}
+  @media print{.screen{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="doc">
+    <h1>Wireframe — Advisor</h1>
+    <div class="sub">Academic Risk Alert System · VNU-IS</div>
+  </header>
+  <div class="rule"></div>
+
+  <!-- 1 -->
+  <section class="screen">
+    <div class="cap"><b>1.</b> Log in</div>
+    <div class="frame">
+      <div class="row">
+        <div class="img flex1" style="flex-basis:52%;padding:12px"><div class="logo"></div></div>
+        <div class="box flex1" style="flex-basis:48%">
+          <div class="row end"><span class="chip on"></span><span class="chip"></span></div>
+          <div class="tx lg w60"></div><div class="tx s w80"></div>
+          <div><div class="tx s w20 mb"></div><div class="field"></div></div>
+          <div><div class="tx s w20 mb"></div><div class="field"></div></div>
+          <div class="row end"><span class="tx s w30"></span></div>
+          <div class="btn pri blk"></div>
+          <div class="tx s w80" style="margin:2px auto 0"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="screen">
+    <div class="cap"><b>2.</b> Forgot password</div>
+    <div class="frame row">
+      <div class="box flex1">
+        <div class="tx lg w50"></div><div class="tx s w80"></div>
+        <div><div class="tx s w20 mb"></div><div class="field"></div></div>
+        <div class="btn pri blk"></div>
+        <div class="tx s w40" style="margin:2px auto 0"></div>
+      </div>
+      <div class="box flex1">
+        <div class="tx lg w50"></div><div class="tx s w80"></div>
+        <div><div class="tx s w30 mb"></div><div class="otp"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div><div class="tx s w30 mb"></div><div class="field"></div></div>
+        <div><div class="tx s w40 mb"></div><div class="field"></div></div>
+        <div class="btn pri blk"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="screen">
+    <div class="cap"><b>3.</b> Dashboard</div>
+    <div class="frame">
+      <div class="top"><div class="logo" style="width:26px;height:30px"></div><div class="flex1"></div><span class="chip on"></span><span class="chip"></span><span class="pill" style="width:110px"></span><span class="btn sm"></span></div>
+      <div class="row">
+        <div class="side"><div class="tx s w60 mb"></div><div class="navi on"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div></div>
+        <div class="col flex1">
+          <div class="kpis">
+            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
+            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
+            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
+            <div class="kpi"><div class="tx s w60"></div><div class="tx lg w40"></div></div>
+          </div>
+          <div class="row">
+            <div class="box flex1" style="flex-basis:55%"><div class="row sp ac"><div class="tx w50"></div><span class="btn sm" style="width:96px"></span></div><div class="img" style="min-height:96px"></div></div>
+            <div class="box flex1" style="flex-basis:45%"><div class="tx w60"></div>
+              <table class="wf"><tr><td><div class="tx s w60"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr>
+              <tr><td><div class="tx s w50"></div></td><td><div class="tx s"></div></td><td><span class="pill"></span></td></tr></table>
+            </div>
+          </div>
+          <div class="box"><div class="tx w40"></div>
+            <table class="wf"><tr><td><div class="tx s w40"></div></td><td><span class="pill"></span></td><td><span class="pill"></span></td><td><div class="tx s w60"></div></td></tr></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="screen">
+    <div class="cap"><b>4.</b> Students</div>
+    <div class="frame">
+      <div class="row">
+        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi on"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div></div>
+        <div class="col flex1">
+          <div class="row sp ac" style="flex-wrap:wrap;gap:8px"><div class="tx w20"></div><div class="row" style="gap:8px;flex-wrap:wrap"><span class="btn sm"></span><span class="btn sm"></span><span class="btn sm"></span><span class="btn sm"></span><span class="btn sm pri" style="width:110px"></span></div></div>
+          <div class="row" style="gap:8px"><div class="field flex1"></div><div class="field" style="width:120px"></div><div class="field" style="width:150px"></div></div>
+          <div class="row ac" style="gap:8px"><span class="chip on"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span><span class="btn sm" style="width:70px"></span></div>
+          <div class="tx s w30"></div>
+          <div class="box">
+            <table class="wf">
+              <tr><td><div class="tx s w70"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="bar"></div></td><td><span class="pill"></span></td><td><span class="pill"></span></td></tr>
+              <tr><td><div class="tx s w60"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="bar"><i style="width:36%"></i></div></td><td><span class="pill"></span></td><td><div class="tx s w20"></div></td></tr>
+              <tr><td><div class="tx s w70"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="tx s"></div></td><td><div class="bar"><i style="width:70%"></i></div></td><td><span class="pill"></span></td><td><span class="pill"></span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="screen">
+    <div class="cap"><b>5.</b> Student detail</div>
+    <div class="frame">
+      <div class="tx s w20"></div>
+      <div class="row sp ac"><div class="col" style="gap:5px"><div class="tx w30"></div><div class="tx s w40"></div></div><span class="pill" style="width:70px;height:20px"></span></div>
+      <div class="row">
+        <div class="box flex1" style="flex-basis:33%"><div class="tx s w60"></div><div class="tx w70"></div><div class="tx s w80"></div></div>
+        <div class="box flex1" style="flex-basis:34%"><div class="tx s w50"></div><div class="bar"><i style="width:80%"></i></div><div class="bar"><i style="width:45%"></i></div><div class="bar"><i style="width:30%"></i></div><div class="bar"><i style="width:60%"></i></div></div>
+        <div class="box flex1" style="flex-basis:33%"><div class="tx s w50"></div><div><div class="tx s w40 mb"></div><div class="field"></div></div><div><div class="tx s w60 mb"></div><div class="field"></div></div><div class="btn blk"></div></div>
+      </div>
+      <div class="box"><div class="tx w40"></div>
+        <div class="row sp ac"><div class="tx s w40"></div><span class="pill" style="width:110px;height:18px"></span></div>
+        <table class="wf"><tr><td><div class="tx s w70"></div></td><td><div class="field sm"></div></td><td><div class="field sm"></div></td><td><div class="field sm"></div></td><td><div class="tx s w20"></div></td><td><span class="pill"></span></td><td><span class="btn sm" style="width:54px"></span></td></tr></table>
+        <div class="box plain" style="border-top:1px solid var(--line);padding-top:9px;gap:6px"><div class="tx s w60"></div><div class="tx s w50"></div><div class="tx s w40"></div></div>
+      </div>
+      <div class="row">
+        <div class="box flex1"><div class="tx w50"></div><div class="tx s w70"></div><div><div class="tx s w40 mb"></div><div class="field"></div></div><div class="field" style="height:44px"></div><div class="btn blk"></div></div>
+        <div class="box flex1"><div class="tx w50"></div><div class="field"></div><div class="field" style="height:38px"></div><div class="btn blk"></div><div class="box" style="min-height:34px"></div></div>
+      </div>
+      <div class="box"><div class="tx w40"></div>
+        <div class="row sp ac" style="border-top:1px solid var(--line);padding-top:8px"><div class="tx s w40"></div><div class="row ac" style="gap:6px"><span class="pill"></span><span class="btn sm" style="width:60px"></span><span class="btn sm" style="width:50px"></span></div></div>
+        <div class="row sp ac" style="border-top:1px solid var(--line);padding-top:8px"><div class="tx s w40"></div><div class="row ac" style="gap:6px"><span class="pill"></span><span class="btn sm" style="width:60px"></span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="screen">
+    <div class="cap"><b>6.</b> Alerts &amp; interventions</div>
+    <div class="frame">
+      <div class="row">
+        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi"></div><div class="navi on"></div><div class="navi"></div><div class="navi"></div></div>
+        <div class="col flex1">
+          <div class="row ac" style="gap:8px"><span class="chip on"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span><span class="chip"></span></div>
+          <div class="box"><div class="tx s w30"></div>
+            <table class="wf">
+              <tr><td><div class="tx s w60"></div></td><td><span class="pill"></span></td><td><div class="tx s"></div></td><td><span class="pill"></span></td><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td></tr>
+              <tr><td><div class="tx s w50"></div></td><td><span class="pill"></span></td><td><div class="tx s"></div></td><td><span class="pill"></span></td><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td></tr>
+            </table>
+          </div>
+          <div class="box"><div class="tx w40"></div>
+            <table class="wf">
+              <tr><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td><td><div class="tx s"></div></td><td><div class="tx s w70"></div></td><td><span class="pill"></span></td></tr>
+              <tr><td><div class="tx s w40"></div></td><td><div class="tx s w40"></div></td><td><div class="tx s"></div></td><td><div class="tx s w60"></div></td><td><span class="pill"></span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="screen">
+    <div class="cap"><b>7.</b> Messages</div>
+    <div class="frame">
+      <div class="row">
+        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi on"></div><div class="navi"></div></div>
+        <div class="row flex1">
+          <div class="box" style="flex-basis:38%"><div class="tx w50"></div>
+            <div class="row ac" style="gap:8px;border-top:1px solid var(--line);padding-top:8px"><span class="pill" style="width:22px;height:22px;border-radius:50%"></span><div class="col flex1" style="gap:5px"><div class="tx s w50"></div><div class="tx s w80"></div></div></div>
+            <div class="row ac" style="gap:8px;border-top:1px solid var(--line);padding-top:8px"><span class="pill" style="width:22px;height:22px;border-radius:50%"></span><div class="col flex1" style="gap:5px"><div class="tx s w40"></div><div class="tx s w70"></div></div></div>
+          </div>
+          <div class="box flex1"><div class="tx w40"></div>
+            <div class="col" style="gap:7px;min-height:120px;justify-content:flex-end">
+              <div style="border:1px solid var(--line);width:65%;height:28px"></div>
+              <div style="border:1px solid var(--line);width:65%;height:28px;margin-left:auto;background:var(--fill2)"></div>
+            </div>
+            <div class="row g8" style="gap:8px"><div class="field flex1"></div><div class="btn" style="width:70px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="screen">
+    <div class="cap"><b>8.</b> Evaluation</div>
+    <div class="frame">
+      <div class="row">
+        <div class="side"><div class="tx s w60 mb"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi"></div><div class="navi on"></div></div>
+        <div class="col flex1">
+          <div class="row">
+            <div class="box flex1"><div class="tx w50"></div><div class="tx s w80"></div>
+              <div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div></div>
+            </div>
+            <div class="box flex1"><div class="tx w50"></div><div class="tx s w80"></div>
+              <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div><div class="kpi" style="min-height:44px"><div class="tx s w60"></div><div class="tx lg w40"></div></div></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="box flex1"><div class="tx w50"></div>
+              <div class="row" style="gap:8px"><div class="flex1"><div class="tx s w40 mb"></div><div class="field"></div></div><div class="flex1"><div class="tx s w60 mb"></div><div class="field"></div></div><div class="flex1"><div class="tx s w40 mb"></div><div class="field"></div></div><div class="flex1"><div class="tx s w60 mb"></div><div class="field"></div></div></div>
+              <div class="btn blk"></div>
+            </div>
+            <div class="box flex1"><div class="tx w50"></div><div class="tx s w80"></div>
+              <div class="row" style="gap:8px"><div class="field flex1"></div><div class="btn" style="width:110px"></div></div>
+              <div class="field" style="height:40px"></div>
+              <div class="row" style="gap:8px"><div class="btn" style="width:96px"></div><div class="tx s w40" style="align-self:center"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
