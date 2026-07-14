@@ -1,9 +1,11 @@
 # Dựng Prototype trong Figma — Student Risk Alert System
 
-Mình đã cắt sẵn **16 frame** (mỗi màn 1 ảnh, đã crop gọn) trong thư mục **`Figma-frames/`**:
+Mình đã dựng sẵn **11 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`**:
 
-- **Student (8):** `student-01-log-in` → `student-08-email-notifications`
+- **Student (3):** `student-01-log-in`, `student-02-forgot-password`, `student-03-portal`
 - **Advisor (8):** `advisor-01-log-in` → `advisor-08-evaluation`
+
+*(Cấu trúc khớp app thật: sinh viên chỉ có 1 trang tổng — Portal — chứa bảng điểm, thông báo, hỏi đáp, lịch hẹn; cố vấn có 8 màn theo sidebar.)*
 
 Việc của bạn chỉ là: kéo ảnh vào Figma → biến mỗi ảnh thành 1 Frame → nối link bấm chạy. Mất ~15 phút.
 
@@ -31,21 +33,17 @@ Việc của bạn chỉ là: kéo ảnh vào Figma → biến mỗi ảnh thàn
 
 ## Bản đồ nối link — LUỒNG STUDENT
 
+Sinh viên chỉ có 3 màn (Portal là 1 trang tổng chứa mọi thứ):
+
 | Từ frame | Bấm vào | → Sang frame |
 |---|---|---|
-| 01 Log in | nút **Sign in** | 03 Dashboard |
-| 01 Log in | **Forgot password?** | 02 Forgot password |
-| 02 Forgot password | **Update password** | 03 Dashboard |
-| 02 Forgot password | **← Back to login** | 01 Log in |
-| 03 Dashboard | khối **Transcript by semester** / *Print transcript* | 04 Transcript |
-| 03 Dashboard | khối **Notifications** | 05 Notifications |
-| 03 Dashboard | khối **Advisor Q&A** | 06 Advisor chat |
-| 03 Dashboard | khối **Appointments** | 07 Appointments |
-| 03 Dashboard | **Log out** | 01 Log in |
-| 04 / 05 / 06 / 07 | (vẽ hotspot ở tiêu đề) → dùng **Back** | 03 Dashboard |
-| 05 Notifications | dòng **Risk alert** *(tuỳ chọn)* | 08 Email notifications |
+| 01 Log in | nút **Đăng nhập** | 03 Portal |
+| 01 Log in | **Quên mật khẩu?** | 02 Forgot password |
+| 02 Forgot password | **Cập nhật mật khẩu** | 03 Portal |
+| 02 Forgot password | **← Quay lại đăng nhập** | 01 Log in |
+| 03 Portal | **Đăng xuất** | 01 Log in |
 
-*Frame 08 (email) là ảnh minh hoạ các email sinh viên nhận — để tham khảo, không bắt buộc nối.*
+*Trong màn 03 Portal, bảng điểm · thông báo · hỏi đáp · lịch hẹn đều nằm cùng trang (cuộn), giống hệt web thật — không cần tách frame.*
 
 ## Bản đồ nối link — LUỒNG ADVISOR
 

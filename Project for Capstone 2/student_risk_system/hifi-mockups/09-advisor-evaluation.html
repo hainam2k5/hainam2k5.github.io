@@ -1,0 +1,61 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><link rel="stylesheet" href="hifi-common.css"></head><body>
+<div class="topbar">
+  <div class="brand"><div class="brand-logo" style="font-size:10px;line-height:1.05">VNU<br><span>iS</span></div><div><div class="brand-name">Cảnh báo Rủi ro Học tập</div><div class="brand-sub">Trường Quốc tế — VNU-IS</div></div></div>
+  <div class="topbar-spacer"></div>
+  <div class="lang-switch"><button class="active">VI</button><button>EN</button></div>
+  <div class="topbar-user"><div class="avatar">TB</div><div class="who"><b>TS. Trần Thị B</b><small>Quản lý</small></div><button class="btn btn-sm">Đăng xuất</button></div>
+</div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="nav-label">Điều hướng</div>
+    <nav class="nav">
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Tổng quan</span></a>
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.3a3 3 0 0 1 0 5.4"/><path d="M18.5 20a6.5 6.5 0 0 0-3-5.5"/></svg><span>Sinh viên</span></a>
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M12 3 22 20H2z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg><span>Cảnh báo &amp; Can thiệp</span><span class="count">3</span></a>
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M21 15a3 3 0 0 1-3 3H8l-5 4V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3z"/></svg><span>Tin nhắn</span><span class="count">1</span></a>
+      <a class="active"><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Đánh giá</span></a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="page-head"><div><div class="page-title">Đánh giá</div><div class="page-sub">Độ chính xác cảnh báo · hiệu quả can thiệp · cấu hình</div></div><button class="btn btn-primary"><svg class="ic-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2 5"/><path d="M20 4v6h-6"/></svg> Tính lại rủi ro</button></div>
+    <div class="card">
+      <div class="card-head"><div class="card-title"><svg class="ic-svg" width="17" height="17" viewBox="0 0 24 24"><path d="M4 20h4L18 10l-4-4L4 16z"/><path d="M14 6l4 4"/></svg> Cấu hình rủi ro</div><div class="card-sub">Quản lý chỉnh · cố vấn chỉ xem</div></div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Trọng số 4 yếu tố</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"><div><label>GPA</label><input value="0.40"></div><div><label>Chuyên cần</label><input value="0.30"></div><div><label>LMS</label><input value="0.15"></div><div><label>Môn trượt</label><input value="0.15"></div></div>
+      <div style="font-size:12.5px;color:var(--muted);margin:12px 0 8px">Ngưỡng phân mức</div>
+      <div class="field-grid"><div><label>Trung bình</label><input value="40"></div><div><label>Cao</label><input value="65"></div><div><label>Nghiêm trọng</label><input value="85"></div></div>
+      <button class="btn btn-primary" style="margin-top:6px">Lưu cấu hình</button>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title"><svg class="ic-svg" width="17" height="17" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg> Độ chính xác cảnh báo</div></div>
+        <div class="card-sub" style="margin-bottom:12px">So cảnh báo (Trung bình+) với chuẩn học lực yếu (CPA &lt; 2.0)</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div class="kpi" style="padding:12px"><div class="kpi-label">Precision</div><div class="kpi-value" style="font-size:22px">83%</div></div>
+          <div class="kpi" style="padding:12px"><div class="kpi-label">Recall</div><div class="kpi-value" style="font-size:22px">71%</div></div>
+          <div class="kpi" style="padding:12px"><div class="kpi-label">F1</div><div class="kpi-value" style="font-size:22px">0.77</div></div>
+          <div class="kpi" style="padding:12px"><div class="kpi-label">Accuracy</div><div class="kpi-value" style="font-size:22px">88%</div></div>
+        </div>
+        <div class="muted-note" style="margin-top:10px">Ma trận nhầm lẫn: TP 5 · FP 1 · FN 2 · TN 16</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Hiệu quả can thiệp</div></div>
+        <div class="card-sub" style="margin-bottom:12px">Điểm rủi ro trước / sau mỗi can thiệp đã ghi nhận</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div class="kpi" style="padding:12px"><div class="kpi-label">Đo được</div><div class="kpi-value" style="font-size:22px">8</div></div>
+          <div class="kpi" style="padding:12px"><div class="kpi-label">Có cải thiện</div><div class="kpi-value" style="font-size:22px">6</div></div>
+          <div class="kpi" style="padding:12px"><div class="kpi-label">Δ trung bình</div><div class="kpi-value tone-Low" style="font-size:22px">−9.4</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title"><svg class="ic-svg" width="17" height="17" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2 5"/><path d="M20 4v6h-6"/></svg> Đồng bộ SIS/LMS</div><div class="card-sub">Tự cập nhật chuyên cần &amp; hoạt động LMS</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-end"><div style="flex:1"><label>Liên kết nguồn (CSV)</label><input value="https://docs.google.com/…/pub?output=csv"></div><button class="btn btn-primary">Kéo &amp; đồng bộ</button></div>
+      <div class="card-sub" style="margin:10px 0 6px">Hoặc dán trực tiếp dữ liệu CSV:</div>
+      <textarea style="min-height:56px">student_code,attendance_rate,lms_activity_score
+24010001,88,72</textarea>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:8px"><button class="btn">Áp dụng CSV</button><span class="muted-note">Cập nhật 10 · bỏ qua 0 · nhận 10 dòng.</span></div>
+    </div>
+  </main>
+</div>
+</body></html>

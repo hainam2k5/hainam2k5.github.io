@@ -1,0 +1,49 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><link rel="stylesheet" href="hifi-common.css"></head><body>
+<div class="topbar">
+  <div class="brand"><div class="brand-logo" style="font-size:10px;line-height:1.05">VNU<br><span>iS</span></div><div><div class="brand-name">Cảnh báo Rủi ro Học tập</div><div class="brand-sub">Trường Quốc tế — VNU-IS</div></div></div>
+  <div class="topbar-spacer"></div>
+  <div class="lang-switch"><button class="active">VI</button><button>EN</button></div>
+  <div class="topbar-user"><div class="avatar">TB</div><div class="who"><b>TS. Trần Thị B</b><small>Cố vấn · Hệ thống thông tin</small></div><button class="btn btn-sm">Đăng xuất</button></div>
+</div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="nav-label">Điều hướng</div>
+    <nav class="nav">
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Tổng quan</span></a>
+      <a class="active"><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.3a3 3 0 0 1 0 5.4"/><path d="M18.5 20a6.5 6.5 0 0 0-3-5.5"/></svg><span>Sinh viên</span></a>
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M12 3 22 20H2z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg><span>Cảnh báo &amp; Can thiệp</span><span class="count">3</span></a>
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M21 15a3 3 0 0 1-3 3H8l-5 4V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3z"/></svg><span>Tin nhắn</span><span class="count">1</span></a>
+      <a><svg class="ic-svg" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Đánh giá</span></a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="page-head">
+      <div><div class="page-title">Sinh viên</div><div class="page-sub">24 sinh viên</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm">Nhập CSV</button><button class="btn btn-sm">Tải mẫu</button>
+        <button class="btn btn-sm">Nhập điểm</button><button class="btn btn-sm">Xuất báo cáo</button>
+        <button class="btn btn-sm btn-primary"><svg class="ic-svg" width="15" height="15" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Thêm sinh viên</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search"><svg class="ic-svg" width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="Tìm theo tên hoặc mã SV…"></div>
+      <select><option>Tất cả khóa</option></select>
+      <select><option>Tất cả học kỳ</option></select>
+    </div>
+    <div class="chips" style="margin-bottom:14px">
+      <span class="chip active">Tất cả</span><span class="chip">Nghiêm trọng</span><span class="chip">Cao</span><span class="chip">Trung bình</span><span class="chip">Thấp</span>
+    </div>
+    <div class="muted-note" style="margin-bottom:12px">Hiển thị 3 / 24 sinh viên</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Sinh viên</th><th>Mã SV</th><th>Khóa</th><th>CPA</th><th>Điểm rủi ro</th><th>Mức</th><th>Dự đoán</th><th>Cảnh báo</th></tr></thead>
+        <tbody>
+          <tr class="row-link"><td><b>Hoàng Văn Em</b><div class="muted-note">Hệ thống thông tin</div></td><td class="mono">SV004</td><td>K69</td><td class="mono">0.23</td><td><div class="score-cell"><div class="riskbar"><span class="f-gpa" style="width:44%"></span><span class="f-att" style="width:24%"></span><span class="f-lms" style="width:12%"></span><span class="f-fail" style="width:20%"></span></div><span class="score-num">70.3</span></div></td><td><span class="badge badge-High">Cao</span></td><td><span class="pill Open">Đang báo động</span></td><td><span class="pill Open">Mở</span></td></tr>
+          <tr class="row-link"><td><b>Lê Văn Cường</b><div class="muted-note">Kỹ thuật phần mềm</div></td><td class="mono">SV002</td><td>K70</td><td class="mono">1.13</td><td><div class="score-cell"><div class="riskbar"><span class="f-gpa" style="width:22%"></span><span class="f-att" style="width:8%"></span><span class="f-lms" style="width:4%"></span><span class="f-fail" style="width:2%"></span></div><span class="score-num">36.1</span></div></td><td><span class="badge badge-Medium">Trung bình</span></td><td><span class="pill Acknowledged">Nguy cơ cao</span></td><td>—</td></tr>
+          <tr class="row-link"><td><b>Phạm Thị Dung</b><div class="muted-note">Hệ thống thông tin</div></td><td class="mono">SV003</td><td>K71</td><td class="mono">2.30</td><td><div class="score-cell"><div class="riskbar"><span class="f-gpa" style="width:5%"></span><span class="f-att" style="width:1%"></span></div><span class="score-num">3.2</span></div></td><td><span class="badge badge-Low">Thấp</span></td><td><span class="pill Resolved">An toàn</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body></html>
