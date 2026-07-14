@@ -1,4 +1,27 @@
-export type Role = "student" | "advisor" | "manager";
+export type Role = "student" | "advisor" | "manager" | "teacher";
+
+export interface Section {
+  id: string;
+  code: string;
+  name: string;
+  semester: string;
+  academic_year: string;
+  teacher_id: string | null;
+  credits: number;
+  weight_regular: number;
+  weight_midterm: number;
+  weight_final: number;
+  created_at?: string;
+}
+
+export interface Attendance {
+  id: string;
+  section_id: string;
+  student_id: string;
+  session_date: string;
+  present: boolean;
+  created_at?: string;
+}
 
 export interface Profile {
   id: string;
