@@ -17,7 +17,7 @@ import { predictAlarm, type Prediction } from "@/lib/predict";
 import { ClassesView } from "@/components/classes-view";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message, Appointment } from "@/lib/types";
 
-type View = "dashboard" | "students" | "student" | "alerts" | "messages" | "evaluation" | "classes";
+type View = "dashboard" | "students" | "student" | "alerts" | "messages" | "evaluation" | "attendance" | "grades";
 // A validated grade row ready to write (used by the grade-import preview).
 type PGrade = { sid: string; code: string; name: string; credits: number; semester: string; academic_year: string; wr: number; wm: number; wf: number; sr: number | null; sm: number | null; sf: number | null; total: number | null; letter: string | null; point: number | null };
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
@@ -1296,7 +1296,8 @@ export default function AdvisorPage() {
   const navItems: [View, string, string][] = [
     ["dashboard", "dashboard", "nav.dashboard"],
     ["students", "students", "nav.students"],
-    ["classes", "grad", "nav.classes"],
+    ["attendance", "grad", "nav.attendance"],
+    ["grades", "edit", "nav.grades"],
     ["alerts", "alert", "nav.alerts"],
     ["messages", "message", "nav.messages"],
     ["evaluation", "target", "nav.evaluation"],
@@ -1332,7 +1333,8 @@ export default function AdvisorPage() {
         <main className="main">
           {view === "dashboard" && renderDashboard()}
           {view === "students" && renderStudents()}
-          {view === "classes" && <ClassesView me={me} />}
+          {view === "attendance" && <ClassesView me={me} mode="attend" />}
+          {view === "grades" && <ClassesView me={me} mode="grades" />}
           {view === "student" && renderStudentDetail()}
           {view === "alerts" && renderAlerts()}
           {view === "messages" && renderMessages()}

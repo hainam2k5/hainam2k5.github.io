@@ -10,16 +10,17 @@ import type { Profile, Section, Course, Attendance } from "@/lib/types";
 type Row = { c: Course; s: Profile };
 
 // Shared "Classes" screen: a teacher (or an advisor who also teaches, or a
-// manager) picks a class they teach, takes attendance for a session, and enters
-// the TX/GK/CK component grades of the enrolled students. A class roster is the
-// set of `courses` rows whose (code, semester, academic_year) match the section.
-export function ClassesView({ me }: { me: Profile }) {
+// manager) picks a class they teach and — depending on `mode` — either takes
+// attendance for a session (mode="attend") OR enters the TX/GK/CK component
+// grades (mode="grades"). Attendance and grade entry live on two separate pages.
+// A class roster is the set of `courses` rows whose (code, semester,
+// academic_year) match the section.
+export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grades" }) {
   const { t } = useI18n();
   const sb = supabase;
   const [sections, setSections] = useState<Section[]>([]);
   const [selId, setSelId] = useState("");
   const [roster, setRoster] = useState<Row[]>([]);
-  const [tab, setTab] = useState<"attend" | "grades">("attend");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [present, setPresent] = useState<Record<string, boolean>>({});
   const [rates, setRates] = useState<Record<string, { pre: number; tot: number }>>({});
@@ -121,7 +122,10 @@ export function ClassesView({ me }: { me: Profile }) {
   return (
     <>
       <div className="page-head">
-        <div><div className="page-title">{t("cls.title")}</div><div className="page-sub">{t("cls.sub")}</div></div>
+        <div>
+          <div className="page-title">{t(mode === "attend" ? "cls.titleAttend" : "cls.titleGrades")}</div>
+          <div className="page-sub">{t(mode === "attend" ? "cls.subAttend" : "cls.subGrades")}</div>
+        </div>
         <button className="btn btn-primary" onClick={() => setShowNew((v) => !v)}><Icon name="plus" size={16} /> {t("cls.addClass")}</button>
       </div>
 
@@ -160,23 +164,16 @@ export function ClassesView({ me }: { me: Profile }) {
 
       {sel && (
         <div className="card">
-          <div className="toolbar" style={{ marginBottom: 14 }}>
-            <div className="chips">
-              <span className={"chip" + (tab === "attend" ? " active" : "")} onClick={() => setTab("attend")}>{t("cls.tabAttend")}</span>
-              <span className={"chip" + (tab === "grades" ? " active" : "")} onClick={() => setTab("grades")}>{t("cls.tabGrades")}</span>
+          {mode === "attend" && (
+            <div className="toolbar" style={{ marginBottom: 14 }}>
+              <label style={{ margin: 0, alignSelf: "center" }}>{t("cls.session")}</label>
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ width: "auto" }} />
             </div>
-            <div className="topbar-spacer" />
-            {tab === "attend" && (
-              <>
-                <label style={{ margin: 0, alignSelf: "center" }}>{t("cls.session")}</label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ width: "auto" }} />
-              </>
-            )}
-          </div>
+          )}
 
           {roster.length === 0 ? (
             <div className="empty"><Icon name="students" size={30} />{t("cls.noStudents")}</div>
-          ) : tab === "attend" ? (
+          ) : mode === "attend" ? (
             <>
               <div style={{ overflowX: "auto" }}>
                 <table>
