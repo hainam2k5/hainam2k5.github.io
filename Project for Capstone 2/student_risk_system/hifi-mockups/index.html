@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xem thử 3 giao diện — Student Risk Alert System</title>
+<style>
+  :root{--navy:#13294f;--gold:#c9a227;--primary:#2461e6;--bg:#f3f5f9;--line:#e4e8f0;--muted:#5c6678}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:"Inter","Segoe UI",system-ui,Arial,sans-serif}
+  body{display:flex;background:var(--bg);color:#121a2b}
+  .side{width:250px;flex:none;background:#fff;border-right:1px solid var(--line);height:100vh;overflow-y:auto;padding:16px 12px}
+  .brand{display:flex;align-items:center;gap:9px;padding:4px 8px 14px}
+  .logo{width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px;line-height:1}
+  .logo span{color:var(--gold)}
+  .brand b{font-size:13.5px;letter-spacing:-.01em}
+  .brand small{display:block;color:var(--muted);font-size:11px}
+  .grp{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#949cad;padding:14px 10px 6px}
+  a.item{display:block;padding:8px 10px;border-radius:8px;color:#3a4557;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
+  a.item:hover{background:#f1f5ff}
+  a.item.active{background:#eaf1ff;color:#1b4fc4}
+  .main{flex:1;display:flex;flex-direction:column;height:100vh}
+  .bar{height:44px;flex:none;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 16px;font-size:12.5px;color:var(--muted)}
+  .bar .t{font-weight:700;color:#121a2b}
+  .bar .note{margin-left:auto;color:#949cad;font-size:11.5px}
+  .bar a{color:var(--primary);font-weight:600;text-decoration:none}
+  iframe{flex:1;width:100%;border:0;background:#fff}
+  .role-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:1px}
+  .r-sv{background:#2461e6}.r-cv{background:#157f3c}.r-gv{background:#c9a227}
+</style>
+</head>
+<body>
+<nav class="side">
+  <div class="brand"><div class="logo">VNU<br><span>iS</span></div><div><b>Xem thử giao diện</b><small>Bản hi-fi · không cần đăng nhập</small></div></div>
+
+  <div class="grp"><span class="role-dot r-sv"></span>Sinh viên</div>
+  <a class="item" data-src="03-student-portal.html">Cổng sinh viên</a>
+
+  <div class="grp"><span class="role-dot r-cv"></span>Cố vấn</div>
+  <a class="item" data-src="04-advisor-dashboard.html">Tổng quan</a>
+  <a class="item" data-src="05-advisor-students.html">Sinh viên</a>
+  <a class="item" data-src="06-advisor-classes.html">Lớp học</a>
+  <a class="item" data-src="07-advisor-student-detail.html">Chi tiết sinh viên</a>
+  <a class="item" data-src="08-advisor-alerts.html">Cảnh báo &amp; Can thiệp</a>
+  <a class="item" data-src="09-advisor-messages.html">Tin nhắn</a>
+  <a class="item" data-src="10-advisor-evaluation.html">Đánh giá</a>
+
+  <div class="grp"><span class="role-dot r-gv"></span>Giáo viên</div>
+  <a class="item" data-src="11-teacher-classes.html">Lớp học (điểm danh · nhập điểm)</a>
+
+  <div class="grp">Chung</div>
+  <a class="item" data-src="01-login.html">Đăng nhập</a>
+  <a class="item" data-src="02-forgot-password.html">Quên mật khẩu</a>
+</nav>
+<div class="main">
+  <div class="bar">
+    <span class="t" id="title">Cổng sinh viên</span>
+    <span class="note">Bản dựng hi-fi tĩnh — nút bấm chỉ để xem bố cục, không lưu dữ liệu · <a id="openNew" href="03-student-portal.html" target="_blank">Mở tab riêng ↗</a></span>
+  </div>
+  <iframe id="view" src="03-student-portal.html" title="preview"></iframe>
+</div>
+<script>
+  const items = document.querySelectorAll('a.item');
+  const view = document.getElementById('view');
+  const title = document.getElementById('title');
+  const openNew = document.getElementById('openNew');
+  function select(el){
+    items.forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    const src = el.dataset.src;
+    view.src = src; openNew.href = src; title.textContent = el.textContent.trim();
+  }
+  items.forEach(el => el.addEventListener('click', e => { e.preventDefault(); select(el); }));
+  document.querySelector('a.item[data-src="03-student-portal.html"]').classList.add('active');
+</script>
+</body>
+</html>
