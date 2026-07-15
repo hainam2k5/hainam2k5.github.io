@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Teacher</title>
+<style>
+  :root{--ink:#333;--mut:#888;--faint:#aaa;--line:#c4c4c4;--fill:#e6e6e6;--fill2:#f2f2f2;--dark:#5f5f5f}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13px;line-height:1.5}
+  .page{max-width:1000px;margin:0 auto;padding:28px 20px 70px}
+  header.doc h1{font-size:22px;margin:0;text-align:center;letter-spacing:-.01em}
+  header.doc .sub{text-align:center;color:var(--mut);font-size:12px;margin-top:4px}
+  .rule{height:1px;background:var(--line);margin:14px 0 22px}
+  .screen{border:1px solid #bbb;margin:0 0 22px}
+  .cap{border-bottom:1px solid #bbb;padding:9px 12px;font-size:14px;font-weight:600}
+  .frame{padding:16px;display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;gap:12px} .col{display:flex;flex-direction:column;gap:12px}
+  .flex1{flex:1} .sp{justify-content:space-between} .ac{align-items:center} .end{justify-content:flex-end} .wrap{flex-wrap:wrap}
+  .box{border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px}
+  .h{font-weight:700;font-size:14px} .muted{color:var(--mut)} .small{font-size:11px}
+  .lbl{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+  .flabel{font-size:11px;color:var(--mut);margin-bottom:4px}
+  .field{border:1px solid var(--line);min-height:30px;display:flex;align-items:center;padding:5px 9px;color:var(--faint);font-size:12px}
+  .field.sel::after{content:"▾";margin-left:auto;color:var(--mut)}
+  .field.in{width:56px;justify-content:center;color:var(--ink)}
+  .btn{border:1px solid var(--dark);height:30px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;font-size:12px;color:var(--dark);background:#fff;white-space:nowrap}
+  .btn.pri{background:var(--dark);color:#fff} .btn.blk{width:100%;display:flex} .btn.sm{height:24px;font-size:11px;padding:0 9px}
+  .chip{border:1px solid var(--line);border-radius:999px;height:24px;display:inline-flex;align-items:center;padding:0 11px;font-size:11.5px;color:var(--mut)} .chip.on{background:var(--fill);color:var(--ink)}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:11px;background:var(--fill2)}
+  .img{background:var(--fill2) linear-gradient(45deg,transparent 47%,var(--line) 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,var(--line) 47% 53%,transparent 53%);min-height:200px;display:grid;place-items:center;color:var(--mut);text-align:center;position:relative}
+  .logo{border:1px solid var(--dark);padding:2px 6px;font-size:9px;font-weight:700;color:var(--dark);position:absolute;top:12px;left:12px}
+  .top{border:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:10px;font-size:12px}
+  table.wf{width:100%;border-collapse:collapse;font-size:12px}
+  table.wf td{border-bottom:1px solid #eee;padding:8px;color:var(--dark)}
+  table.wf tr:first-child td{border-bottom:1px solid #9a9a9a}
+  .otp{display:flex;gap:6px}.otp span{flex:1;height:34px;border:1px solid var(--line);display:grid;place-items:center;color:var(--faint)}
+  .dots{letter-spacing:3px;color:var(--faint)}
+  @media print{.screen{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="doc">
+    <h1>Wireframe — Teacher</h1>
+    <div class="sub">Academic Risk Alert System · VNU-IS</div>
+  </header>
+  <div class="rule"></div>
+
+  <!-- 1 -->
+  <section class="screen">
+    <div class="cap"><b>1.</b> Log in</div>
+    <div class="frame">
+      <div class="row">
+        <div class="img flex1" style="flex-basis:52%"><div class="logo">VNU iS</div>School photo (carousel)<br><span class="dots">● ● ● ●</span></div>
+        <div class="box flex1" style="flex-basis:48%">
+          <div class="row end"><span class="chip on">VI</span><span class="chip">EN</span></div>
+          <div class="h">Welcome back</div>
+          <div class="muted small">Sign in to continue.</div>
+          <div><div class="flabel">Email</div><div class="field">teacher@school.edu.vn</div></div>
+          <div><div class="flabel">Password</div><div class="field">••••••••</div></div>
+          <div class="row end"><span class="small muted">Forgot password?</span></div>
+          <div class="btn pri blk">Sign in</div>
+          <div class="small muted" style="text-align:center">Signs in to the teacher view based on role.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="screen">
+    <div class="cap"><b>2.</b> Forgot password</div>
+    <div class="frame row">
+      <div class="box flex1">
+        <div class="lbl">Step 1 — enter email</div>
+        <div class="h">Reset password</div>
+        <div class="muted small">Enter your email; we'll send a 6-digit code.</div>
+        <div><div class="flabel">Email</div><div class="field">teacher@school.edu.vn</div></div>
+        <div class="btn pri blk">Send code</div>
+        <div class="small muted" style="text-align:center">← Back to login</div>
+      </div>
+      <div class="box flex1">
+        <div class="lbl">Step 2 — code &amp; new password</div>
+        <div class="h">Set new password</div>
+        <div class="muted small">Enter the 6-digit code sent to your email.</div>
+        <div><div class="flabel">Verification code (6 digits)</div><div class="otp"><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span></div></div>
+        <div><div class="flabel">New password</div><div class="field">••••••••</div></div>
+        <div><div class="flabel">Confirm new password</div><div class="field">••••••••</div></div>
+        <div class="btn pri blk">Update password</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="screen">
+    <div class="cap"><b>3.</b> Classes</div>
+    <div class="frame">
+      <div class="top"><b>VNU iS</b><div class="flex1"></div><span class="chip on">VI</span><span class="chip">EN</span><span class="pill">Ms. C · Teacher</span><span class="btn sm">Log out</span></div>
+      <div class="row sp ac wrap" style="gap:8px"><div><div class="h">Classes</div><div class="small muted">Attendance &amp; component grades for the classes you teach</div></div><span class="btn sm pri">+ Add class</span></div>
+      <div class="box">
+        <div class="h" style="font-size:13px">Create a class</div>
+        <div class="row" style="gap:8px;flex-wrap:wrap">
+          <div style="flex:1;min-width:110px"><div class="flabel">Course code</div><div class="field">INT1008</div></div>
+          <div style="flex:2;min-width:160px"><div class="flabel">Course name</div><div class="field">Intro to Programming</div></div>
+          <div style="flex:1;min-width:80px"><div class="flabel">Credits</div><div class="field">3</div></div>
+          <div style="flex:1;min-width:110px"><div class="flabel">Semester</div><div class="field">HK1 2025-2026</div></div>
+          <div style="flex:1;min-width:100px"><div class="flabel">Year</div><div class="field">2025-2026</div></div>
+        </div>
+        <div class="row"><span class="btn">Create class</span></div>
+        <div class="small muted">Roster is derived from grade records matching course code + semester + year.</div>
+      </div>
+      <div class="row" style="gap:8px"><div class="field sel" style="width:330px;flex:none">INT1008 — Intro to Programming · HK1 2025-2026</div></div>
+      <div class="row ac" style="gap:8px"><span class="chip">Attendance</span><span class="chip on">Grades</span></div>
+      <div class="box">
+        <table class="wf">
+          <tr><td><b>Student</b></td><td><b>ID</b></td><td><b>Reg</b></td><td><b>Mid</b></td><td><b>Final</b></td><td><b>Total</b></td><td><b>Grade</b></td></tr>
+          <tr><td>Hoang Van Em</td><td>SV004</td><td><div class="field in">3.0</div></td><td><div class="field in">2.5</div></td><td><div class="field in">3.0</div></td><td>2.9</td><td><span class="pill">F</span></td></tr>
+          <tr><td>Le Van Cuong</td><td>SV002</td><td><div class="field in">6.5</div></td><td><div class="field in">7.0</div></td><td><div class="field in">6.0</div></td><td>6.4</td><td><span class="pill">C</span></td></tr>
+          <tr><td>Pham Thi Dung</td><td>SV003</td><td><div class="field in">8.0</div></td><td><div class="field in">8.5</div></td><td><div class="field in">9.0</div></td><td>8.6</td><td><span class="pill">A</span></td></tr>
+        </table>
+        <div class="small muted">Weights: Reg 0.2 · Mid 0.3 · Final 0.5</div>
+        <div class="row"><span class="btn pri" style="color:#fff">Save grades</span></div>
+      </div>
+      <div class="box">
+        <div class="h" style="font-size:13px">Attendance tab</div>
+        <div class="row ac" style="gap:8px"><div class="flabel" style="margin:0">Session date</div><div class="field" style="width:150px">15/07/2026</div></div>
+        <table class="wf">
+          <tr><td><b>Student</b></td><td><b>ID</b></td><td style="text-align:center"><b>Present</b></td><td style="text-align:right"><b>Attendance</b></td></tr>
+          <tr><td>Hoang Van Em</td><td>SV004</td><td style="text-align:center">☑</td><td style="text-align:right">54%</td></tr>
+          <tr><td>Le Van Cuong</td><td>SV002</td><td style="text-align:center">☑</td><td style="text-align:right">82%</td></tr>
+        </table>
+        <div class="small muted">Tick = present. Saving updates each student's attendance rate.</div>
+        <div class="row"><span class="btn pri" style="color:#fff">Save attendance</span></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
