@@ -1,12 +1,12 @@
 # Dựng Prototype trong Figma — Student Risk Alert System
 
-Mình đã dựng sẵn **15 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`**:
+Mình đã dựng sẵn **17 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`**:
 
 - **Student (3):** `student-01-log-in`, `student-02-forgot-password`, `student-03-portal`
-- **Advisor (9):** `advisor-01-log-in` → `advisor-09-evaluation` — trong đó `advisor-05-classes` là màn **Lớp học** (điểm danh + nhập điểm thành phần)
-- **Teacher (3):** `teacher-01-log-in`, `teacher-02-forgot-password`, `teacher-03-classes` (tab Nhập điểm)
+- **Advisor (10):** `advisor-01-log-in` → `advisor-10-evaluation` — trong đó `advisor-05-attendance` là màn **Điểm danh** và `advisor-06-grades` là màn **Nhập điểm** (cố vấn kiêm giáo viên nên có 2 màn này)
+- **Teacher (4):** `teacher-01-log-in`, `teacher-02-forgot-password`, `teacher-03-attendance` (Điểm danh), `teacher-04-grades` (Nhập điểm)
 
-*(Cấu trúc khớp app thật: SV có 1 trang Portal tổng; cố vấn có 9 màn theo sidebar 6 mục — kiêm giáo viên nên có Lớp học; giáo viên thuần chỉ có màn Lớp học.)*
+*(Cấu trúc khớp app thật: SV có 1 trang Portal tổng; cố vấn có 10 màn theo sidebar 7 mục — có **Điểm danh** và **Nhập điểm** tách riêng; giáo viên thuần có 2 màn Điểm danh + Nhập điểm.)*
 
 Việc của bạn chỉ là: kéo ảnh vào Figma → biến mỗi ảnh thành 1 Frame → nối link bấm chạy. Mất ~15 phút.
 
@@ -15,11 +15,11 @@ Việc của bạn chỉ là: kéo ảnh vào Figma → biến mỗi ảnh thàn
 ## Bước 1 — Đưa frame vào Figma
 
 1. Mở **figma.com** → tạo file Design mới.
-2. Mở thư mục `Figma-frames/` trên máy → **kéo–thả cả loạt ảnh** vào canvas Figma (kéo riêng nhóm student, riêng nhóm advisor cho gọn).
+2. Mở thư mục `Figma-frames/` trên máy → **kéo–thả cả loạt ảnh** vào canvas Figma (kéo riêng nhóm student, riêng nhóm advisor, riêng nhóm teacher cho gọn).
 3. Chọn **tất cả ảnh** (`Ctrl/Cmd + A`) → nhấn **`Ctrl/Cmd + Alt + G`** (*Frame selection*) — mỗi ảnh thành **1 Frame** ôm khít.
-4. Đổi tên frame theo tên ảnh (F2) và xếp thành 1 hàng theo thứ tự 01 → 08 cho dễ nối.
+4. Đổi tên frame theo tên ảnh (F2) và xếp thành 1 hàng theo thứ tự 01 → 10 cho dễ nối.
 
-> Mẹo: đặt 2 hàng — hàng trên là luồng **Student**, hàng dưới là luồng **Advisor**.
+> Mẹo: đặt 3 hàng — hàng 1 luồng **Student**, hàng 2 luồng **Advisor**, hàng 3 luồng **Teacher**.
 
 ## Bước 2 — Bật chế độ Prototype & nối link
 
@@ -48,7 +48,7 @@ Sinh viên chỉ có 3 màn (Portal là 1 trang tổng chứa mọi thứ):
 
 ## Bản đồ nối link — LUỒNG ADVISOR
 
-Sidebar 6 mục (Tổng quan · Sinh viên · **Lớp học** · Cảnh báo & Can thiệp · Tin nhắn · Đánh giá) xuất hiện ở frame 03–09 — nối các mục sidebar giống nhau trên mỗi frame.
+Sidebar 7 mục (Tổng quan · Sinh viên · **Điểm danh** · **Nhập điểm** · Cảnh báo & Can thiệp · Tin nhắn · Đánh giá) xuất hiện ở frame 03–10 — nối các mục sidebar giống nhau trên mỗi frame.
 
 | Từ frame | Bấm vào | → Sang frame |
 |---|---|---|
@@ -57,36 +57,38 @@ Sidebar 6 mục (Tổng quan · Sinh viên · **Lớp học** · Cảnh báo & C
 | 02 Forgot password | **Cập nhật mật khẩu** | 03 Dashboard |
 | 02 Forgot password | **← Quay lại đăng nhập** | 01 Log in |
 | 03 Dashboard | sidebar **Sinh viên** | 04 Students |
-| 03 Dashboard | sidebar **Lớp học** | 05 Classes |
-| 03 Dashboard | sidebar **Cảnh báo & Can thiệp** | 07 Alerts & interventions |
-| 03 Dashboard | sidebar **Tin nhắn** | 08 Messages |
-| 03 Dashboard | sidebar **Đánh giá** | 09 Evaluation |
+| 03 Dashboard | sidebar **Điểm danh** | 05 Attendance |
+| 03 Dashboard | sidebar **Nhập điểm** | 06 Grades |
+| 03 Dashboard | sidebar **Cảnh báo & Can thiệp** | 08 Alerts & interventions |
+| 03 Dashboard | sidebar **Tin nhắn** | 09 Messages |
+| 03 Dashboard | sidebar **Đánh giá** | 10 Evaluation |
 | 03 Dashboard | **Đăng xuất** | 01 Log in |
-| 04 Students | một **dòng sinh viên** (vd Hoàng Văn Em) | 06 Student detail |
-| 04 Students | sidebar Tổng quan / Lớp học / Cảnh báo / Tin nhắn / Đánh giá | 03 / 05 / 07 / 08 / 09 |
-| 05 Classes | tab **Nhập điểm** *(tuỳ chọn)* | 03 frame teacher-03 (cùng nội dung tab điểm) |
-| 05 Classes | sidebar các mục khác | 03 / 04 / 07 / 08 / 09 |
-| 06 Student detail | **← Danh sách sinh viên** | 04 Students |
-| 07 Alerts & interventions | một **dòng cảnh báo** | 06 Student detail |
-| 07 / 08 / 09 | sidebar các mục khác | 03 / 04 / 05 / … |
+| 04 Students | một **dòng sinh viên** (vd Hoàng Văn Em) | 07 Student detail |
+| 05 Attendance | sidebar **Nhập điểm** | 06 Grades |
+| 06 Grades | sidebar **Điểm danh** | 05 Attendance |
+| 05 / 06 | sidebar các mục khác | 03 / 04 / 08 / 09 / 10 |
+| 07 Student detail | **← Danh sách sinh viên** | 04 Students |
+| 08 Alerts & interventions | một **dòng cảnh báo** | 07 Student detail |
+| 08 / 09 / 10 | sidebar các mục khác | 03 / 04 / 05 / 06 / … |
 
 ## Bản đồ nối link — LUỒNG TEACHER
 
-Giáo viên (không phải cố vấn) chỉ có 3 màn — đăng nhập xong vào thẳng Lớp học:
+Giáo viên (không phải cố vấn) có 4 màn, sidebar 2 mục (**Điểm danh** · **Nhập điểm**) — đăng nhập xong vào thẳng Điểm danh:
 
 | Từ frame | Bấm vào | → Sang frame |
 |---|---|---|
-| teacher-01 Log in | **Đăng nhập** | teacher-03 Classes |
+| teacher-01 Log in | **Đăng nhập** | teacher-03 Attendance |
 | teacher-01 Log in | **Quên mật khẩu?** | teacher-02 Forgot password |
-| teacher-02 | **Cập nhật mật khẩu** | teacher-03 Classes |
-| teacher-03 Classes | tab **Điểm danh** *(tuỳ chọn)* | advisor-05 Classes (cùng nội dung tab điểm danh) |
-| teacher-03 Classes | **Đăng xuất** | teacher-01 Log in |
+| teacher-02 | **Cập nhật mật khẩu** | teacher-03 Attendance |
+| teacher-03 Attendance | sidebar **Nhập điểm** | teacher-04 Grades |
+| teacher-04 Grades | sidebar **Điểm danh** | teacher-03 Attendance |
+| teacher-03 / 04 | **Đăng xuất** | teacher-01 Log in |
 
 ---
 
 ## Cách khác — nhập bản CHỈNH SỬA ĐƯỢC (nâng cao)
 
-Nếu muốn frame có layer sửa được (không phải ảnh tĩnh): dùng plugin **html.to.design** → *Import from URL* với 2 link (đã live):
+Nếu muốn frame có layer sửa được (không phải ảnh tĩnh): dùng plugin **html.to.design** → *Import from URL* với 3 link (đã live):
 
 ```
 https://hainam2k5.github.io/Project%20for%20Capstone%202/student_risk_system/Wireframe-Student.html
@@ -94,4 +96,4 @@ https://hainam2k5.github.io/Project%20for%20Capstone%202/student_risk_system/Wir
 https://hainam2k5.github.io/Project%20for%20Capstone%202/student_risk_system/Wireframe-Teacher.html
 ```
 
-Nhược điểm: mỗi file nhập thành **1 frame dài** (8 màn xếp dọc) → phải tự tách từng `section` thành frame riêng trước khi nối link. Với mục đích prototype bấm-chạy, cách **ảnh-thành-frame** ở trên nhanh và gọn hơn.
+Nhược điểm: mỗi file nhập thành **1 frame dài** (nhiều màn xếp dọc) → phải tự tách từng `section` thành frame riêng trước khi nối link. Với mục đích prototype bấm-chạy, cách **ảnh-thành-frame** ở trên nhanh và gọn hơn.
