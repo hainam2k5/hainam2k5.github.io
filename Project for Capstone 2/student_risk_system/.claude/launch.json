@@ -2,14 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "webapp",
+      "name": "wireframes",
       "runtimeExecutable": "python",
       "runtimeArgs": [
-        "-m", "http.server", "5173",
-        "--directory",
-        "student_risk_system/webapp"
+        "-m", "http.server", "8123",
+        "--directory", "."
       ],
-      "port": 5173
+      "port": 8123
     },
     {
       "name": "webapp-next",
