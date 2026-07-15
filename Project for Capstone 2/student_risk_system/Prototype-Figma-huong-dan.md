@@ -1,11 +1,12 @@
 # Dựng Prototype trong Figma — Student Risk Alert System
 
-Mình đã dựng sẵn **11 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`**:
+Mình đã dựng sẵn **15 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`**:
 
 - **Student (3):** `student-01-log-in`, `student-02-forgot-password`, `student-03-portal`
-- **Advisor (8):** `advisor-01-log-in` → `advisor-08-evaluation`
+- **Advisor (9):** `advisor-01-log-in` → `advisor-09-evaluation` — trong đó `advisor-05-classes` là màn **Lớp học** (điểm danh + nhập điểm thành phần)
+- **Teacher (3):** `teacher-01-log-in`, `teacher-02-forgot-password`, `teacher-03-classes` (tab Nhập điểm)
 
-*(Cấu trúc khớp app thật: sinh viên chỉ có 1 trang tổng — Portal — chứa bảng điểm, thông báo, hỏi đáp, lịch hẹn; cố vấn có 8 màn theo sidebar.)*
+*(Cấu trúc khớp app thật: SV có 1 trang Portal tổng; cố vấn có 9 màn theo sidebar 6 mục — kiêm giáo viên nên có Lớp học; giáo viên thuần chỉ có màn Lớp học.)*
 
 Việc của bạn chỉ là: kéo ảnh vào Figma → biến mỗi ảnh thành 1 Frame → nối link bấm chạy. Mất ~15 phút.
 
@@ -47,27 +48,39 @@ Sinh viên chỉ có 3 màn (Portal là 1 trang tổng chứa mọi thứ):
 
 ## Bản đồ nối link — LUỒNG ADVISOR
 
-Sidebar (Overview · Students · Alerts & interventions · Messages · Evaluation) xuất hiện ở frame 03–08, nên nối các mục sidebar giống nhau trên mỗi frame.
+Sidebar 6 mục (Tổng quan · Sinh viên · **Lớp học** · Cảnh báo & Can thiệp · Tin nhắn · Đánh giá) xuất hiện ở frame 03–09 — nối các mục sidebar giống nhau trên mỗi frame.
 
 | Từ frame | Bấm vào | → Sang frame |
 |---|---|---|
-| 01 Log in | **Sign in** | 03 Dashboard |
-| 01 Log in | **Forgot password?** | 02 Forgot password |
-| 02 Forgot password | **Update password** | 03 Dashboard |
-| 02 Forgot password | **← Back to login** | 01 Log in |
-| 03 Dashboard | sidebar **Students** | 04 Students |
-| 03 Dashboard | sidebar **Alerts & interventions** | 06 Alerts & interventions |
-| 03 Dashboard | sidebar **Messages** | 07 Messages |
-| 03 Dashboard | sidebar **Evaluation** | 08 Evaluation |
-| 03 Dashboard | **Log out** | 01 Log in |
-| 04 Students | sidebar **Overview** | 03 Dashboard |
-| 04 Students | một **dòng sinh viên** (vd Hoang Van Em) | 05 Student detail |
-| 04 Students | sidebar Alerts / Messages / Evaluation | 06 / 07 / 08 |
-| 05 Student detail | **← Students** | 04 Students |
-| 06 Alerts & interventions | sidebar Overview / Students / Messages / Evaluation | 03 / 04 / 07 / 08 |
-| 06 Alerts & interventions | một **dòng cảnh báo** | 05 Student detail |
-| 07 Messages | sidebar Overview / Students / Alerts / Evaluation | 03 / 04 / 06 / 08 |
-| 08 Evaluation | sidebar Overview / Students / Alerts / Messages | 03 / 04 / 06 / 07 |
+| 01 Log in | **Đăng nhập** | 03 Dashboard |
+| 01 Log in | **Quên mật khẩu?** | 02 Forgot password |
+| 02 Forgot password | **Cập nhật mật khẩu** | 03 Dashboard |
+| 02 Forgot password | **← Quay lại đăng nhập** | 01 Log in |
+| 03 Dashboard | sidebar **Sinh viên** | 04 Students |
+| 03 Dashboard | sidebar **Lớp học** | 05 Classes |
+| 03 Dashboard | sidebar **Cảnh báo & Can thiệp** | 07 Alerts & interventions |
+| 03 Dashboard | sidebar **Tin nhắn** | 08 Messages |
+| 03 Dashboard | sidebar **Đánh giá** | 09 Evaluation |
+| 03 Dashboard | **Đăng xuất** | 01 Log in |
+| 04 Students | một **dòng sinh viên** (vd Hoàng Văn Em) | 06 Student detail |
+| 04 Students | sidebar Tổng quan / Lớp học / Cảnh báo / Tin nhắn / Đánh giá | 03 / 05 / 07 / 08 / 09 |
+| 05 Classes | tab **Nhập điểm** *(tuỳ chọn)* | 03 frame teacher-03 (cùng nội dung tab điểm) |
+| 05 Classes | sidebar các mục khác | 03 / 04 / 07 / 08 / 09 |
+| 06 Student detail | **← Danh sách sinh viên** | 04 Students |
+| 07 Alerts & interventions | một **dòng cảnh báo** | 06 Student detail |
+| 07 / 08 / 09 | sidebar các mục khác | 03 / 04 / 05 / … |
+
+## Bản đồ nối link — LUỒNG TEACHER
+
+Giáo viên (không phải cố vấn) chỉ có 3 màn — đăng nhập xong vào thẳng Lớp học:
+
+| Từ frame | Bấm vào | → Sang frame |
+|---|---|---|
+| teacher-01 Log in | **Đăng nhập** | teacher-03 Classes |
+| teacher-01 Log in | **Quên mật khẩu?** | teacher-02 Forgot password |
+| teacher-02 | **Cập nhật mật khẩu** | teacher-03 Classes |
+| teacher-03 Classes | tab **Điểm danh** *(tuỳ chọn)* | advisor-05 Classes (cùng nội dung tab điểm danh) |
+| teacher-03 Classes | **Đăng xuất** | teacher-01 Log in |
 
 ---
 
@@ -78,6 +91,7 @@ Nếu muốn frame có layer sửa được (không phải ảnh tĩnh): dùng p
 ```
 https://hainam2k5.github.io/Project%20for%20Capstone%202/student_risk_system/Wireframe-Student.html
 https://hainam2k5.github.io/Project%20for%20Capstone%202/student_risk_system/Wireframe-Advisor.html
+https://hainam2k5.github.io/Project%20for%20Capstone%202/student_risk_system/Wireframe-Teacher.html
 ```
 
 Nhược điểm: mỗi file nhập thành **1 frame dài** (8 màn xếp dọc) → phải tự tách từng `section` thành frame riêng trước khi nối link. Với mục đích prototype bấm-chạy, cách **ảnh-thành-frame** ở trên nhanh và gọn hơn.
