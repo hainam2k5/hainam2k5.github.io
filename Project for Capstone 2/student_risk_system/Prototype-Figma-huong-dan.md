@@ -1,6 +1,49 @@
-# Dựng Prototype trong Figma — Student Risk Alert System
+# Prototype & cách đưa lên Figma — Student Risk Alert System
 
-Mình đã dựng sẵn **17 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`**:
+## A. Prototype là gì?
+
+**Prototype** = bản *mô phỏng* sản phẩm dựng **trước khi (hoặc thay vì) code đầy đủ**, để thử ý tưởng, luồng dùng và giao diện với người dùng/hội đồng — rẻ, nhanh, dễ sửa.
+
+**Thang độ chi tiết (fidelity ladder) — 3 nấc:**
+
+| Nấc | Là gì | Trả lời câu hỏi |
+|---|---|---|
+| **Wireframe (lo-fi)** | Khung xương: chỉ bố cục hộp + nhãn, đen trắng, chưa màu/ảnh | *Cái gì nằm ở đâu?* |
+| **Mockup (hi-fi)** | Giống thật: có màu, font, ảnh, số liệu — nhưng **tĩnh** (ảnh) | *Trông như thế nào?* |
+| **Prototype (tương tác)** | Nối các màn bằng **link bấm được** → mô phỏng luồng thật (bấm *Đăng nhập* → sang *Dashboard*) | *Dùng ra sao?* |
+
+> Điểm mấu chốt: **Wireframe ≠ Mockup ≠ Prototype**. Cái làm nên chữ “prototype” là **bấm được (clickable)**, không phải ảnh đẹp tĩnh. Trong Figma, bạn dựng các **Frame** (màn hình) rồi sang tab **Prototype** để **nối link** giữa chúng — đó chính là lúc mockup biến thành prototype.
+
+Vài cách phân loại hay gặp: *throwaway* (bỏ sau khi học được) vs *evolutionary* (tiến hoá thành sản phẩm); *horizontal* (rộng — nhiều màn, nông) vs *vertical* (sâu — 1 luồng làm kỹ). Bản của bạn là **horizontal + hi-fi**, phủ đủ 3 vai trò.
+
+**Trong capstone, prototype để:** (1) chốt yêu cầu & luồng với giảng viên/hội đồng; (2) test trải nghiệm trước khi tốn công code; (3) trình chiếu khi bảo vệ.
+
+## B. Prototype của dự án bạn — đã có sẵn gì (không phải vẽ lại từ đầu)
+
+Bạn **không cần dựng mới** — các nấc đã có đủ từ những phần trước:
+
+| Nấc | Đã có | File / nơi lưu |
+|---|---|---|
+| Wireframe (lo-fi) | 3 bộ SV / Cố vấn / Giáo viên | `Wireframe-Student/Advisor/Teacher.html · .pdf · .png` |
+| Mockup (hi-fi, tĩnh) | **17 frame** + 13 mockup + trang xem thử | `Figma-frames/` · `hifi-mockups/index.html` |
+| **Prototype (tương tác)** | ⟶ ghép trong Figma (mục C bên dưới) | dùng 17 frame + nối link |
+| Functional prototype / MVP | **web thật chạy được** (demo 3 vai trò, không cần đăng nhập) | `webapp-next` (localhost:3000, `NEXT_PUBLIC_DEMO=1`) |
+
+Nghĩa là phần “chỉnh sửa cho dự án của mình” **đã xong** — 17 frame vẽ *giống hệt web đã deploy*. Việc còn lại chỉ là **biến chúng thành bản bấm được trong Figma** (mục C).
+
+> ⚠️ Mình **không thao tác hộ tài khoản Figma của bạn được** (không có quyền tạo/sửa file Figma tự động). Nên mình chuẩn bị sẵn **frame + bản đồ nối link**; bạn tự import ~15 phút theo các bước dưới.
+
+---
+
+## C. Cách đưa lên Figma
+
+> 🇬🇧 **Bản tiếng Anh (mới):** đã có sẵn 2 dạng, giao diện **giống hệt web đã deploy** (dùng chính CSS thật):
+> - **Prototype bấm được** — 3 file HTML tự chạy (mở bằng trình duyệt, bấm chuyển trang được): `prototype-en/advisor.html · teacher.html · student.html`.
+> - **17 frame ảnh tiếng Anh** để kéo vào Figma: thư mục **`Figma-frames-en/`** (advisor 01–10, teacher 01–04, student 01–03).
+>
+> Cách nhanh nhất để có prototype Figma tiếng Anh: kéo ảnh trong `Figma-frames-en/` vào Figma rồi làm theo Bước 1–2 dưới. Bản đồ nối link ở phần dưới dùng chung cho cả 2 ngôn ngữ (chỉ khác nhãn VI/EN).
+
+Mình đã dựng sẵn **17 frame hi-fi** (giao diện **giống hệt web đã deploy** — theme navy/gold VNU-IS, card/KPI/bảng thật, không phải greybox) trong thư mục **`Figma-frames/`** (nhãn tiếng Việt) và **`Figma-frames-en/`** (nhãn tiếng Anh):
 
 - **Student (3):** `student-01-log-in`, `student-02-forgot-password`, `student-03-portal`
 - **Advisor (10):** `advisor-01-log-in` → `advisor-10-evaluation` — trong đó `advisor-05-attendance` là màn **Điểm danh** và `advisor-06-grades` là màn **Nhập điểm** (cố vấn kiêm giáo viên nên có 2 màn này)
