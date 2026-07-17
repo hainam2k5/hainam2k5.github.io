@@ -107,17 +107,26 @@ export default function AdvisorPage() {
   }
   async function loadCore(): Promise<Core> { const c = await fetchCore(); applyCore(c); return c; }
 
-  async function recomputeStudent(student: Profile, core: Core, cfg: RiskConfig = riskCfg): Promise<boolean> {
+  // Pure risk computation for one student — no I/O. Returns the rows to write,
+  // or null when the student has nothing to score yet.
+  // `snap` is null when the score/level did not change vs the latest snapshot,
+  // so repeated "Recompute" clicks no longer grow risk_scores unboundedly
+  // (history keeps every CHANGE, which is all predict/evaluation need).
+  interface Outcome { snap: object | null; alert: object | null; notif: object | null; emailStudentId: string | null; emailLevel: string }
+  function computeOutcome(student: Profile, core: Core, cfg: RiskConfig): Outcome | null {
     const cs = core.courses.filter((c) => c.student_id === student.id);
     const g = gpaOf(cs);
     const failed = failedCount(cs);
-    if (g.gpa === null && failed === 0) return false;
+    if (g.gpa === null && failed === 0) return null;
     const result = computeRisk({ cpa: g.gpa, attendance_rate: student.attendance_rate, lms_activity_score: student.lms_activity_score, failed_count: failed }, cfg);
-    await sb!.from("risk_scores").insert({
+    const latest = core.risks.find((r) => r.student_id === student.id); // risks are desc → first is latest
+    const changed = !latest || Number(latest.score) !== result.score || latest.risk_level !== result.level;
+    const snap = changed ? {
       student_id: student.id, score: result.score, risk_level: result.level,
       factor_gpa: result.factor_gpa, factor_attendance: result.factor_attendance,
       factor_lms: result.factor_lms, factor_failed_credits: result.factor_failed_credits,
-    });
+    } : null;
+
     // Compound rules — early signals that fire an alert even when the composite
     // score is still low (e.g. a sharp GPA drop, repeated fails, disengagement).
     const sems = bySemester(cs).filter((x) => x.gpa !== null);
@@ -129,40 +138,61 @@ export default function AdvisorPage() {
     if (student.lms_activity_score < 40) reasons.push(t("alert.rLms", { lms: Math.round(student.lms_activity_score) }));
 
     const openAlert = core.alerts.find((a) => a.student_id === student.id && a.status === "Open");
+    let alert: object | null = null, notif: object | null = null, emailStudentId: string | null = null, emailLevel = "";
     if ((alertWorthy(result.level) || reasons.length > 0) && !openAlert) {
       // A compound-only trigger (score still Low) is floored at Medium so it reads
       // as a genuine alert.
       const alertLevel = alertWorthy(result.level) ? result.level : "Medium";
-      await sb!.from("alerts").insert({
+      alert = {
         student_id: student.id, advisor_id: student.advisor_id || me!.id,
         risk_level: alertLevel, score_at_alert: result.score, status: "Open",
-      });
+      };
       const body = t("alert.autoBody", { level: riskLabel(t, alertLevel) })
         + (reasons.length ? " " + t("alert.reasonsLabel") + " " + reasons.join("; ") + "." : "");
-      await sb!.from("notifications").insert({
-        student_id: student.id, sender_id: me!.id, type: "alert",
-        title: t("alert.autoTitle"), body,
-      });
-      // Best-effort awareness email to the student (no-op if email unconfigured).
-      if (student.email) {
-        try {
-          const { data: sess } = await sb!.auth.getSession();
-          const token = sess.session?.access_token;
-          if (token) {
-            void fetch("/api/notify-alert", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ studentId: student.id, level: alertLevel, lang }),
-            }).catch(() => {});
-          }
-        } catch { /* ignore email errors */ }
-      }
+      notif = { student_id: student.id, sender_id: me!.id, type: "alert", title: t("alert.autoTitle"), body };
+      if (student.email) { emailStudentId = student.id; emailLevel = alertLevel; }
     }
+    return { snap, alert, notif, emailStudentId, emailLevel };
+  }
+
+  // Writes many outcomes with 3 batched inserts instead of 2–3 round-trips per
+  // student (sequential per-student writes took minutes at ~1,000 students).
+  async function persistOutcomes(outs: Outcome[]) {
+    const snaps = outs.map((o) => o.snap).filter(Boolean);
+    const alertRows = outs.map((o) => o.alert).filter(Boolean);
+    const notifRows = outs.map((o) => o.notif).filter(Boolean);
+    if (snaps.length) await sb!.from("risk_scores").insert(snaps);
+    if (alertRows.length) await sb!.from("alerts").insert(alertRows);
+    if (notifRows.length) await sb!.from("notifications").insert(notifRows);
+    // Best-effort awareness emails (no-op if email unconfigured): one session
+    // lookup, then fire-and-forget requests.
+    const emails = outs.filter((o) => o.emailStudentId);
+    if (!emails.length) return;
+    try {
+      const { data: sess } = await sb!.auth.getSession();
+      const token = sess.session?.access_token;
+      if (token) {
+        for (const o of emails) {
+          void fetch("/api/notify-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ studentId: o.emailStudentId, level: o.emailLevel, lang }),
+          }).catch(() => {});
+        }
+      }
+    } catch { /* ignore email errors */ }
+  }
+
+  async function recomputeStudent(student: Profile, core: Core, cfg: RiskConfig = riskCfg): Promise<boolean> {
+    const o = computeOutcome(student, core, cfg);
+    if (!o) return false;
+    await persistOutcomes([o]);
     return true;
   }
   async function recomputeAll() {
     const core = await fetchCore();
-    for (const s of core.students) await recomputeStudent(s, core);
+    const outs = core.students.map((s) => computeOutcome(s, core, riskCfg)).filter((o): o is Outcome => o !== null);
+    await persistOutcomes(outs);
     await loadCore();
     toast(t("toast.recalcAll"), "success");
   }
@@ -191,14 +221,13 @@ export default function AdvisorPage() {
       const core = await fetchCore();
       if (!active) return;
       applyCore(core);
-      let scored = false;
-      for (const s of core.students) {
-        if (!core.risks.some((r) => r.student_id === s.id)) {
-          const did = await recomputeStudent(s, core, effCfg);
-          if (did) scored = true;
-        }
-      }
-      if (scored && active) await loadCore();
+      // Score first-seen students in one batched write instead of per-student round-trips.
+      const firstOuts = core.students
+        .filter((s) => !core.risks.some((r) => r.student_id === s.id))
+        .map((s) => computeOutcome(s, core, effCfg))
+        .filter((o): o is Outcome => o !== null);
+      if (firstOuts.length) await persistOutcomes(firstOuts);
+      if (firstOuts.length && active) await loadCore();
       if (active) setReady(true);
     })();
 
@@ -567,7 +596,13 @@ export default function AdvisorPage() {
     const upRes = await Promise.all(toUpdate.map((u) => sb!.from("courses").update(u.payload).eq("id", u.id)));
     failed += upRes.filter((r) => r.error).length;
     const core = await fetchCore();
-    for (const sid of sids) { const st = core.students.find((x) => x.id === sid); if (st) await recomputeStudent(st, core); }
+    // One batched write for every student touched by the import.
+    const importOuts = sids
+      .map((sid) => core.students.find((x) => x.id === sid))
+      .filter((st): st is Profile => !!st)
+      .map((st) => computeOutcome(st, core, riskCfg))
+      .filter((o): o is Outcome => o !== null);
+    if (importOuts.length) await persistOutcomes(importOuts);
     await loadCore();
     setImporting(false);
     setGradePreview(null);

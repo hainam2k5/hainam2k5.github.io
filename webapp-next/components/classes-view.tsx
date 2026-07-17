@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useI18n } from "@/lib/i18n";
 import { toast } from "@/lib/toast";
@@ -26,8 +26,6 @@ export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grade
   const [rates, setRates] = useState<Record<string, { pre: number; tot: number }>>({});
   const [gEdits, setGEdits] = useState<Record<string, { sr?: string; sm?: string; sf?: string }>>({});
   const [saving, setSaving] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [nf, setNf] = useState({ code: "", name: "", semester: "", year: "", credits: "3" });
 
   const sel = sections.find((s) => s.id === selId) || null;
 
@@ -42,17 +40,20 @@ export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grade
 
   async function loadRoster(sec: Section, d: string) {
     if (!sb) return;
-    const { data: crs } = await sb.from("courses").select("*").eq("code", sec.code).eq("semester", sec.semester);
+    // Fetch only the columns this screen renders (courses has 19, profiles 12).
+    const { data: crs } = await sb.from("courses")
+      .select("id, student_id, code, semester, academic_year, score_regular, score_midterm, score_final")
+      .eq("code", sec.code).eq("semester", sec.semester);
     const courses = ((crs as Course[]) || []).filter((c) => (c.academic_year || "") === (sec.academic_year || ""));
     const ids = [...new Set(courses.map((c) => c.student_id))];
     let profs: Profile[] = [];
-    if (ids.length) profs = ((await sb.from("profiles").select("*").in("id", ids)).data as Profile[]) || [];
+    if (ids.length) profs = ((await sb.from("profiles").select("id, full_name, student_code").in("id", ids)).data as Profile[]) || [];
     const pmap = new Map(profs.map((p) => [p.id, p]));
     const list: Row[] = courses.map((c) => ({ c, s: pmap.get(c.student_id) as Profile })).filter((r) => r.s);
     list.sort((a, b) => (a.s.full_name || "").localeCompare(b.s.full_name || ""));
     setRoster(list);
     setGEdits({});
-    const rows = ((await sb.from("attendance").select("*").eq("section_id", sec.id)).data as Attendance[]) || [];
+    const rows = ((await sb.from("attendance").select("student_id, session_date, present").eq("section_id", sec.id)).data as Attendance[]) || [];
     const r: Record<string, { pre: number; tot: number }> = {};
     for (const a of rows) { const x = r[a.student_id] || { pre: 0, tot: 0 }; x.tot++; if (a.present) x.pre++; r[a.student_id] = x; }
     setRates(r);
@@ -105,20 +106,6 @@ export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grade
     loadRoster(sel, date);
   }
 
-  async function addSection(e: FormEvent) {
-    e.preventDefault();
-    if (!sb) return;
-    if (!nf.code.trim() || !nf.name.trim() || !nf.semester.trim()) return toast(t("cls.needFields"), "error");
-    const { error } = await sb.from("sections").insert({
-      code: nf.code.trim(), name: nf.name.trim(), semester: nf.semester.trim(),
-      academic_year: nf.year.trim(), credits: parseInt(nf.credits) || 3, teacher_id: me.id,
-    });
-    if (error) return toast(t("cls.addErr"), "error");
-    toast(t("cls.added"), "success");
-    setShowNew(false); setNf({ code: "", name: "", semester: "", year: "", credits: "3" });
-    loadSections();
-  }
-
   return (
     <>
       <div className="page-head">
@@ -126,30 +113,7 @@ export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grade
           <div className="page-title">{t(mode === "attend" ? "cls.titleAttend" : "cls.titleGrades")}</div>
           <div className="page-sub">{t(mode === "attend" ? "cls.subAttend" : "cls.subGrades")}</div>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowNew((v) => !v)}><Icon name="plus" size={16} /> {t("cls.addClass")}</button>
       </div>
-
-      {showNew && (
-        <div className="card">
-          <div className="card-head"><div className="card-title"><Icon name="grad" /> {t("cls.newClass")}</div></div>
-          <form onSubmit={addSection}>
-            <div className="field-grid">
-              <div><label>{t("cls.fCode")}</label><input value={nf.code} onChange={(e) => setNf({ ...nf, code: e.target.value })} placeholder="INT1008" /></div>
-              <div><label>{t("cls.fName")}</label><input value={nf.name} onChange={(e) => setNf({ ...nf, name: e.target.value })} placeholder={t("cls.fNamePh")} /></div>
-              <div><label>{t("cls.fCredits")}</label><input value={nf.credits} onChange={(e) => setNf({ ...nf, credits: e.target.value })} /></div>
-            </div>
-            <div className="field-grid-2" style={{ marginTop: 12 }}>
-              <div><label>{t("cls.fSemester")}</label><input value={nf.semester} onChange={(e) => setNf({ ...nf, semester: e.target.value })} placeholder="HK1 2025-2026" /></div>
-              <div><label>{t("cls.fYear")}</label><input value={nf.year} onChange={(e) => setNf({ ...nf, year: e.target.value })} placeholder="2025-2026" /></div>
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button className="btn btn-primary" type="submit">{t("cls.create")}</button>
-              <button className="btn" type="button" onClick={() => setShowNew(false)}>{t("appt.cancel")}</button>
-            </div>
-            <div className="muted-note" style={{ marginTop: 8 }}>{t("cls.rosterNote")}</div>
-          </form>
-        </div>
-      )}
 
       <div className="card">
         <div className="field" style={{ maxWidth: 520, marginBottom: 0 }}>
