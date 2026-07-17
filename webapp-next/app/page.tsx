@@ -23,6 +23,9 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [slide, setSlide] = useState(0);
   const [logoOk, setLogoOk] = useState(true);
+  // Slide photos are optional. Probe only slide 1; load the rest only if it
+  // exists — otherwise every visit fires 4 broken-image requests.
+  const [slidesOk, setSlidesOk] = useState<boolean | null>(null);
 
   useEffect(() => {
     const id = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 5000);
@@ -97,8 +100,15 @@ export default function LoginPage() {
         <div className="abp-carousel" aria-hidden="true">
           {SLIDES.map((s, i) => (
             <div key={i} className={"abp-slide" + (i === slide ? " active" : "")} style={{ backgroundImage: s.grad }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.src} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+              {(i === 0 ? slidesOk !== false : slidesOk === true) && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={s.src}
+                  alt=""
+                  onLoad={i === 0 ? () => setSlidesOk(true) : undefined}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; if (i === 0) setSlidesOk(false); }}
+                />
+              )}
             </div>
           ))}
           <div className="abp-scrim" />
