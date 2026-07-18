@@ -497,9 +497,27 @@ export default function AdvisorPage() {
       return obj;
     });
   }
+
+  // Read an uploaded file into rows keyed by lower-cased header. Accepts Excel
+  // (.xlsx/.xls, via SheetJS loaded on demand) or .csv (same hand-parser as before).
+  async function parseSheet(file: File): Promise<Record<string, string>[]> {
+    const name = file.name.toLowerCase();
+    if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+      const XLSX = await import("xlsx");
+      const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "", raw: false });
+      return raw.map((r) => {
+        const o: Record<string, string> = {};
+        for (const k of Object.keys(r)) o[k.trim().toLowerCase()] = r[k] == null ? "" : String(r[k]).trim();
+        return o;
+      });
+    }
+    return parseCsv(await file.text());
+  }
   async function importCsv(file: File) {
     if (!sb || !me) return;
-    const rows = parseCsv(await file.text());
+    const rows = await parseSheet(file);
     const students = rows
       .map((row) => ({
         student_code: (row.student_code || row.code || "").trim(),
@@ -520,12 +538,16 @@ export default function AdvisorPage() {
     toast(t("adv.importDone", { n: r.created }) + (r.failed ? " · " + t("adv.importFail", { n: r.failed }) : ""), r.failed ? "error" : "success");
     await loadCore();
   }
-  function downloadTemplate() {
-    const csv = "student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score,password\nSV010,Nguyen Van A,sv010@gmail.com,He thong thong tin,K69,90,80,Sv@123456\n";
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "students_template.csv"; a.click();
-    URL.revokeObjectURL(url);
+  async function downloadTemplate() {
+    const XLSX = await import("xlsx");
+    const rows = [
+      ["student_code", "full_name", "email", "program", "cohort", "attendance_rate", "lms_activity_score", "password"],
+      ["SV010", "Nguyen Van A", "sv010@gmail.com", "He thong thong tin", "K69", "90", "80", "Sv@123456"],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "students");
+    XLSX.writeFile(wb, "students_template.xlsx");
   }
 
   // A score cell: empty is allowed (null); otherwise must be a number in 0..10.
@@ -539,7 +561,7 @@ export default function AdvisorPage() {
   // is written yet; the advisor confirms after seeing valid/error counts.
   async function prepareGrades(file: File) {
     if (!sb || !me) return;
-    const rows = parseCsv(await file.text());
+    const rows = await parseSheet(file);
     const byCode = new Map<string, string>();
     for (const s of students) if (s.student_code) byCode.set(s.student_code.trim().toLowerCase(), s.id);
     const valid: PGrade[] = [];
@@ -617,14 +639,16 @@ export default function AdvisorPage() {
     const a = document.createElement("a"); a.href = url; a.download = "grade_import_errors.csv"; a.click();
     URL.revokeObjectURL(url);
   }
-  function downloadGradeTemplate() {
-    const csv =
-      "student_code,course_code,course_name,credits,semester,academic_year,weight_regular,weight_midterm,weight_final,score_regular,score_midterm,score_final\n" +
-      "SV001,INT1004,Nhap mon lap trinh,3,2024-2,2024-2025,0.2,0.3,0.5,8.0,8.5,9.0\n";
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "grades_template.csv"; a.click();
-    URL.revokeObjectURL(url);
+  async function downloadGradeTemplate() {
+    const XLSX = await import("xlsx");
+    const rows = [
+      ["student_code", "course_code", "course_name", "credits", "semester", "academic_year", "weight_regular", "weight_midterm", "weight_final", "score_regular", "score_midterm", "score_final"],
+      ["SV001", "INT1004", "Nhap mon lap trinh", "3", "2024-2", "2024-2025", "0.2", "0.3", "0.5", "8.0", "8.5", "9.0"],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "grades");
+    XLSX.writeFile(wb, "grades_template.xlsx");
   }
   async function sendReply(e: FormEvent) {
     e.preventDefault();
@@ -955,15 +979,21 @@ export default function AdvisorPage() {
       <>
         <div className="page-head">
           <div><div className="page-title">{t("adv.studentsTitle")}</div><div className="page-sub">{t("adv.studentsSub", { n: students.length })}</div></div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <label className="btn"><Icon name="inbox" size={16} /> {t("adv.import")}
-              <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) importCsv(f); e.target.value = ""; }} />
-            </label>
-            <button className="btn" onClick={downloadTemplate}>{t("adv.importTemplate")}</button>
-            <label className="btn"><Icon name="chart" size={16} /> {t("adv.importGrades")}
-              <input type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) prepareGrades(f); e.target.value = ""; }} />
-            </label>
-            <button className="btn" onClick={downloadGradeTemplate}>{t("adv.gradeTemplate")}</button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+            {/* Nhập tài khoản SV — nút "tải mẫu" là link phụ ngay dưới, không phải nút riêng */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+              <label className="btn"><Icon name="inbox" size={16} /> {t("adv.import")}
+                <input type="file" accept=".csv,.xlsx,.xls" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) importCsv(f); e.target.value = ""; }} />
+              </label>
+              <button type="button" className="link-btn" style={{ fontSize: 12 }} onClick={downloadTemplate}>{t("adv.importTemplate")}</button>
+            </div>
+            {/* Nhập điểm bằng CSV — cũng có link "tải mẫu điểm" đi kèm */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+              <label className="btn"><Icon name="chart" size={16} /> {t("adv.importGrades")}
+                <input type="file" accept=".csv,.xlsx,.xls" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) prepareGrades(f); e.target.value = ""; }} />
+              </label>
+              <button type="button" className="link-btn" style={{ fontSize: 12 }} onClick={downloadGradeTemplate}>{t("adv.gradeTemplate")}</button>
+            </div>
             <button className="btn" onClick={() => exportReport(rows)}><Icon name="notes" size={16} /> {t("adv.exportReport")}</button>
             <button className="btn btn-primary" onClick={() => setShowAdd((v) => !v)}><Icon name="plus" size={16} /> {t("adv.addStudent")}</button>
           </div>
