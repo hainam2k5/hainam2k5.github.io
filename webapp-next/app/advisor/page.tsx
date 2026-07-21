@@ -17,7 +17,7 @@ import { predictAlarm, type Prediction } from "@/lib/predict";
 import { ClassesView } from "@/components/classes-view";
 import type { Profile, Course, RiskScore, Alert, Intervention, Message, Appointment } from "@/lib/types";
 
-type View = "dashboard" | "students" | "student" | "alerts" | "messages" | "evaluation" | "attendance" | "grades";
+type View = "dashboard" | "students" | "student" | "alerts" | "messages" | "evaluation" | "classes";
 // A validated grade row ready to write (used by the grade-import preview).
 type PGrade = { sid: string; code: string; name: string; credits: number; semester: string; academic_year: string; wr: number; wm: number; wf: number; sr: number | null; sm: number | null; sf: number | null; total: number | null; letter: string | null; point: number | null };
 interface Agg { courses: Course[]; cpa: number | null; credits: number; failed: number; risk: RiskScore | null; }
@@ -884,6 +884,15 @@ export default function AdvisorPage() {
       trend.push({ label: d.getDate() + "/" + (d.getMonth() + 1), count });
     }
     const trendMax = Math.max(1, ...trend.map((b) => b.count));
+    // risk-level distribution (drives the clickable stacked bar)
+    const dist = [
+      { key: "Low", color: "#16a34a", n: counts.Low },
+      { key: "Medium", color: "#d97706", n: counts.Medium },
+      { key: "High", color: "#ea580c", n: counts.High },
+      { key: "Critical", color: "#dc2626", n: counts.Critical },
+      { key: "Unscored", color: "#94a3b8", n: counts.Unscored },
+    ];
+    const jumpToLevel = (lv: string) => { setLevel(lv); setView("students"); };
     return (
       <>
         <div className="page-head">
@@ -896,6 +905,29 @@ export default function AdvisorPage() {
           <div className="kpi"><div className="kpi-label">{t("kpi.highCrit")}</div><div className="kpi-value tone-High">{counts.High + counts.Critical}</div></div>
           <div className="kpi"><div className="kpi-label">{t("kpi.avgCpa")}</div><div className="kpi-value">{avgCpa === null ? "—" : avgCpa.toFixed(2)}</div></div>
           <div className="kpi"><div className="kpi-label">{t("kpi.predicted")}</div><div className="kpi-value tone-High">{predictedCount}</div></div>
+        </div>
+        <div className="card">
+          <div className="card-head">
+            <div className="card-title"><Icon name="chart" /> {t("card.riskDist")}</div>
+            <span className="muted-note">{t("riskdist.hint")}</span>
+          </div>
+          <div style={{ display: "flex", height: 30, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border, #e5e7eb)" }}>
+            {dist.filter((d) => d.n > 0).map((d) => (
+              <div key={d.key} onClick={() => jumpToLevel(d.key)} title={t("risk." + d.key) + ": " + d.n}
+                style={{ width: (d.n / Math.max(1, students.length)) * 100 + "%", background: d.color, color: "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                {students.length && d.n / students.length >= 0.05 ? d.n : ""}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 12 }}>
+            {dist.map((d) => (
+              <div key={d.key} onClick={() => jumpToLevel(d.key)} style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
+                <span style={{ width: 12, height: 12, borderRadius: 3, background: d.color, flex: "none" }} />
+                <span style={{ fontSize: 13 }}><b>{d.n}</b> {t("risk." + d.key)} <span className="muted-note">({students.length ? Math.round((d.n / students.length) * 100) : 0}%)</span></span>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="page-sub" style={{ fontWeight: 700, color: "var(--text)", margin: "2px 0 10px" }}>{t("adv.evaluation")}</div>
         <div className="kpi-grid">
@@ -1361,8 +1393,7 @@ export default function AdvisorPage() {
   const navItems: [View, string, string][] = [
     ["dashboard", "dashboard", "nav.dashboard"],
     ["students", "students", "nav.students"],
-    ["attendance", "grad", "nav.attendance"],
-    ["grades", "edit", "nav.grades"],
+    ["classes", "grad", "nav.classes"],
     ["alerts", "alert", "nav.alerts"],
     ["messages", "message", "nav.messages"],
     ["evaluation", "target", "nav.evaluation"],
@@ -1398,8 +1429,7 @@ export default function AdvisorPage() {
         <main className="main">
           {view === "dashboard" && renderDashboard()}
           {view === "students" && renderStudents()}
-          {view === "attendance" && <ClassesView me={me} mode="attend" />}
-          {view === "grades" && <ClassesView me={me} mode="grades" />}
+          {view === "classes" && <ClassesView me={me} />}
           {view === "student" && renderStudentDetail()}
           {view === "alerts" && renderAlerts()}
           {view === "messages" && renderMessages()}

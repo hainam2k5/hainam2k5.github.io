@@ -9,15 +9,15 @@ import type { Profile, Section, Course, Attendance } from "@/lib/types";
 
 type Row = { c: Course; s: Profile };
 
-// Shared "Classes" screen: a teacher (or an advisor who also teaches, or a
-// manager) picks a class they teach and — depending on `mode` — either takes
-// attendance for a session (mode="attend") OR enters the TX/GK/CK component
-// grades (mode="grades"). Attendance and grade entry live on two separate pages.
-// A class roster is the set of `courses` rows whose (code, semester,
-// academic_year) match the section.
-export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grades" }) {
+// Unified "Classes" screen: a teacher (or an advisor who also teaches, or a
+// manager) picks a class they teach, then switches between two TABS for that
+// class — Attendance (per weekly session) and Grades (TX/GK/CK). A class roster
+// is the set of `courses` rows whose (code, semester, academic_year) match the
+// section. Classes meet once a week, so attendance is taken per session date.
+export function ClassesView({ me }: { me: Profile }) {
   const { t } = useI18n();
   const sb = supabase;
+  const [tab, setTab] = useState<"attend" | "grades">("attend");
   const [sections, setSections] = useState<Section[]>([]);
   const [selId, setSelId] = useState("");
   const [roster, setRoster] = useState<Row[]>([]);
@@ -106,12 +106,24 @@ export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grade
     loadRoster(sel, date);
   }
 
+  const tabBtn = (tb: "attend" | "grades", ic: string, key: string) => (
+    <button type="button" onClick={() => setTab(tb)}
+      style={{
+        border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+        padding: "9px 16px", fontSize: 14, fontWeight: tab === tb ? 700 : 500,
+        color: tab === tb ? "var(--primary, #2563eb)" : "var(--muted, #5C6678)",
+        borderBottom: "2px solid " + (tab === tb ? "var(--primary, #2563eb)" : "transparent"),
+      }}>
+      <Icon name={ic} size={15} /> {t(key)}
+    </button>
+  );
+
   return (
     <>
       <div className="page-head">
         <div>
-          <div className="page-title">{t(mode === "attend" ? "cls.titleAttend" : "cls.titleGrades")}</div>
-          <div className="page-sub">{t(mode === "attend" ? "cls.subAttend" : "cls.subGrades")}</div>
+          <div className="page-title">{t("cls.title")}</div>
+          <div className="page-sub">{t("cls.sub")}</div>
         </div>
       </div>
 
@@ -128,16 +140,23 @@ export function ClassesView({ me, mode }: { me: Profile; mode: "attend" | "grade
 
       {sel && (
         <div className="card">
-          {mode === "attend" && (
+          {/* Two tabs for the selected class */}
+          <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border, #e5e7eb)", marginBottom: 16 }}>
+            {tabBtn("attend", "grad", "cls.tabAttend")}
+            {tabBtn("grades", "edit", "cls.tabGrades")}
+          </div>
+
+          {tab === "attend" && (
             <div className="toolbar" style={{ marginBottom: 14 }}>
               <label style={{ margin: 0, alignSelf: "center" }}>{t("cls.session")}</label>
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ width: "auto" }} />
+              <span className="muted-note" style={{ alignSelf: "center" }}>{t("cls.weeklyNote")}</span>
             </div>
           )}
 
           {roster.length === 0 ? (
             <div className="empty"><Icon name="students" size={30} />{t("cls.noStudents")}</div>
-          ) : mode === "attend" ? (
+          ) : tab === "attend" ? (
             <>
               <div style={{ overflowX: "auto" }}>
                 <table>
