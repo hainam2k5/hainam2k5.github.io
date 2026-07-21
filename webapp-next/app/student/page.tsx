@@ -6,7 +6,8 @@ import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClien
 import { toast } from "@/lib/toast";
 import { Icon } from "@/lib/icons";
 import { BrandLogo, LangSwitch } from "@/components/common";
-import { gpaOf, bySemester, failedCount, avg10Of } from "@/lib/gpa";
+import { WhatIf } from "@/components/whatif";
+import { gpaOf, bySemester, failedCount, avg10Of, GRADE_TABLE } from "@/lib/gpa";
 import { fmtDate, initials, numFmt, gradeClass } from "@/lib/format";
 import type { Profile, Course, Notification, Message, Appointment } from "@/lib/types";
 
@@ -256,10 +257,16 @@ export default function StudentPage() {
                   <div><b>{t("sum.h10")}:</b> {avg10Of(courses) === null ? "—" : avg10Of(courses)!.toFixed(2)}</div>
                   <div><b>{t("sum.h4")}:</b> {cpa === null ? "—" : cpa.toFixed(2)}</div>
                   <div><b>{t("sum.credits")}:</b> {overall.credits || 0}</div>
+                  {/* Transparency: how a course total becomes a letter and 4-scale point. */}
+                  <div className="muted-note" style={{ marginTop: 6 }}>
+                    {t("legend.formula")}<br />
+                    {t("legend.scale")}: {GRADE_TABLE.filter((g) => g.letter !== "F").map((g) => `${g.letter} ≥ ${g.min.toFixed(1)} (${g.point.toFixed(1)})`).join(" · ")} · F &lt; 4.0 (0.0)
+                  </div>
                 </div>
                 </>
               )}
             </div>
+            <WhatIf me={me} courses={courses} />
           </div>
 
           <div>

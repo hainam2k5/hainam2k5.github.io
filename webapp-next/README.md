@@ -1,23 +1,27 @@
 # Student Risk Alert System — Next.js (deploy Vercel)
 
 Phiên bản **Next.js (App Router) + TypeScript** của Hệ thống Cảnh báo Rủi ro Học
-tập, dùng chung backend **Supabase** (Auth + Postgres + Realtime + RLS) với bản
-web tĩnh ở thư mục `../webapp`. Giữ nguyên tính năng: đăng nhập/đăng ký, cổng sinh
-viên, bảng cố vấn (nhập điểm TX/GK/CK, GPA/CPA, rủi ro, cảnh báo, can thiệp, thông
-báo, hỏi đáp realtime), **song ngữ VI/EN**.
+tập, dùng backend **Supabase** (Auth + Postgres + Realtime + RLS). Bốn vai trò
+**Sinh viên · Giáo viên · Cố vấn · Quản lý**: cổng sinh viên (bảng điểm, GPA/CPA,
+cảnh báo, mô phỏng cải thiện điểm, hỏi đáp realtime), trang **Lớp học** (điểm danh +
+ghi điểm TX/GK/CK theo lịch 1 buổi/tuần), bảng cố vấn (dashboard phân bố rủi ro,
+cảnh báo, can thiệp, đánh giá KPI), **song ngữ VI/EN**.
 
 ## Yêu cầu
 - **Node.js 18+** (để chạy cục bộ / build).
 - Một project **Supabase** (miễn phí).
 
 ## 1. Chuẩn bị Supabase (nếu chưa làm)
-Trong **Supabase → SQL Editor**, chạy lần lượt:
-1. `supabase/schema.sql` (bảng + RLS + trigger + realtime)
-2. `supabase/seed.sql` (dữ liệu demo)
+Trong **Supabase → SQL Editor**, chạy lần lượt các file trong `supabase/`:
+1. `schema.sql` — bảng, RLS, trigger đăng ký, realtime (bắt buộc)
+2. `rls-major-scope.sql` + `guards.sql` — siết phân quyền theo ngành (khuyến nghị)
+3. `teacher-classes.sql` — vai trò Giáo viên + Lớp học (điểm danh & điểm thành phần)
+4. `risk-config.sql`, `grade-lock.sql`, `appointments.sql` — cấu hình rủi ro, khóa điểm, lịch hẹn
+5. (tùy chọn) `seed-mis-30.sql` — 50 sinh viên mẫu để xem thử dashboard
 
-Rồi **Authentication → Providers → Email** → tắt *Confirm email* để demo mượt.
-> Nếu bạn đã chạy `schema.sql` ở bản cũ, chạy thêm `supabase/hardening.sql` để cập
-> nhật bản vá bảo mật (đăng ký công khai chỉ tạo Sinh viên + siết policy).
+Rồi **Authentication → Providers → Email** → bật *Confirm email* khi dùng thật.
+> Nếu đã chạy `schema.sql` ở bản cũ, chạy thêm `hardening.sql` để cập nhật bản vá
+> bảo mật (đăng ký công khai chỉ tạo Sinh viên + siết policy).
 
 ## 2. Chạy cục bộ
 ```bash
@@ -77,8 +81,15 @@ tài khoản Gmail làm SMTP — **không cần tên miền riêng**, gửi tớ
 - **Phân quyền theo ngành**: mỗi cố vấn chỉ thấy/quản lý sinh viên được gán cho mình
   (`advisor_id`); tài khoản `manager` thấy tất cả. Thêm cố vấn khác qua seed/SQL, gán
   SV bằng nút “Thêm sinh viên” trong bảng cố vấn.
-- **Nhập liệu CSV**: nút “Nhập CSV” + “Tải mẫu” ở trang Sinh viên (cột
-  `student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score`).
+- **Nhập liệu Excel/CSV**: nút “Nhập Excel” + “Tải mẫu” (.xlsx) ở trang Sinh viên
+  (cột `student_code,full_name,email,program,cohort,attendance_rate,lms_activity_score`),
+  và “Nhập điểm (Excel)” để nhập điểm hàng loạt khớp theo mã sinh viên.
+- **Trang “Lớp học” (giáo viên & cố vấn)**: chọn lớp → hai tab **Điểm danh** và
+  **Ghi điểm** (TX/GK/CK) trong cùng màn; lớp theo lịch 1 buổi/tuần.
+- **Dashboard Tổng quan**: **biểu đồ phân bố mức rủi ro** (Thấp/Trung bình/Cao/Nghiêm
+  trọng) — bấm một mức để **lọc nhanh** danh sách sinh viên.
+- **Mô phỏng cải thiện điểm (cổng SV)**: thử điểm chữ tốt hơn cho môn định học lại →
+  CPA & điểm rủi ro tính lại ngay, kèm mục tiêu xếp loại tốt nghiệp (chỉ mô phỏng, không lưu).
 - **KPI đánh giá** trên Tổng quan: thời gian xử lý cảnh báo TB, tỷ lệ hoàn thành can
   thiệp, theo dõi ca rủi ro cao, cảnh báo đã xử lý — và **biểu đồ xu hướng rủi ro 14 ngày**.
 - **Chi tiết sinh viên (cho giảng viên)**: thẻ thông tin liên hệ (email `mailto:`),
@@ -91,12 +102,14 @@ tài khoản Gmail làm SMTP — **không cần tên miền riêng**, gửi tớ
   dự đoán ở trang chi tiết (kèm lý do + gợi ý can thiệp sớm), và KPI **“Dự đoán sắp
   báo động”** trên Tổng quan.
 
-### Tài khoản demo
-Đăng ký (tab **Đăng ký**) bằng đúng email để nhận dữ liệu mẫu (mật khẩu `Demo@12345`):
-- Cố vấn: `advisor@demo.edu.vn` · Sinh viên rủi ro: `sv002@demo.edu.vn` / `sv004@demo.edu.vn`
-
-(Đăng ký công khai luôn là **Sinh viên**; tài khoản cố vấn nhận vai trò từ hồ sơ đã
-seed khi đăng ký bằng đúng email cố vấn.)
+### Tài khoản
+Tài khoản do **nhà trường cấp**: đăng ký công khai luôn là **Sinh viên** (trigger ép
+role). Cố vấn/Giáo viên/Quản lý được tạo sẵn hồ sơ (`profiles`) rồi kích hoạt bằng đúng
+email tương ứng qua **Supabase → Authentication**. Vai trò lấy từ `profiles.role` — không
+suy ra từ email.
+> Tài liệu công khai này **không kèm tài khoản/mật khẩu demo** vì lý do bảo mật. Muốn có
+> dữ liệu mẫu để xem thử, chạy `supabase/seed-mis-30.sql` (50 sinh viên chỉ-xem, không
+> đăng nhập được), rồi tự tạo tài khoản đăng nhập ở Supabase Dashboard nếu cần.
 
 ## 3. Deploy lên Vercel
 1. Đẩy repo lên GitHub (nếu chưa).
@@ -112,13 +125,15 @@ seed khi đăng ký bằng đúng email cố vấn.)
 ```
 app/
   layout.tsx        # bọc I18nProvider, import globals.css
-  globals.css       # theme (giống bản tĩnh)
-  page.tsx          # đăng nhập / đăng ký
-  student/page.tsx  # cổng sinh viên
-  advisor/page.tsx  # bảng cố vấn (6 màn hình, đổi bằng state)
-lib/                # supabaseClient, gpa, risk, i18n, icons, format, types
-components/         # common (LangSwitch, RiskBadge, RiskBar), advisor-parts (form con)
-supabase/           # schema.sql, seed.sql, hardening.sql (giống ../webapp)
+  globals.css       # theme (CSS thuần, không framework UI)
+  page.tsx          # đăng nhập / quên mật khẩu (OTP 6 số)
+  student/page.tsx  # cổng sinh viên (+ mô phỏng cải thiện điểm)
+  teacher/page.tsx  # cổng giáo viên (trang Lớp học)
+  advisor/page.tsx  # cố vấn/quản lý (Tổng quan, Sinh viên, Lớp học, Cảnh báo, Tin nhắn, Đánh giá)
+  api/              # route đặc quyền: import-students, sync-lms, notify-alert, notify-grade
+lib/                # supabaseClient, gpa, risk, predict, i18n, icons, format, types
+components/         # common, advisor-parts, classes-view (Lớp học 2 tab), whatif (mô phỏng điểm)
+supabase/           # schema.sql + rls-major-scope, guards, teacher-classes, risk-config, ...
 ```
 
 ## Ghi chú kỹ thuật
