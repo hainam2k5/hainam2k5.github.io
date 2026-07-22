@@ -266,16 +266,30 @@ export default function AdvisorPage() {
       .then(({ data }) => setAllMsgs((data as Message[]) || []));
   }, [view, msgTick]);
 
-  // mark the selected thread's student messages as read
+  // message threads (shared by the mark-read effect, sendReply, and renderMessages)
+  const msgThreads = useMemo(() => {
+    const visibleIds = new Set(students.map((s) => s.id));
+    const th: Record<string, Message[]> = {};
+    allMsgs.filter((m) => visibleIds.has(m.student_id)).forEach((m) => (th[m.student_id] = th[m.student_id] || []).push(m));
+    return th;
+  }, [students, allMsgs]);
+  const msgThreadIds = useMemo(() => Object.keys(msgThreads).sort((a, b) => {
+    const la = msgThreads[a][msgThreads[a].length - 1].created_at, lb = msgThreads[b][msgThreads[b].length - 1].created_at;
+    return la < lb ? 1 : -1;
+  }), [msgThreads]);
+  // the thread actually shown/acted on: explicit pick, else the newest thread
+  const activeThread = (selectedThread && msgThreads[selectedThread] ? selectedThread : msgThreadIds[0]) || null;
+
+  // mark the active thread's student messages as read
   useEffect(() => {
-    if (view !== "messages" || !selectedThread || !sb) return;
-    const unreadIds = allMsgs.filter((m) => m.student_id === selectedThread && m.sender_role === "student" && !m.is_read).map((m) => m.id);
+    if (view !== "messages" || !activeThread || !sb) return;
+    const unreadIds = allMsgs.filter((m) => m.student_id === activeThread && m.sender_role === "student" && !m.is_read).map((m) => m.id);
     if (!unreadIds.length) return;
     sb.from("messages").update({ is_read: true }).in("id", unreadIds).then(() => {
       setAllMsgs((prev) => prev.map((m) => (unreadIds.includes(m.id) ? { ...m, is_read: true } : m)));
       setMsgUnread((n) => Math.max(0, n - unreadIds.length));
     });
-  }, [view, selectedThread, allMsgs]);
+  }, [view, activeThread, allMsgs]);
 
   // ------------------------------------------------------------ derived
   const coursesBy = useMemo(() => {
@@ -650,14 +664,14 @@ export default function AdvisorPage() {
     XLSX.utils.book_append_sheet(wb, ws, "grades");
     XLSX.writeFile(wb, "grades_template.xlsx");
   }
-  async function sendReply(e: FormEvent) {
-    e.preventDefault();
-    if (!sb || !selectedThread) return;
+  async function sendReply(e?: FormEvent) {
+    e?.preventDefault();
+    if (!sb || !activeThread) return;
     const body = reply.trim(); if (!body) return;
     setReply("");
-    const { error } = await sb.from("messages").insert({ student_id: selectedThread, advisor_id: me!.id, sender_id: me!.id, sender_role: "advisor", body });
-    if (error) { toast(error.message, "error"); return; }
-    await sb.from("notifications").insert({ student_id: selectedThread, sender_id: me!.id, type: "message", title: t("notif.advReplyTitle"), body });
+    const { error } = await sb.from("messages").insert({ student_id: activeThread, advisor_id: me!.id, sender_id: me!.id, sender_role: "advisor", body });
+    if (error) { toast(error.message, "error"); setReply(body); return; }
+    await sb.from("notifications").insert({ student_id: activeThread, sender_id: me!.id, type: "message", title: t("notif.advReplyTitle"), body });
     setMsgTick((x) => x + 1);
   }
 
@@ -1331,14 +1345,7 @@ export default function AdvisorPage() {
   };
 
   const renderMessages = () => {
-    const visibleIds = new Set(students.map((s) => s.id));
-    const threads: Record<string, Message[]> = {};
-    allMsgs.filter((m) => visibleIds.has(m.student_id)).forEach((m) => (threads[m.student_id] = threads[m.student_id] || []).push(m));
-    const threadIds = Object.keys(threads).sort((a, b) => {
-      const la = threads[a][threads[a].length - 1].created_at, lb = threads[b][threads[b].length - 1].created_at;
-      return la < lb ? 1 : -1;
-    });
-    const activeThread = selectedThread && threads[selectedThread] ? selectedThread : threadIds[0] || null;
+    const threads = msgThreads, threadIds = msgThreadIds; // shared with sendReply / mark-read effect
     const cur = activeThread ? threads[activeThread] : [];
     const curStudent = activeThread ? studentById(activeThread) : null;
     return (
@@ -1376,7 +1383,7 @@ export default function AdvisorPage() {
                   })}
                 </div>
                 <form className="msg-input" onSubmit={sendReply}>
-                  <input type="text" value={reply} onChange={(e) => setReply(e.target.value)} placeholder={t("chat.phAdvisor")} autoComplete="off" />
+                  <input type="text" value={reply} onChange={(e) => setReply(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) { e.preventDefault(); sendReply(); } }} placeholder={t("chat.phAdvisor")} autoComplete="off" />
                   <button className="btn btn-primary" type="submit">{t("btn.send")}</button>
                 </form>
               </>

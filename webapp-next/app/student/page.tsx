@@ -102,8 +102,8 @@ export default function StudentPage() {
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   }
 
-  async function sendMessage(e: FormEvent) {
-    e.preventDefault();
+  async function sendMessage(e?: FormEvent) {
+    e?.preventDefault();
     if (!supabase || !me) return;
     const body = draft.trim();
     if (!body) return;
@@ -312,7 +312,7 @@ export default function StudentPage() {
                 )}
               </div>
               <form className="msg-input" onSubmit={sendMessage}>
-                <input type="text" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t("chat.phStudent")} autoComplete="off" />
+                <input type="text" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) { e.preventDefault(); sendMessage(); } }} placeholder={t("chat.phStudent")} autoComplete="off" />
                 <button className="btn btn-primary" type="submit">{t("btn.send")}</button>
               </form>
               {!me.advisor_id && <div className="muted-note">{t("student.chatNote")}</div>}
