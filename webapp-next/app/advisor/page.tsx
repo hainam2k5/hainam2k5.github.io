@@ -907,6 +907,15 @@ export default function AdvisorPage() {
       { key: "Unscored", color: "#94a3b8", n: counts.Unscored },
     ];
     const jumpToLevel = (lv: string) => { setLevel(lv); setView("students"); };
+    // donut geometry (SVG, no chart lib) — cumulative arc offsets around a rotated ring
+    const donutR = 70, donutC = 2 * Math.PI * donutR;
+    let donutAcc = 0;
+    const donutSegs = dist.filter((d) => d.n > 0).map((d) => {
+      const len = (students.length ? d.n / students.length : 0) * donutC;
+      const seg = { key: d.key, color: d.color, n: d.n, len, off: -donutAcc };
+      donutAcc += len;
+      return seg;
+    });
     return (
       <>
         <div className="page-head">
@@ -925,22 +934,31 @@ export default function AdvisorPage() {
             <div className="card-title"><Icon name="chart" /> {t("card.riskDist")}</div>
             <span className="muted-note">{t("riskdist.hint")}</span>
           </div>
-          <div style={{ display: "flex", height: 30, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border, #e5e7eb)" }}>
-            {dist.filter((d) => d.n > 0).map((d) => (
-              <div key={d.key} onClick={() => jumpToLevel(d.key)} title={t("risk." + d.key) + ": " + d.n}
-                style={{ width: (d.n / Math.max(1, students.length)) * 100 + "%", background: d.color, color: "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
-                {students.length && d.n / students.length >= 0.05 ? d.n : ""}
-              </div>
-            ))}
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 12 }}>
-            {dist.map((d) => (
-              <div key={d.key} onClick={() => jumpToLevel(d.key)} style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
-                <span style={{ width: 12, height: 12, borderRadius: 3, background: d.color, flex: "none" }} />
-                <span style={{ fontSize: 13 }}><b>{d.n}</b> {t("risk." + d.key)} <span className="muted-note">({students.length ? Math.round((d.n / students.length) * 100) : 0}%)</span></span>
-              </div>
-            ))}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 30, marginTop: 4 }}>
+            <svg width={176} height={176} viewBox="0 0 176 176" style={{ flex: "none" }}>
+              <g transform="rotate(-90 88 88)">
+                <circle cx={88} cy={88} r={donutR} fill="none" stroke="var(--border, #e5e7eb)" strokeWidth={22} />
+                {donutSegs.map((s) => (
+                  <circle key={s.key} cx={88} cy={88} r={donutR} fill="none" stroke={s.color} strokeWidth={22}
+                    strokeDasharray={`${s.len} ${donutC - s.len}`} strokeDashoffset={s.off}
+                    onClick={() => jumpToLevel(s.key)} style={{ cursor: "pointer" }}>
+                    <title>{t("risk." + s.key) + ": " + s.n}</title>
+                  </circle>
+                ))}
+              </g>
+              <text x={88} y={82} textAnchor="middle" fontSize={34} fontWeight={800} fill="var(--text, #0f172a)">{students.length}</text>
+              <text x={88} y={104} textAnchor="middle" fontSize={11.5} fill="var(--muted, #64748b)">{t("kpi.totalStudents")}</text>
+            </svg>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, minWidth: 200, flex: 1 }}>
+              {dist.map((d) => (
+                <div key={d.key} onClick={() => jumpToLevel(d.key)} style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }}>
+                  <span style={{ width: 12, height: 12, borderRadius: 3, background: d.color, flex: "none" }} />
+                  <span style={{ fontSize: 13.5, flex: 1 }}>{t("risk." + d.key)}</span>
+                  <b style={{ fontSize: 14 }}>{d.n}</b>
+                  <span className="muted-note" style={{ fontSize: 12, minWidth: 42, textAlign: "right" }}>{students.length ? Math.round((d.n / students.length) * 100) : 0}%</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="page-sub" style={{ fontWeight: 700, color: "var(--text)", margin: "2px 0 10px" }}>{t("adv.evaluation")}</div>
