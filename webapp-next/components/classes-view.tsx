@@ -15,7 +15,7 @@ type Row = { c: Course; s: Profile };
 // is the set of `courses` rows whose (code, semester, academic_year) match the
 // section. Classes meet once a week, so attendance is taken per session date.
 export function ClassesView({ me }: { me: Profile }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const sb = supabase;
   const [tab, setTab] = useState<"attend" | "grades">("attend");
   const [sections, setSections] = useState<Section[]>([]);
@@ -31,11 +31,9 @@ export function ClassesView({ me }: { me: Profile }) {
 
   async function loadSections() {
     if (!sb) return;
-    // Teachers see the classes they teach; advisors/managers oversee every class
-    // (RLS `sections_read` already permits advisor/manager to read all sections).
-    let q = sb.from("sections").select("*").order("created_at", { ascending: false });
-    if (me.role === "teacher") q = q.eq("teacher_id", me.id);
-    const { data } = await q;
+    // Each user manages only the classes they own. An advisor may also teach a
+    // few classes (owns those sections); they are not meant to run every class.
+    const { data } = await sb.from("sections").select("*").eq("teacher_id", me.id).order("created_at", { ascending: false });
     const list = (data as Section[]) || [];
     setSections(list);
     setSelId((cur) => cur || (list[0]?.id ?? ""));
@@ -51,7 +49,7 @@ export function ClassesView({ me }: { me: Profile }) {
     const courses = ((crs as Course[]) || []).filter((c) => (c.academic_year || "") === (sec.academic_year || ""));
     const ids = [...new Set(courses.map((c) => c.student_id))];
     let profs: Profile[] = [];
-    if (ids.length) profs = ((await sb.from("profiles").select("id, full_name, student_code").in("id", ids)).data as Profile[]) || [];
+    if (ids.length) profs = ((await sb.from("profiles").select("id, full_name, student_code, email").in("id", ids)).data as Profile[]) || [];
     const pmap = new Map(profs.map((p) => [p.id, p]));
     const list: Row[] = courses.map((c) => ({ c, s: pmap.get(c.student_id) as Profile })).filter((r) => r.s);
     list.sort((a, b) => (a.s.full_name || "").localeCompare(b.s.full_name || ""));
@@ -104,8 +102,29 @@ export function ClassesView({ me }: { me: Profile }) {
       }).eq("id", c.id);
     });
     const res = await Promise.all(ups);
+    if (res.filter((r) => r.error).length) { setSaving(false); return toast(t("cls.gErr"), "error"); }
+    // Best-effort: notify + email each student their updated grade. Only an
+    // advisor/manager may do this (the notify-grade route and notifications RLS
+    // both require that role); demo addresses (@sv.demo.edu.vn) are skipped so we
+    // don't send to fake inboxes.
+    if (me.role === "advisor" || me.role === "manager") {
+      const token = (await sb.auth.getSession()).data.session?.access_token;
+      const fmt = (v: string) => (v === "" ? "—" : v);
+      await Promise.all(roster.map(async ({ c, s }) => {
+        const sr = gVal(c, "sr"), sm = gVal(c, "sm"), sf = gVal(c, "sf");
+        const g = computeCourse({ score_regular: sr, score_midterm: sm, score_final: sf, weight_regular: sel.weight_regular, weight_midterm: sel.weight_midterm, weight_final: sel.weight_final });
+        const body = t("notif.gradeBodyDetailed", { course: sel.name, r: fmt(sr), m: fmt(sm), f: fmt(sf), total: g.total === null ? "—" : String(g.total), letter: g.letter || "—" });
+        await sb.from("notifications").insert({ student_id: s.id, sender_id: me.id, type: "grade", title: t("notif.gradeTitle"), body }); // RLS skips non-advisees
+        if (token && s.email && !/@sv\.demo\.edu\.vn$/i.test(s.email)) {
+          void fetch("/api/notify-grade", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ studentId: s.id, courseName: sel.name, r: fmt(sr), m: fmt(sm), f: fmt(sf), total: g.total, letter: g.letter, lang }),
+          }).catch(() => {});
+        }
+      }));
+    }
     setSaving(false);
-    if (res.filter((r) => r.error).length) return toast(t("cls.gErr"), "error");
     toast(t("cls.gSaved"), "success");
     loadRoster(sel, date);
   }
