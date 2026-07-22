@@ -916,31 +916,46 @@ export default function AdvisorPage() {
       donutAcc += len;
       return seg;
     });
+    const donutGap = 3; // small surface gap between arcs (mark spec)
+    // professional stat tile: label + icon chip + big value (+ optional caption)
+    const kpi = (label: string, value: string | number, o: { icon?: string; tone?: string; cap?: string; accent?: boolean } = {}) => (
+      <div className={"kpi" + (o.accent ? " accent" : "")}>
+        <div className="kpi-top">
+          <span className="kpi-label">{label}</span>
+          {o.icon ? <span className="kpi-ic"><Icon name={o.icon} size={16} /></span> : null}
+        </div>
+        <div className={"kpi-value" + (o.tone ? " tone-" + o.tone : "")}>{value}</div>
+        {o.cap ? <div className="kpi-cap">{o.cap}</div> : null}
+      </div>
+    );
     return (
       <>
         <div className="page-head">
           <div><div className="page-title">{t("adv.dashTitle")}</div><div className="page-sub">{t("adv.dashSub")}</div></div>
           <button className="btn btn-primary" onClick={recomputeAll}><Icon name="refresh" size={16} /> {t("btn.recalc")}</button>
         </div>
+        <div className="sec-label">{t("adv.secOverview")}</div>
         <div className="kpi-grid">
-          <div className="kpi accent"><div className="kpi-label">{t("kpi.totalStudents")}</div><div className="kpi-value">{students.length}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.openAlerts")}</div><div className="kpi-value tone-Critical">{openAlerts}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.highCrit")}</div><div className="kpi-value tone-High">{counts.High + counts.Critical}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.avgCpa")}</div><div className="kpi-value">{avgCpa === null ? "—" : avgCpa.toFixed(2)}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.predicted")}</div><div className="kpi-value tone-High">{predictedCount}</div></div>
+          {kpi(t("kpi.totalStudents"), students.length, { icon: "students", accent: true })}
+          {kpi(t("kpi.openAlerts"), openAlerts, { icon: "bell", tone: openAlerts ? "Critical" : undefined })}
+          {kpi(t("kpi.highCrit"), counts.High + counts.Critical, { icon: "alert", tone: "High" })}
+          {kpi(t("kpi.avgCpa"), avgCpa === null ? "—" : avgCpa.toFixed(2), { icon: "grad" })}
+          {kpi(t("kpi.predicted"), predictedCount, { icon: "target", tone: predictedCount ? "High" : undefined })}
         </div>
+        <div className="sec-label">{t("adv.secAnalytics")}</div>
+        <div className="dash-grid">
         <div className="card">
           <div className="card-head">
             <div className="card-title"><Icon name="chart" /> {t("card.riskDist")}</div>
             <span className="muted-note">{t("riskdist.hint")}</span>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 30, marginTop: 4 }}>
-            <svg width={176} height={176} viewBox="0 0 176 176" style={{ flex: "none" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24, marginTop: 4 }}>
+            <svg width={164} height={164} viewBox="0 0 176 176" style={{ flex: "none" }}>
               <g transform="rotate(-90 88 88)">
-                <circle cx={88} cy={88} r={donutR} fill="none" stroke="var(--border, #e5e7eb)" strokeWidth={22} />
+                <circle cx={88} cy={88} r={donutR} fill="none" stroke="var(--surface-3, #eef2f8)" strokeWidth={22} />
                 {donutSegs.map((s) => (
-                  <circle key={s.key} cx={88} cy={88} r={donutR} fill="none" stroke={s.color} strokeWidth={22}
-                    strokeDasharray={`${s.len} ${donutC - s.len}`} strokeDashoffset={s.off}
+                  <circle key={s.key} cx={88} cy={88} r={donutR} fill="none" stroke={s.color} strokeWidth={22} strokeLinecap="butt"
+                    strokeDasharray={`${Math.max(0.5, s.len - donutGap)} ${donutC - s.len + donutGap}`} strokeDashoffset={s.off}
                     onClick={() => jumpToLevel(s.key)} style={{ cursor: "pointer" }}>
                     <title>{t("risk." + s.key) + ": " + s.n}</title>
                   </circle>
@@ -949,10 +964,10 @@ export default function AdvisorPage() {
               <text x={88} y={82} textAnchor="middle" fontSize={34} fontWeight={800} fill="var(--text, #0f172a)">{students.length}</text>
               <text x={88} y={104} textAnchor="middle" fontSize={11.5} fill="var(--muted, #64748b)">{t("kpi.totalStudents")}</text>
             </svg>
-            <div style={{ display: "flex", flexDirection: "column", gap: 9, minWidth: 200, flex: 1 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, minWidth: 178, flex: 1 }}>
               {dist.map((d) => (
                 <div key={d.key} onClick={() => jumpToLevel(d.key)} style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }}>
-                  <span style={{ width: 12, height: 12, borderRadius: 3, background: d.color, flex: "none" }} />
+                  <span style={{ width: 11, height: 11, borderRadius: 3, background: d.color, flex: "none" }} />
                   <span style={{ fontSize: 13.5, flex: 1 }}>{t("risk." + d.key)}</span>
                   <b style={{ fontSize: 14 }}>{d.n}</b>
                   <span className="muted-note" style={{ fontSize: 12, minWidth: 42, textAlign: "right" }}>{students.length ? Math.round((d.n / students.length) * 100) : 0}%</span>
@@ -961,12 +976,43 @@ export default function AdvisorPage() {
             </div>
           </div>
         </div>
-        <div className="page-sub" style={{ fontWeight: 700, color: "var(--text)", margin: "2px 0 10px" }}>{t("adv.evaluation")}</div>
+        <div className="card">
+          <div className="card-head"><div className="card-title"><Icon name="activity" /> {t("card.trend")}</div></div>
+          {(() => {
+            const W = 340, H = 138, padX = 10, padT = 14, padB = 22, n = trend.length;
+            const xx = (i: number) => padX + (n <= 1 ? 0 : (i / (n - 1)) * (W - 2 * padX));
+            const yy = (v: number) => H - padB - (v / trendMax) * (H - padT - padB);
+            const pts = trend.map((bb, i) => xx(i).toFixed(1) + "," + yy(bb.count).toFixed(1)).join(" ");
+            const area = xx(0).toFixed(1) + "," + (H - padB) + " " + pts + " " + xx(n - 1).toFixed(1) + "," + (H - padB);
+            return (
+              <svg viewBox={"0 0 " + W + " " + H} width="100%" style={{ display: "block" }}>
+                <defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.20" />
+                  <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                </linearGradient></defs>
+                <line x1={padX} y1={H - padB} x2={W - padX} y2={H - padB} stroke="var(--border)" strokeWidth={1} />
+                <polygon points={area} fill="url(#trendFill)" />
+                <polyline points={pts} fill="none" stroke="var(--primary)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+                {trend.map((bb, i) => (
+                  <circle key={i} cx={xx(i)} cy={yy(bb.count)} r={2.6} fill="var(--surface)" stroke="var(--primary)" strokeWidth={1.6}>
+                    <title>{bb.label + ": " + bb.count}</title>
+                  </circle>
+                ))}
+                {trend.map((bb, i) => (i % 3 === 0 || i === n - 1) ? (
+                  <text key={"x" + i} x={xx(i)} y={H - 7} textAnchor="middle" fontSize={9} fill="var(--faint)">{bb.label}</text>
+                ) : null)}
+              </svg>
+            );
+          })()}
+          <div className="muted-note" style={{ marginTop: 6 }}>{t("trend.hint")}</div>
+        </div>
+        </div>
+        <div className="sec-label">{t("adv.evaluation")}</div>
         <div className="kpi-grid">
-          <div className="kpi"><div className="kpi-label">{t("kpi.avgHandle")}</div><div className="kpi-value">{avgHandleDays === null ? "—" : avgHandleDays.toFixed(1)}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.ivComplete")}</div><div className="kpi-value">{pct(ivCompleteRate)}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.followup")}</div><div className="kpi-value">{pct(followupRate)}</div></div>
-          <div className="kpi"><div className="kpi-label">{t("kpi.resolvedRate")}</div><div className="kpi-value">{pct(resolvedRate)}</div></div>
+          {kpi(t("kpi.avgHandle"), avgHandleDays === null ? "—" : avgHandleDays.toFixed(1), { icon: "activity" })}
+          {kpi(t("kpi.ivComplete"), pct(ivCompleteRate), { icon: "check" })}
+          {kpi(t("kpi.followup"), pct(followupRate), { icon: "target" })}
+          {kpi(t("kpi.resolvedRate"), pct(resolvedRate), { icon: "check" })}
         </div>
         <div className="card">
           <div className="card-head"><div className="card-title"><Icon name="alert" /> {t("card.topRisk")}</div><a className="back-link" onClick={() => setView("students")}>{t("link.seeAll")}</a></div>
@@ -990,18 +1036,6 @@ export default function AdvisorPage() {
               </tbody>
             </table>
           )}
-        </div>
-        <div className="card">
-          <div className="card-head"><div className="card-title"><Icon name="chart" /> {t("card.trend")}</div></div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 110 }}>
-            {trend.map((b, i) => (
-              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }} title={String(b.count)}>
-                <div style={{ width: "100%", height: (b.count / trendMax) * 84 + "px", minHeight: b.count ? 4 : 0, background: "var(--primary)", borderRadius: "4px 4px 0 0" }} />
-                <div style={{ fontSize: 9, color: "var(--faint)" }}>{b.label}</div>
-              </div>
-            ))}
-          </div>
-          <div className="muted-note" style={{ marginTop: 8 }}>{t("trend.hint")}</div>
         </div>
       </>
     );

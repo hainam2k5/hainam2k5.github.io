@@ -133,6 +133,17 @@ h1, h2, h3 { margin: 0; }
 .kpi.accent { background: linear-gradient(150deg, var(--navy), var(--navy-2)); border: none; color: #fff; }
 .kpi.accent .kpi-label { color: rgba(255, 255, 255, 0.75); }
 .kpi.accent .kpi-value small { color: rgba(255, 255, 255, 0.7); }
+.kpi-grid { grid-template-columns: repeat(auto-fit, minmax(184px, 1fr)); }
+.kpi-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.kpi-top .kpi-label { margin-bottom: 0; }
+.kpi-ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--primary-050); color: var(--primary); flex: none; }
+.kpi.accent .kpi-ic { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.kpi-cap { font-size: 11.5px; color: var(--faint); font-weight: 600; margin-top: 7px; }
+.kpi.accent .kpi-cap { color: rgba(255, 255, 255, 0.72); }
+.sec-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--faint); margin: 4px 0 11px; }
+.dash-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; margin-bottom: 18px; align-items: stretch; }
+.dash-grid > .card { margin-bottom: 0; }
+@media (max-width: 980px) { .dash-grid { grid-template-columns: 1fr; } }
 .tone-Low { color: var(--risk-low); } .tone-Medium { color: var(--risk-medium); }
 .tone-High { color: var(--risk-high); } .tone-Critical { color: var(--risk-critical); }
 
