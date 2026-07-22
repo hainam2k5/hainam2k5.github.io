@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   const uid = userData?.user?.id;
   if (!uid) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   const { data: caller } = await sb.from("profiles").select("role").eq("user_id", uid).maybeSingle();
-  if (!caller || (caller.role !== "advisor" && caller.role !== "manager")) {
+  if (!caller || !["advisor", "manager", "teacher"].includes(caller.role)) {
     return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
   }
 
@@ -69,8 +69,8 @@ export async function POST(req: Request) {
   const course = esc(body.courseName);
   const L =
     lang === "en"
-      ? { subject: `Grade updated — ${course}`, greeting: `Hello ${esc(student.full_name)},`, line: `Your advisor updated the grade for <b>${course}</b>.`, reg: "Regular", mid: "Midterm", fin: "Final", total: "Total", grade: "Grade", foot: "Academic Risk Alert System" }
-      : { subject: `Cập nhật điểm — ${course}`, greeting: `Chào ${esc(student.full_name)},`, line: `Cố vấn đã cập nhật điểm môn <b>${course}</b>.`, reg: "Thường xuyên", mid: "Giữa kỳ", fin: "Cuối kỳ", total: "Tổng", grade: "Điểm chữ", foot: "Hệ thống Cảnh báo Rủi ro Học tập" };
+      ? { subject: `Grade updated — ${course}`, greeting: `Hello ${esc(student.full_name)},`, line: `The grade for <b>${course}</b> has been updated.`, reg: "Regular", mid: "Midterm", fin: "Final", total: "Total", grade: "Grade", foot: "Academic Risk Alert System" }
+      : { subject: `Cập nhật điểm — ${course}`, greeting: `Chào ${esc(student.full_name)},`, line: `Điểm môn <b>${course}</b> vừa được cập nhật.`, reg: "Thường xuyên", mid: "Giữa kỳ", fin: "Cuối kỳ", total: "Tổng", grade: "Điểm chữ", foot: "Hệ thống Cảnh báo Rủi ro Học tập" };
 
   const row = (k: string, v: string, bold?: boolean) =>
     `<tr><td style="padding:6px 10px;border:1px solid #e4e8f0">${bold ? "<b>" + k + "</b>" : k}</td><td style="padding:6px 10px;border:1px solid #e4e8f0">${bold ? "<b>" + v + "</b>" : v}</td></tr>`;

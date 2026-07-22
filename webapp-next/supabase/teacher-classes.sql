@@ -123,6 +123,15 @@ create policy profiles_teacher_read on public.profiles for select
     where c.student_id = profiles.id
       and public.teaches_course(c.code, c.semester, c.academic_year)));
 
+-- teacher may notify students in the classes they teach (e.g. grade updates from
+-- the Classes page). Additive to notif_insert (advisor/manager) in rls-major-scope.
+drop policy if exists notif_insert_teacher on public.notifications;
+create policy notif_insert_teacher on public.notifications for insert
+  with check (my_role() = 'teacher' and exists (
+    select 1 from public.courses c
+    where c.student_id = notifications.student_id
+      and public.teaches_course(c.code, c.semester, c.academic_year)));
+
 -- 7) realtime (optional) ------------------------------------------------------
 do $$ begin
   if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and tablename='attendance') then

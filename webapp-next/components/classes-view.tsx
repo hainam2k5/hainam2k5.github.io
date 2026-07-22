@@ -103,11 +103,11 @@ export function ClassesView({ me }: { me: Profile }) {
     });
     const res = await Promise.all(ups);
     if (res.filter((r) => r.error).length) { setSaving(false); return toast(t("cls.gErr"), "error"); }
-    // Best-effort: notify + email each student their updated grade. Only an
-    // advisor/manager may do this (the notify-grade route and notifications RLS
-    // both require that role); demo addresses (@sv.demo.edu.vn) are skipped so we
-    // don't send to fake inboxes.
-    if (me.role === "advisor" || me.role === "manager") {
+    // Best-effort: notify + email each student their updated grade. Allowed for a
+    // teacher (own class), advisor, or manager — the notify-grade route and the
+    // notifications RLS both permit these roles. Demo addresses (@sv.demo.edu.vn)
+    // are skipped so we don't send to fake inboxes.
+    if (me.role === "advisor" || me.role === "manager" || me.role === "teacher") {
       const token = (await sb.auth.getSession()).data.session?.access_token;
       const fmt = (v: string) => (v === "" ? "—" : v);
       await Promise.all(roster.map(async ({ c, s }) => {
