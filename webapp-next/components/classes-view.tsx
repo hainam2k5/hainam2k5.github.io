@@ -31,7 +31,11 @@ export function ClassesView({ me }: { me: Profile }) {
 
   async function loadSections() {
     if (!sb) return;
-    const { data } = await sb.from("sections").select("*").eq("teacher_id", me.id).order("created_at", { ascending: false });
+    // Teachers see the classes they teach; advisors/managers oversee every class
+    // (RLS `sections_read` already permits advisor/manager to read all sections).
+    let q = sb.from("sections").select("*").order("created_at", { ascending: false });
+    if (me.role === "teacher") q = q.eq("teacher_id", me.id);
+    const { data } = await q;
     const list = (data as Section[]) || [];
     setSections(list);
     setSelId((cur) => cur || (list[0]?.id ?? ""));
