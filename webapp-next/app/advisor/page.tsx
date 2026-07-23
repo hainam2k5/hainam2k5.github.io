@@ -1413,7 +1413,8 @@ export default function AdvisorPage() {
             {threadIds.length === 0 ? (
               <div className="empty"><Icon name="message" size={30} />{t("empty.noMessages")}</div>
             ) : (
-              threadIds.map((sid) => {
+              <div className="notif-list">
+              {threadIds.map((sid) => {
                 const s = studentById(sid); const msgs = threads[sid]; const last = msgs[msgs.length - 1];
                 const unread = msgs.filter((m) => m.sender_role === "student" && !m.is_read).length;
                 return (
@@ -1425,7 +1426,8 @@ export default function AdvisorPage() {
                     </div>
                   </div>
                 );
-              })
+              })}
+              </div>
             )}
           </div>
           <div className="card">

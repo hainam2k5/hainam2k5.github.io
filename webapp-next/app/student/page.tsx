@@ -278,16 +278,18 @@ export default function StudentPage() {
               {notifications.length === 0 ? (
                 <div className="empty"><Icon name="bell" size={30} />{t("empty.noNotif")}</div>
               ) : (
-                notifications.map((n) => (
-                  <div key={n.id} className={"notif" + (n.is_read ? "" : " unread")}>
-                    <div className="ni"><Icon name={NOTIF_IC[n.type] || "bell"} size={16} /></div>
-                    <div style={{ flex: 1 }}>
-                      <div className="nt">{n.title}</div>
-                      <div className="nb">{n.body}</div>
-                      <div className="nd">{fmtDate(n.created_at, locale, true)}</div>
+                <div className="notif-list">
+                  {notifications.map((n) => (
+                    <div key={n.id} className={"notif" + (n.is_read ? "" : " unread")}>
+                      <div className="ni"><Icon name={NOTIF_IC[n.type] || "bell"} size={16} /></div>
+                      <div style={{ flex: 1 }}>
+                        <div className="nt">{n.title}</div>
+                        <div className="nb">{n.body}</div>
+                        <div className="nd">{fmtDate(n.created_at, locale, true)}</div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
 
