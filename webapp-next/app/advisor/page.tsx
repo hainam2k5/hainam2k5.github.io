@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, FormEvent } from "react";
+import { useState, useEffect, useMemo, useRef, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { supabase, configured, getMyProfile, homeFor } from "@/lib/supabaseClient";
@@ -290,6 +290,10 @@ export default function AdvisorPage() {
       setMsgUnread((n) => Math.max(0, n - unreadIds.length));
     });
   }, [view, activeThread, allMsgs]);
+
+  // keep whichever advisor chat is open scrolled to the newest message
+  const chatRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [allMsgs, selectedId, activeThread, view]);
 
   // ------------------------------------------------------------ derived
   const coursesBy = useMemo(() => {
@@ -1295,7 +1299,7 @@ export default function AdvisorPage() {
             <SendNotifBox onSend={sendNotification} />
             <div className="card">
               <div className="card-head"><div className="card-title"><Icon name="message" /> {t("card.chatStudent")}</div></div>
-              <div className="chat">
+              <div className="chat" ref={chatRef}>
                 {detailMsgs.length === 0 ? (
                   <div className="empty" style={{ padding: 16 }}><Icon name="message" size={26} />{t("empty.noChat")}</div>
                 ) : (
@@ -1428,7 +1432,7 @@ export default function AdvisorPage() {
             <div className="card-head"><div className="card-title">{curStudent ? curStudent.full_name : t("adv.conversation")}</div></div>
             {activeThread ? (
               <>
-                <div className="chat">
+                <div className="chat" ref={chatRef}>
                   {cur.map((m) => {
                     const mine = m.sender_role !== "student";
                     return <div key={m.id} className={"msg " + (mine ? "msg-me" : "msg-them")}>{m.body}<div className="mm">{(mine ? t("you") : (curStudent ? curStudent.full_name : t("role.student"))) + " · " + fmtDate(m.created_at, locale, true)}</div></div>;

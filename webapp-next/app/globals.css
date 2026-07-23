@@ -247,7 +247,7 @@ textarea { resize: vertical; min-height: 72px; }
 .notif .nb { font-size: 13px; color: var(--muted); }
 .notif .nd { font-size: 11px; color: var(--faint); margin-top: 3px; }
 
-.chat { display: flex; flex-direction: column; gap: 10px; max-height: 46vh; overflow-y: auto; padding: 4px; }
+.chat { display: flex; flex-direction: column; gap: 10px; height: 300px; max-height: 42vh; overflow-y: auto; padding: 4px; }
 .msg { max-width: 76%; padding: 9px 13px; border-radius: 14px; font-size: 13.5px; line-height: 1.45; }
 .msg .mm { font-size: 10.5px; opacity: 0.72; margin-top: 4px; }
 .msg-them { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
